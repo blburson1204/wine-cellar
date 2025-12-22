@@ -12,7 +12,9 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "db:generate": "npm run generate --workspace=packages/database",
     "db:push": "npm run push --workspace=packages/database",
-    "db:studio": "npm run studio --workspace=packages/database"
+    "db:studio": "npm run studio --workspace=packages/database",
+    "test": "npm run test:api",
+    "test:api": "jest --config=apps/api/jest.config.js --rootDir=."
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
