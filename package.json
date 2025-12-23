@@ -13,10 +13,19 @@
     "db:generate": "npm run generate --workspace=packages/database",
     "db:push": "npm run push --workspace=packages/database",
     "db:studio": "npm run studio --workspace=packages/database",
-    "test": "npm run test:api",
-    "test:api": "jest --config=apps/api/jest.config.js --rootDir=."
+    "test": "npm run test:all",
+    "test:all": "npm run test:api && npm run test:web",
+    "test:api": "cd apps/api && npm test",
+    "test:web": "cd apps/web && npm test",
+    "test:coverage": "npm run test:coverage:all",
+    "test:coverage:all": "npm run test:coverage:api && npm run test:coverage:web",
+    "test:coverage:api": "cd apps/api && npm run test:coverage",
+    "test:coverage:web": "cd apps/web && npm run test:coverage"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "styled-jsx": "^5.1.7"
   }
 }

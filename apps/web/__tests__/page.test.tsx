@@ -1,25 +1,25 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import Home from '../src/app/page';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('Home Page - Wine Cellar', () => {
   beforeEach(() => {
     // Reset fetch mock before each test
-    (global.fetch as jest.Mock).mockClear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('Loading State', () => {
     it('displays loading message initially', () => {
       // Mock fetch to never resolve (keeps loading state)
-      (global.fetch as jest.Mock).mockImplementation(() =>
+      vi.mocked(global.fetch).mockImplementation(() =>
         new Promise(() => {})
       );
 
@@ -30,9 +30,9 @@ describe('Home Page - Wine Cellar', () => {
 
   describe('Empty Collection', () => {
     it('shows empty state when no wines exist', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         json: async () => [],
-      });
+      } as Response);
 
       render(<Home />);
 
@@ -62,7 +62,7 @@ describe('Home Page - Wine Cellar', () => {
     ];
 
     it('displays wine count correctly', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => mockWines,
       });
@@ -75,7 +75,7 @@ describe('Home Page - Wine Cellar', () => {
     });
 
     it('renders wine details', async () => {
-      (global.fetch as jest.Mock).mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => mockWines,
       });
@@ -95,7 +95,7 @@ describe('Home Page - Wine Cellar', () => {
     it('toggles form when Add Wine button clicked', async () => {
       const user = userEvent.setup();
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => [],
       });
@@ -120,7 +120,7 @@ describe('Home Page - Wine Cellar', () => {
       const user = userEvent.setup();
 
       // Mock fetch for all calls
-      (global.fetch as jest.Mock).mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => [],
       });
@@ -172,11 +172,11 @@ describe('Home Page - Wine Cellar', () => {
 
     it('calls delete API when confirmed', async () => {
       const user = userEvent.setup();
-      window.confirm = jest.fn(() => true);
+      window.confirm = vi.fn(() => true);
 
       // Mock fetch to return wine initially, then empty after delete
       let callCount = 0;
-      (global.fetch as jest.Mock).mockImplementation((url, options) => {
+      vi.mocked(global.fetch).mockImplementation((url, options) => {
         if (options?.method === 'DELETE') {
           return Promise.resolve({ ok: true, json: async () => ({}) });
         }
@@ -205,9 +205,9 @@ describe('Home Page - Wine Cellar', () => {
 
     it('does not delete when cancelled', async () => {
       const user = userEvent.setup();
-      window.confirm = jest.fn(() => false);
+      window.confirm = vi.fn(() => false);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => [mockWine],
       });
@@ -218,19 +218,19 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getAllByText('Test Wine').length).toBeGreaterThan(0);
       });
 
-      const fetchCallCount = (global.fetch as jest.Mock).mock.calls.length;
+      const fetchCallCount = vi.mocked(global.fetch).mock.calls.length;
       await user.click(screen.getByText('Delete'));
 
       // Verify DELETE was NOT called
-      expect((global.fetch as jest.Mock).mock.calls.length).toBe(fetchCallCount);
+      expect(vi.mocked(global.fetch).mock.calls.length).toBe(fetchCallCount);
     });
   });
 
   describe('Error Handling', () => {
     it('handles fetch error gracefully', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+      vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network error'));
 
       render(<Home />);
 
@@ -244,10 +244,10 @@ describe('Home Page - Wine Cellar', () => {
 
     it('handles add wine error', async () => {
       const user = userEvent.setup();
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       // Mock initial fetch to succeed, POST to fail
-      (global.fetch as jest.Mock).mockImplementation((url, options) => {
+      vi.mocked(global.fetch).mockImplementation((url, options) => {
         if (options?.method === 'POST') {
           return Promise.reject(new Error('Server error'));
         }
@@ -276,8 +276,8 @@ describe('Home Page - Wine Cellar', () => {
 
     it('handles delete error', async () => {
       const user = userEvent.setup();
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-      window.confirm = jest.fn(() => true);
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      window.confirm = vi.fn(() => true);
 
       const mockWine = {
         id: '1',
@@ -293,7 +293,7 @@ describe('Home Page - Wine Cellar', () => {
         notes: null,
       };
 
-      (global.fetch as jest.Mock).mockImplementation((url, options) => {
+      vi.mocked(global.fetch).mockImplementation((url, options) => {
         if (options?.method === 'DELETE') {
           return Promise.reject(new Error('Delete failed'));
         }
