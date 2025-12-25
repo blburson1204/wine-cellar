@@ -32,7 +32,8 @@ describe('Wine API', () => {
       const response = await request(app).get('/api/health');
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({ status: 'ok' });
+      expect(response.body.status).toBe('ok');
+      expect(response.body.database).toBe('connected');
     });
   });
 
@@ -150,7 +151,9 @@ describe('Wine API', () => {
       const response = await request(app).get('/api/wines/nonexistent-id');
 
       expect(response.status).toBe(404);
-      expect(response.body.error).toBe('Wine not found');
+      expect(response.body.error).toContain('Wine');
+      expect(response.body.error).toContain('not found');
+      expect(response.body.errorCode).toBe('NOT_FOUND');
     });
   });
 
@@ -195,8 +198,9 @@ describe('Wine API', () => {
         .put('/api/wines/nonexistent-id')
         .send({ quantity: 5 });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
       expect(response.body.error).toBeDefined();
+      expect(response.body.errorCode).toBe('NOT_FOUND');
     });
   });
 
@@ -218,8 +222,9 @@ describe('Wine API', () => {
     it('returns error when wine not found', async () => {
       const response = await request(app).delete('/api/wines/nonexistent-id');
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(404);
       expect(response.body.error).toBeDefined();
+      expect(response.body.errorCode).toBe('NOT_FOUND');
     });
   });
 

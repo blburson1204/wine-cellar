@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: December 23, 2025
+**Last Updated**: December 24, 2025
 
 ## Project Overview
 
@@ -26,11 +26,18 @@ Wine Cellar is a full-stack web application for managing personal wine collectio
 - **Containerization**: Docker Compose (port 5433)
 
 ### Testing
-- **Test Runner**: Jest 30.2.0
+- **Test Runner**: Vitest 4.0.16
 - **React Testing**: React Testing Library 16.3.1
 - **User Interactions**: @testing-library/user-event 14.6.1
 - **Assertions**: @testing-library/jest-dom 6.9.1
-- **Environment**: jsdom
+- **HTTP Testing**: Supertest 7.1.4
+- **Environment**: Node.js (API), jsdom (Web)
+
+### Error Handling & Logging
+- **Logger**: Winston 3.x
+- **HTTP Logging**: Morgan
+- **Validation**: Zod 3.25.76 (stable)
+- **Error Tracking**: Sentry-ready (not configured)
 
 ### Development Tools
 - Docker Desktop
@@ -44,16 +51,24 @@ wine-cellar/
 ├── apps/
 │   ├── api/                    # Express API server (port 3001)
 │   │   ├── src/
-│   │   │   ├── index.ts       # API entry point
-│   │   │   └── routes/        # API route handlers
-│   │   └── __tests__/         # API test suite (18 tests)
+│   │   │   ├── server.ts      # API entry point
+│   │   │   ├── app.ts         # Express app configuration
+│   │   │   ├── errors/        # Custom error classes
+│   │   │   ├── middleware/    # Error handling, logging, validation
+│   │   │   ├── schemas/       # Zod validation schemas
+│   │   │   └── utils/         # Winston logger
+│   │   ├── logs/              # Log files (gitignored)
+│   │   └── __tests__/         # API test suite (49 tests)
 │   │
 │   └── web/                    # Next.js frontend (port 3000)
 │       ├── src/
-│       │   └── app/
-│       │       ├── layout.tsx  # Root layout with header
-│       │       ├── page.tsx    # Home page (wine list)
-│       │       └── api/        # Next.js API routes (proxy)
+│       │   ├── app/
+│       │   │   ├── layout.tsx  # Root layout with ErrorBoundary
+│       │   │   ├── page.tsx    # Home page (wine list)
+│       │   │   └── api/        # Next.js API routes (proxy)
+│       │   ├── components/     # React components
+│       │   │   └── ErrorBoundary.tsx  # Error boundary
+│       │   └── utils/          # API utilities with error handling
 │       ├── __tests__/          # React component tests (11 tests)
 │       ├── jest.config.js      # Jest configuration
 │       └── jest.setup.js       # Test environment setup
@@ -64,10 +79,16 @@ wine-cellar/
 │       │   └── schema.prisma   # Database schema
 │       └── index.ts            # Exported Prisma client
 │
+├── .claude/
+│   └── skills/
+│       ├── error-handling/     # Error handling skill
+│       ├── testing/            # Testing skill
+│       └── ui-design/          # UI design skill
 ├── docker-compose.yml          # PostgreSQL container config
 ├── package.json                # Root workspace config
 ├── TODO.md                     # Project roadmap
-└── PROJECT_SUMMARY.md          # This file
+├── PROJECT_SUMMARY.md          # This file
+└── ERROR-HANDLING-SUMMARY.md   # Error handling implementation details
 ```
 
 ## Database Schema
@@ -104,13 +125,28 @@ enum WineColor {
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/wines` | List all wines |
-| GET | `/api/wines/:id` | Get a single wine by ID |
-| POST | `/api/wines` | Create a new wine |
-| PUT | `/api/wines/:id` | Update an existing wine |
-| DELETE | `/api/wines/:id` | Delete a wine |
+| Method | Endpoint | Description | Status Codes |
+|--------|----------|-------------|--------------|
+| GET | `/api/health` | Health check with DB status | 200, 503 |
+| GET | `/api/wines` | List all wines | 200 |
+| GET | `/api/wines/:id` | Get a single wine by ID | 200, 404 |
+| POST | `/api/wines` | Create a new wine | 201, 400 |
+| PUT | `/api/wines/:id` | Update an existing wine | 200, 400, 404 |
+| DELETE | `/api/wines/:id` | Delete a wine | 204, 404 |
+
+### Error Response Format
+
+All errors return a consistent JSON format:
+```json
+{
+  "error": "Human-readable error message",
+  "errorCode": "MACHINE_READABLE_CODE",
+  "requestId": "uuid-for-tracking",
+  "fields": {
+    "fieldName": ["validation error 1", "validation error 2"]
+  }
+}
+```
 
 ### Example Request
 
@@ -145,10 +181,16 @@ curl -X POST http://localhost:3001/api/wines \
 - [x] Schema with enums for wine colors
 
 ### Testing
-- [x] **API Testing**: 18 tests with >70% coverage
-  - Endpoint validation
-  - Error handling
+- [x] **API Testing**: 49 tests passing (100% success rate)
+  - 18 CRUD endpoint tests
+  - 31 error handling tests
+  - Input validation (Zod 3.25.76)
+  - Request ID tracking
   - Database operations
+  - Prisma error handling
+  - Health check endpoint
+  - Sequential execution to prevent race conditions
+  - Isolated test database on port 5433
 
 - [x] **React Component Testing**: 11 tests with >70% coverage
   - Loading states
@@ -157,6 +199,11 @@ curl -X POST http://localhost:3001/api/wines \
   - Form toggle and submission
   - Delete functionality
   - Error handling for fetch/add/delete operations
+
+**Test Configuration:**
+- Vitest 4.0.16 with `fileParallelism: false`
+- Coverage thresholds: 70% branches, 80% functions/lines/statements
+- Test duration: ~851ms for full suite
 
 ### Test Coverage Metrics
 ```
@@ -173,6 +220,19 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
 - [x] Responsive table layout
 - [x] Hover effects and transitions
 - [x] Inter font family for clean typography
+
+### Error Handling & Logging ✅
+- [x] **Structured Logging**: Winston logger with JSON format
+- [x] **Request Tracking**: UUID-based request IDs in all logs and responses
+- [x] **Log Levels**: error, warn, info, debug with contextual metadata
+- [x] **File Rotation**: Automatic log rotation (5MB max, 5 files)
+- [x] **Custom Errors**: 7 error classes (ValidationError, NotFoundError, etc.)
+- [x] **Error Handler**: Centralized middleware handling all error types
+- [x] **Input Validation**: Zod schemas with field-level error messages
+- [x] **React Error Boundaries**: Component-level error catching
+- [x] **API Error Utility**: Typed error handling for frontend
+- [x] **Health Endpoint**: Database connectivity monitoring
+- [x] **Error Tests**: Comprehensive test suite for error scenarios
 
 ## Setup Instructions
 
@@ -267,33 +327,47 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
    docker-compose down
    ```
 
+## Error Handling & Logging Implementation
+
+A comprehensive error handling and logging system has been implemented. See [ERROR-HANDLING-SUMMARY.md](ERROR-HANDLING-SUMMARY.md) for complete details.
+
+### Key Features
+- **Winston Logger**: Structured JSON logging with file rotation
+- **Request IDs**: Track requests across all logs and error responses
+- **Custom Error Classes**: 7 typed error classes with HTTP status codes
+- **Centralized Handler**: Catches Zod, Prisma, and custom errors
+- **Input Validation**: Zod schemas for type-safe validation
+- **React Error Boundaries**: Frontend error catching
+- **Health Check**: Database connectivity monitoring at `/api/health`
+
+### Files Added
+- `apps/api/src/utils/logger.ts` - Winston configuration
+- `apps/api/src/middleware/requestId.ts` - Request ID tracking
+- `apps/api/src/middleware/errorHandler.ts` - Error handling
+- `apps/api/src/errors/AppError.ts` - Custom error classes
+- `apps/api/src/schemas/wine.schema.ts` - Zod validation
+- `apps/web/src/components/ErrorBoundary.tsx` - React error boundary
+- `apps/web/src/utils/api.ts` - API error handling
+- `.claude/skills/error-handling/SKILL.md` - Error handling documentation
+
 ## Next Priorities
 
 See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 
-### 1. Error Handling and Logging (HIGH PRIORITY)
-- Implement structured logging (Winston/Pino)
-- Add request ID tracking
-- Centralized error handling middleware
-- Custom error classes
-- Error tracking with Sentry
-- Frontend error boundaries
-
-### 2. Code Review and Standards (HIGH PRIORITY)
+### 1. Code Review and Standards (HIGH PRIORITY)
 - ESLint configuration with strict rules
 - Prettier for code formatting
 - TypeScript strict mode
 - Pre-commit hooks (Husky + lint-staged)
 - Pull request templates
 
-### 3. Security Best Practices
-- Input validation with Zod
+### 2. Security Best Practices
 - XSS/CSRF protection
 - Rate limiting
 - Security headers (helmet.js)
 - Dependency scanning
 
-### 4. Performance Optimization
+### 3. Performance Optimization
 - Database indexes
 - Caching strategy (Redis)
 - Code splitting
@@ -321,21 +395,24 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 - Isolated from host system
 
 ### Testing Strategy
-- Unit tests for API endpoints
-- Component tests for React UI
+- Unit tests for API endpoints (Vitest + Supertest)
+- Component tests for React UI (React Testing Library)
+- Error scenario testing (31 dedicated error tests)
 - Mock fetch for API calls
-- Coverage thresholds enforced
-- Fast feedback loop with Jest
+- Coverage thresholds enforced (70% branches, 80% functions/lines/statements)
+- Fast feedback loop with Vitest
+- Sequential test execution to prevent database race conditions
+- Isolated test database with cleanup between tests
 
 ## Known Limitations
 
 1. **No Authentication**: All wines are publicly accessible
 2. **No Pagination**: Large collections may have performance issues
 3. **No Search/Filter**: Users must scroll through entire list
-4. **Basic Error Handling**: Errors only logged to console
-5. **No Image Upload**: Wine labels/photos not supported yet
-6. **Inline Styles**: No CSS modules or styled-components
-7. **No Optimistic Updates**: UI waits for API responses
+4. **No Image Upload**: Wine labels/photos not supported yet
+5. **Inline Styles**: No CSS modules or styled-components
+6. **No Optimistic Updates**: UI waits for API responses
+7. **No Sentry Integration**: Error tracking service not configured (infrastructure ready)
 
 ## Future Enhancements
 

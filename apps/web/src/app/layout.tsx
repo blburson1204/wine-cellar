@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'Wine Cellar',
@@ -48,11 +49,13 @@ export default function RootLayout({
             }}>Wine Cellar</h1>
           </div>
         </header>
-        <main style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '32px 24px'
-        }}>{children}</main>
+        <ErrorBoundary>
+          <main style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '32px 24px'
+          }}>{children}</main>
+        </ErrorBoundary>
       </body>
     </html>
   );
