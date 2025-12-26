@@ -18,7 +18,10 @@ export class AppError extends Error {
  * Validation error (400)
  */
 export class ValidationError extends AppError {
-  constructor(message: string, public fields?: Record<string, string[]>) {
+  constructor(
+    message: string,
+    public fields?: Record<string, string[]>
+  ) {
     super(400, message, true, 'VALIDATION_ERROR');
   }
 }
@@ -28,9 +31,7 @@ export class ValidationError extends AppError {
  */
 export class NotFoundError extends AppError {
   constructor(resource: string, id?: string) {
-    const message = id
-      ? `${resource} with ID '${id}' not found`
-      : `${resource} not found`;
+    const message = id ? `${resource} with ID '${id}' not found` : `${resource} not found`;
     super(404, message, true, 'NOT_FOUND');
   }
 }
@@ -66,7 +67,10 @@ export class ConflictError extends AppError {
  * Database error (500)
  */
 export class DatabaseError extends AppError {
-  constructor(message: string, public originalError?: Error) {
+  constructor(
+    message: string,
+    public originalError?: Error
+  ) {
     super(500, message, true, 'DATABASE_ERROR');
   }
 }

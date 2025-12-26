@@ -19,9 +19,7 @@ describe('Home Page - Wine Cellar', () => {
   describe('Loading State', () => {
     it('displays loading message initially', () => {
       // Mock fetch to never resolve (keeps loading state)
-      vi.mocked(global.fetch).mockImplementation(() =>
-        new Promise(() => {})
-      );
+      vi.mocked(global.fetch).mockImplementation(() => new Promise(() => {}));
 
       render(<Home />);
       expect(screen.getByText('Loading your collection...')).toBeInTheDocument();

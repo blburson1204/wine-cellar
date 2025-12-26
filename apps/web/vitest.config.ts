@@ -21,13 +21,13 @@ export default defineConfig({
         branches: 70,
         functions: 60,
         lines: 70,
-        statements: 70
-      }
-    }
+        statements: 70,
+      },
+    },
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
-  }
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
 });

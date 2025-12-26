@@ -18,7 +18,7 @@ function trimStrings(obj: any): any {
   if (typeof obj === 'object') {
     const trimmed: any = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         trimmed[key] = trimStrings(obj[key]);
       }
     }

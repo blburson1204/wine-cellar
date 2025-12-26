@@ -13,7 +13,7 @@ const createWineData = (overrides: any = {}): any => ({
   country: 'France',
   color: WineColor.RED,
   quantity: 1,
-  ...overrides
+  ...overrides,
 });
 
 // Clean up database before each test
@@ -41,12 +41,10 @@ describe('Wine API', () => {
     it('creates a new wine with valid data', async () => {
       const wineData = createWineData({
         name: 'Chateau Margaux',
-        vintage: 2015
+        vintage: 2015,
       });
 
-      const response = await request(app)
-        .post('/api/wines')
-        .send(wineData);
+      const response = await request(app).post('/api/wines').send(wineData);
 
       expect(response.status).toBe(201);
       expect(response.body).toMatchObject(wineData);
@@ -59,12 +57,10 @@ describe('Wine API', () => {
         region: 'Bordeaux',
         grapeVariety: 'Cabernet Sauvignon',
         rating: 95,
-        notes: 'Excellent vintage'
+        notes: 'Excellent vintage',
       });
 
-      const response = await request(app)
-        .post('/api/wines')
-        .send(wineData);
+      const response = await request(app).post('/api/wines').send(wineData);
 
       expect(response.status).toBe(201);
       expect(response.body.region).toBe('Bordeaux');
@@ -79,7 +75,7 @@ describe('Wine API', () => {
         WineColor.ROSE,
         WineColor.SPARKLING,
         WineColor.DESSERT,
-        WineColor.FORTIFIED
+        WineColor.FORTIFIED,
       ];
 
       for (const color of colors) {
@@ -115,15 +111,15 @@ describe('Wine API', () => {
     });
 
     it('returns wines in descending order by creation date', async () => {
-      const wine1 = await prisma.wine.create({
-        data: createWineData({ name: 'First Wine' })
+      await prisma.wine.create({
+        data: createWineData({ name: 'First Wine' }),
       });
 
       // Wait a bit to ensure different timestamps
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const wine2 = await prisma.wine.create({
-        data: createWineData({ name: 'Second Wine' })
+      await prisma.wine.create({
+        data: createWineData({ name: 'Second Wine' }),
       });
 
       const response = await request(app).get('/api/wines');
@@ -137,7 +133,7 @@ describe('Wine API', () => {
   describe('GET /api/wines/:id', () => {
     it('returns a wine by ID', async () => {
       const wine = await prisma.wine.create({
-        data: createWineData({ name: 'Specific Wine' })
+        data: createWineData({ name: 'Specific Wine' }),
       });
 
       const response = await request(app).get(`/api/wines/${wine.id}`);
@@ -160,12 +156,10 @@ describe('Wine API', () => {
   describe('PUT /api/wines/:id', () => {
     it('updates a wine', async () => {
       const wine = await prisma.wine.create({
-        data: createWineData({ quantity: 1 })
+        data: createWineData({ quantity: 1 }),
       });
 
-      const response = await request(app)
-        .put(`/api/wines/${wine.id}`)
-        .send({ quantity: 5 });
+      const response = await request(app).put(`/api/wines/${wine.id}`).send({ quantity: 5 });
 
       expect(response.status).toBe(200);
       expect(response.body.quantity).toBe(5);
@@ -174,18 +168,16 @@ describe('Wine API', () => {
 
     it('updates multiple fields', async () => {
       const wine = await prisma.wine.create({
-        data: createWineData()
+        data: createWineData(),
       });
 
       const updates = {
         quantity: 10,
         rating: 98,
-        notes: 'Updated notes'
+        notes: 'Updated notes',
       };
 
-      const response = await request(app)
-        .put(`/api/wines/${wine.id}`)
-        .send(updates);
+      const response = await request(app).put(`/api/wines/${wine.id}`).send(updates);
 
       expect(response.status).toBe(200);
       expect(response.body.quantity).toBe(10);
@@ -194,9 +186,7 @@ describe('Wine API', () => {
     });
 
     it('returns error when wine not found', async () => {
-      const response = await request(app)
-        .put('/api/wines/nonexistent-id')
-        .send({ quantity: 5 });
+      const response = await request(app).put('/api/wines/nonexistent-id').send({ quantity: 5 });
 
       expect(response.status).toBe(404);
       expect(response.body.error).toBeDefined();
@@ -207,7 +197,7 @@ describe('Wine API', () => {
   describe('DELETE /api/wines/:id', () => {
     it('deletes a wine', async () => {
       const wine = await prisma.wine.create({
-        data: createWineData()
+        data: createWineData(),
       });
 
       const response = await request(app).delete(`/api/wines/${wine.id}`);
@@ -268,15 +258,13 @@ describe('Wine API', () => {
   describe('Data Validation', () => {
     it('handles special characters in wine names', async () => {
       const wineData = createWineData({
-        name: 'Château d\'Yquem - Sauternes (1er Cru)'
+        name: "Château d'Yquem - Sauternes (1er Cru)",
       });
 
-      const response = await request(app)
-        .post('/api/wines')
-        .send(wineData);
+      const response = await request(app).post('/api/wines').send(wineData);
 
       expect(response.status).toBe(201);
-      expect(response.body.name).toBe('Château d\'Yquem - Sauternes (1er Cru)');
+      expect(response.body.name).toBe("Château d'Yquem - Sauternes (1er Cru)");
     });
 
     it('handles very old vintages', async () => {

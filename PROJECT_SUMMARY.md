@@ -1,14 +1,17 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: December 24, 2025
+**Last Updated**: December 26, 2025
 
 ## Project Overview
 
-Wine Cellar is a full-stack web application for managing personal wine collections. Built with modern web technologies, it provides a clean, intuitive interface for tracking wines with full CRUD operations.
+Wine Cellar is a full-stack web application for managing personal wine
+collections. Built with modern web technologies, it provides a clean, intuitive
+interface for tracking wines with full CRUD operations.
 
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 15.5.9 (App Router)
 - **UI Library**: React 18.3.1
 - **Language**: TypeScript 5.6.0
@@ -16,16 +19,19 @@ Wine Cellar is a full-stack web application for managing personal wine collectio
 - **Font**: Inter (Google Fonts)
 
 ### Backend
+
 - **API Framework**: Express.js
 - **Language**: TypeScript
 - **Architecture**: RESTful API
 
 ### Database
+
 - **Database**: PostgreSQL
 - **ORM**: Prisma
 - **Containerization**: Docker Compose (port 5433)
 
 ### Testing
+
 - **Test Runner**: Vitest 4.0.16
 - **React Testing**: React Testing Library 16.3.1
 - **User Interactions**: @testing-library/user-event 14.6.1
@@ -34,12 +40,23 @@ Wine Cellar is a full-stack web application for managing personal wine collectio
 - **Environment**: Node.js (API), jsdom (Web)
 
 ### Error Handling & Logging
+
 - **Logger**: Winston 3.x
 - **HTTP Logging**: Morgan
 - **Validation**: Zod 3.25.76 (stable)
 - **Error Tracking**: Sentry-ready (not configured)
 
+### Code Quality & Standards
+
+- **Linter**: ESLint 9.39.2 with strict rules
+- **Formatter**: Prettier 3.7.4
+- **Git Hooks**: Husky 9.1.7
+- **Staged Files**: lint-staged 16.2.7
+- **Commit Linting**: commitlint with conventional commits
+- **Type Checking**: TypeScript strict mode enabled
+
 ### Development Tools
+
 - Docker Desktop
 - Node.js 18.17+
 - tsx (hot reload for API)
@@ -79,13 +96,28 @@ wine-cellar/
 │       │   └── schema.prisma   # Database schema
 │       └── index.ts            # Exported Prisma client
 │
+├── .github/
+│   ├── workflows/
+│   │   └── code-quality.yml    # CI/CD pipeline for code quality
+│   └── PULL_REQUEST_TEMPLATE.md  # Pull request template
+│
 ├── .claude/
 │   └── skills/
 │       ├── error-handling/     # Error handling skill
 │       ├── testing/            # Testing skill
+│       ├── code-review/        # Code review skill
 │       └── ui-design/          # UI design skill
+│
+├── .husky/                     # Git hooks
+│   ├── pre-commit             # Pre-commit hooks
+│   └── commit-msg             # Commit message validation
+│
 ├── docker-compose.yml          # PostgreSQL container config
 ├── package.json                # Root workspace config
+├── eslint.config.mjs          # ESLint configuration
+├── .prettierrc                # Prettier configuration
+├── .prettierignore            # Prettier ignore patterns
+├── commitlint.config.js       # Commitlint configuration
 ├── TODO.md                     # Project roadmap
 ├── PROJECT_SUMMARY.md          # This file
 └── ERROR-HANDLING-SUMMARY.md   # Error handling implementation details
@@ -125,18 +157,19 @@ enum WineColor {
 
 ## API Endpoints
 
-| Method | Endpoint | Description | Status Codes |
-|--------|----------|-------------|--------------|
-| GET | `/api/health` | Health check with DB status | 200, 503 |
-| GET | `/api/wines` | List all wines | 200 |
-| GET | `/api/wines/:id` | Get a single wine by ID | 200, 404 |
-| POST | `/api/wines` | Create a new wine | 201, 400 |
-| PUT | `/api/wines/:id` | Update an existing wine | 200, 400, 404 |
-| DELETE | `/api/wines/:id` | Delete a wine | 204, 404 |
+| Method | Endpoint         | Description                 | Status Codes  |
+| ------ | ---------------- | --------------------------- | ------------- |
+| GET    | `/api/health`    | Health check with DB status | 200, 503      |
+| GET    | `/api/wines`     | List all wines              | 200           |
+| GET    | `/api/wines/:id` | Get a single wine by ID     | 200, 404      |
+| POST   | `/api/wines`     | Create a new wine           | 201, 400      |
+| PUT    | `/api/wines/:id` | Update an existing wine     | 200, 400, 404 |
+| DELETE | `/api/wines/:id` | Delete a wine               | 204, 404      |
 
 ### Error Response Format
 
 All errors return a consistent JSON format:
+
 ```json
 {
   "error": "Human-readable error message",
@@ -166,6 +199,7 @@ curl -X POST http://localhost:3001/api/wines \
 ## Features Completed ✅
 
 ### Core Functionality
+
 - [x] Full CRUD operations for wines
 - [x] RESTful API with proper error handling
 - [x] Clean, responsive UI with wine collection management
@@ -175,12 +209,14 @@ curl -X POST http://localhost:3001/api/wines \
 - [x] Form validation (required fields, vintage range)
 
 ### Database & Infrastructure
+
 - [x] PostgreSQL database with Docker setup
 - [x] Prisma ORM with type-safe client
 - [x] Database migrations via `prisma db push`
 - [x] Schema with enums for wine colors
 
 ### Testing
+
 - [x] **API Testing**: 49 tests passing (100% success rate)
   - 18 CRUD endpoint tests
   - 31 error handling tests
@@ -201,20 +237,25 @@ curl -X POST http://localhost:3001/api/wines \
   - Error handling for fetch/add/delete operations
 
 **Test Configuration:**
+
 - Vitest 4.0.16 with `fileParallelism: false`
 - Coverage thresholds: 70% branches, 80% functions/lines/statements
 - Test duration: ~851ms for full suite
 
 ### Test Coverage Metrics
+
 ```
 Statements   : 80.39% (82/102)
 Branches     : 76.47% (13/17)
 Functions    : 61.9% (13/21)
 Lines        : 81.63% (80/98)
 ```
-All coverage thresholds met (70% for statements/branches/lines, 60% for functions).
+
+All coverage thresholds met (70% for statements/branches/lines, 60% for
+functions).
 
 ### Design & UX
+
 - [x] Wine-themed color palette (#7C2D3C burgundy, #F5F1E8 off-white)
 - [x] Sticky header with wine bottle emoji
 - [x] Responsive table layout
@@ -222,6 +263,7 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
 - [x] Inter font family for clean typography
 
 ### Error Handling & Logging ✅
+
 - [x] **Structured Logging**: Winston logger with JSON format
 - [x] **Request Tracking**: UUID-based request IDs in all logs and responses
 - [x] **Log Levels**: error, warn, info, debug with contextual metadata
@@ -234,9 +276,41 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
 - [x] **Health Endpoint**: Database connectivity monitoring
 - [x] **Error Tests**: Comprehensive test suite for error scenarios
 
+### Code Quality & Standards ✅
+
+- [x] **ESLint Configuration**: Strict rules for TypeScript and React
+  - TypeScript ESLint parser and plugin
+  - React, React Hooks, and JSX accessibility plugins
+  - Import statement organization
+  - Prettier integration (no conflicts)
+- [x] **Prettier Formatting**: Automatic code formatting
+  - Consistent code style across all files
+  - Integrated with ESLint
+  - Pre-commit formatting checks
+- [x] **TypeScript Strict Mode**: Enhanced type safety
+  - Strict null checks
+  - No implicit any
+  - Strict property initialization
+- [x] **Git Hooks with Husky**: Pre-commit quality gates
+  - Auto-run linting on staged files
+  - Format check before commit
+  - Type checking validation
+- [x] **Conventional Commits**: Standardized commit messages
+  - commitlint validation
+  - Semantic versioning ready
+  - Clear changelog generation
+- [x] **GitHub Actions CI/CD**: Automated quality checks
+  - Lint, format, and type check on PRs
+  - Automated test execution
+  - Build verification
+- [x] **Pull Request Template**: Structured code review process
+- [x] **Code Review Checklist**: Comprehensive review guidelines
+- [x] **Documentation Standards**: Skill-based documentation in .claude/
+
 ## Setup Instructions
 
 ### Prerequisites
+
 - Node.js 18.17+
 - Docker Desktop
 - npm
@@ -244,6 +318,7 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
 ### Installation Steps
 
 1. **Clone and install dependencies**:
+
    ```bash
    git clone https://github.com/blburson1204/wine-cellar.git
    cd wine-cellar
@@ -251,6 +326,7 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
    ```
 
 2. **Create environment file**:
+
    ```bash
    cat > .env << 'EOF'
    DATABASE_URL="postgresql://postgres:postgres@localhost:5433/wine_cellar"
@@ -258,23 +334,27 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
    ```
 
 3. **Copy .env to subdirectories**:
+
    ```bash
    cp .env packages/database/.env
    cp .env apps/api/.env
    ```
 
 4. **Start PostgreSQL**:
+
    ```bash
    docker-compose up -d
    ```
 
 5. **Set up database**:
+
    ```bash
    npm run db:generate
    npm run db:push
    ```
 
 6. **Start development servers**:
+
    ```bash
    npm run dev
    ```
@@ -285,21 +365,27 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start both API and web servers |
-| `npm run dev:api` | Start API server only |
-| `npm run dev:web` | Start web server only |
-| `npm run db:generate` | Generate Prisma client |
-| `npm run db:push` | Push schema changes to database |
-| `npm run db:studio` | Open Prisma Studio (visual DB editor) |
-| `npm test` | Run all tests |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run test:coverage` | Generate test coverage report |
+| Command                 | Description                           |
+| ----------------------- | ------------------------------------- |
+| `npm run dev`           | Start both API and web servers        |
+| `npm run dev:api`       | Start API server only                 |
+| `npm run dev:web`       | Start web server only                 |
+| `npm run db:generate`   | Generate Prisma client                |
+| `npm run db:push`       | Push schema changes to database       |
+| `npm run db:studio`     | Open Prisma Studio (visual DB editor) |
+| `npm test`              | Run all tests                         |
+| `npm run test:watch`    | Run tests in watch mode               |
+| `npm run test:coverage` | Generate test coverage report         |
+| `npm run lint`          | Run ESLint to check code quality      |
+| `npm run lint:fix`      | Auto-fix ESLint issues                |
+| `npm run format`        | Format code with Prettier             |
+| `npm run format:check`  | Check code formatting                 |
+| `npm run type-check`    | Run TypeScript type checking          |
 
 ## Development Workflow
 
 1. **Making Schema Changes**:
+
    ```bash
    # Edit packages/database/prisma/schema.prisma
    npm run db:generate  # Regenerate Prisma client
@@ -307,6 +393,7 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
    ```
 
 2. **Running Tests**:
+
    ```bash
    # API tests
    cd apps/api
@@ -329,9 +416,11 @@ All coverage thresholds met (70% for statements/branches/lines, 60% for function
 
 ## Error Handling & Logging Implementation
 
-A comprehensive error handling and logging system has been implemented. See [ERROR-HANDLING-SUMMARY.md](ERROR-HANDLING-SUMMARY.md) for complete details.
+A comprehensive error handling and logging system has been implemented. See
+[ERROR-HANDLING-SUMMARY.md](ERROR-HANDLING-SUMMARY.md) for complete details.
 
 ### Key Features
+
 - **Winston Logger**: Structured JSON logging with file rotation
 - **Request IDs**: Track requests across all logs and error responses
 - **Custom Error Classes**: 7 typed error classes with HTTP status codes
@@ -341,6 +430,7 @@ A comprehensive error handling and logging system has been implemented. See [ERR
 - **Health Check**: Database connectivity monitoring at `/api/health`
 
 ### Files Added
+
 - `apps/api/src/utils/logger.ts` - Winston configuration
 - `apps/api/src/middleware/requestId.ts` - Request ID tracking
 - `apps/api/src/middleware/errorHandler.ts` - Error handling
@@ -354,20 +444,15 @@ A comprehensive error handling and logging system has been implemented. See [ERR
 
 See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 
-### 1. Code Review and Standards (HIGH PRIORITY)
-- ESLint configuration with strict rules
-- Prettier for code formatting
-- TypeScript strict mode
-- Pre-commit hooks (Husky + lint-staged)
-- Pull request templates
+### 1. Security Best Practices (NEXT PRIORITY)
 
-### 2. Security Best Practices
 - XSS/CSRF protection
 - Rate limiting
 - Security headers (helmet.js)
 - Dependency scanning
 
-### 3. Performance Optimization
+### 2. Performance Optimization
+
 - Database indexes
 - Caching strategy (Redis)
 - Code splitting
@@ -377,24 +462,28 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 ## Key Technical Decisions
 
 ### Why Next.js 15?
+
 - App Router for modern routing patterns
 - Server components support (future enhancement)
 - Built-in API routes for proxying
 - Excellent TypeScript support
 
 ### Why Prisma?
+
 - Type-safe database client
 - Automatic migrations
 - Excellent TypeScript integration
 - Built-in protection against SQL injection
 
 ### Why Docker for Database?
+
 - Consistent development environment
 - Easy setup and teardown
 - Data persistence via volumes
 - Isolated from host system
 
 ### Testing Strategy
+
 - Unit tests for API endpoints (Vitest + Supertest)
 - Component tests for React UI (React Testing Library)
 - Error scenario testing (31 dedicated error tests)
@@ -412,7 +501,8 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 4. **No Image Upload**: Wine labels/photos not supported yet
 5. **Inline Styles**: No CSS modules or styled-components
 6. **No Optimistic Updates**: UI waits for API responses
-7. **No Sentry Integration**: Error tracking service not configured (infrastructure ready)
+7. **No Sentry Integration**: Error tracking service not configured
+   (infrastructure ready)
 
 ## Future Enhancements
 
@@ -438,6 +528,5 @@ MIT
 
 ---
 
-**Project Status**: Active Development
-**Version**: 1.0.0
-**Repository**: https://github.com/blburson1204/wine-cellar
+**Project Status**: Active Development **Version**: 1.0.0 **Repository**:
+https://github.com/blburson1204/wine-cellar

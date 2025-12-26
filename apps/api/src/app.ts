@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
 import { prisma } from '@wine-cellar/database';
 import { requestIdMiddleware } from './middleware/requestId';
@@ -10,7 +10,7 @@ import { createWineSchema, updateWineSchema, wineIdSchema } from './schemas/wine
 import { NotFoundError } from './errors/AppError';
 import { createLogger } from './utils/logger';
 
-export const createApp = () => {
+export const createApp = (): Express => {
   const app = express();
 
   // Request parsing
@@ -30,7 +30,7 @@ export const createApp = () => {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || 'development',
-      database: 'unknown'
+      database: 'unknown',
     };
 
     try {
@@ -56,7 +56,7 @@ export const createApp = () => {
       log.info('Fetching all wines');
 
       const wines = await prisma.wine.findMany({
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
       });
 
       log.info('Wines fetched successfully', { count: wines.length });
@@ -76,7 +76,7 @@ export const createApp = () => {
       log.info('Fetching wine', { wineId: id });
 
       const wine = await prisma.wine.findUnique({
-        where: { id }
+        where: { id },
       });
 
       if (!wine) {
@@ -99,7 +99,7 @@ export const createApp = () => {
       log.info('Creating new wine', { name: req.body.name, vintage: req.body.vintage });
 
       const wine = await prisma.wine.create({
-        data: req.body
+        data: req.body,
       });
 
       log.info('Wine created successfully', { wineId: wine.id, name: wine.name });
@@ -111,25 +111,30 @@ export const createApp = () => {
   });
 
   // Update a wine
-  app.put('/api/wines/:id', validate(wineIdSchema, 'params'), validate(updateWineSchema), async (req, res, next) => {
-    const log = createLogger(req);
+  app.put(
+    '/api/wines/:id',
+    validate(wineIdSchema, 'params'),
+    validate(updateWineSchema),
+    async (req, res, next) => {
+      const log = createLogger(req);
 
-    try {
-      const { id } = req.params;
-      log.info('Updating wine', { wineId: id });
+      try {
+        const { id } = req.params;
+        log.info('Updating wine', { wineId: id });
 
-      const wine = await prisma.wine.update({
-        where: { id },
-        data: req.body
-      });
+        const wine = await prisma.wine.update({
+          where: { id },
+          data: req.body,
+        });
 
-      log.info('Wine updated successfully', { wineId: id });
-      res.json(wine);
-    } catch (error) {
-      log.error('Error updating wine', error as Error, { wineId: req.params.id });
-      next(error);
+        log.info('Wine updated successfully', { wineId: id });
+        res.json(wine);
+      } catch (error) {
+        log.error('Error updating wine', error as Error, { wineId: req.params.id });
+        next(error);
+      }
     }
-  });
+  );
 
   // Delete a wine
   app.delete('/api/wines/:id', validate(wineIdSchema, 'params'), async (req, res, next) => {
@@ -140,7 +145,7 @@ export const createApp = () => {
       log.info('Deleting wine', { wineId: id });
 
       await prisma.wine.delete({
-        where: { id }
+        where: { id },
       });
 
       log.info('Wine deleted successfully', { wineId: id });

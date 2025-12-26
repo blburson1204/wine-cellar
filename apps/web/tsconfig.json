@@ -1,19 +1,36 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2017",
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
     "noEmit": true,
+
+    // Strict mode options
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+
+    // Additional type checking
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Module resolution
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Next.js specific
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
@@ -22,20 +39,9 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    "forceConsistentCasingInFileNames": true,
-    "target": "ES2017"
+      "@/*": ["./src/*"]
+    }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

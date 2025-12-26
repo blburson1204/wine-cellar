@@ -17,17 +17,14 @@ export class ApiError extends Error {
 /**
  * Typed fetch wrapper with error handling
  */
-export async function fetchApi<T>(
-  url: string,
-  options?: RequestInit
-): Promise<T> {
+export async function fetchApi<T>(url: string, options?: RequestInit): Promise<T> {
   try {
     const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        ...options?.headers
-      }
+        ...options?.headers,
+      },
     });
 
     // Handle 204 No Content
@@ -55,10 +52,7 @@ export async function fetchApi<T>(
     }
 
     // Network errors or JSON parsing errors
-    throw new ApiError(
-      0,
-      error instanceof Error ? error.message : 'Network error occurred'
-    );
+    throw new ApiError(0, error instanceof Error ? error.message : 'Network error occurred');
   }
 }
 

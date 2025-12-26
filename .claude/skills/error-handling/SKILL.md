@@ -1,10 +1,12 @@
 # Error Handling & Logging Skill - Wine Cellar
 
-This skill provides error handling strategies, logging patterns, and monitoring best practices for the Wine Cellar application.
+This skill provides error handling strategies, logging patterns, and monitoring
+best practices for the Wine Cellar application.
 
 ## Error Handling Philosophy
 
 **Why Robust Error Handling Matters:**
+
 1. **User Experience** - Clear, helpful error messages instead of crashes
 2. **Debugging** - Quickly identify and fix issues in production
 3. **Reliability** - Graceful degradation when things go wrong
@@ -14,12 +16,14 @@ This skill provides error handling strategies, logging patterns, and monitoring 
 ## Error Handling Stack
 
 ### Backend (API)
+
 - **Logger**: Winston or Pino (structured logging)
 - **Error Tracking**: Sentry (production monitoring)
 - **Validation**: Zod (schema validation with detailed errors)
 - **HTTP Errors**: Custom error classes extending Error
 
 ### Frontend (Web)
+
 - **Error Boundaries**: React Error Boundaries for component crashes
 - **Toast Notifications**: User-friendly error messages
 - **Error Tracking**: Sentry browser integration
@@ -29,23 +33,23 @@ This skill provides error handling strategies, logging patterns, and monitoring 
 
 ```typescript
 enum LogLevel {
-  ERROR = 'error',   // System errors, exceptions
-  WARN = 'warn',     // Potential issues, deprecations
-  INFO = 'info',     // Important events (user actions, API calls)
-  DEBUG = 'debug',   // Detailed diagnostic information
-  TRACE = 'trace'    // Very detailed, rarely used
+  ERROR = 'error', // System errors, exceptions
+  WARN = 'warn', // Potential issues, deprecations
+  INFO = 'info', // Important events (user actions, API calls)
+  DEBUG = 'debug', // Detailed diagnostic information
+  TRACE = 'trace', // Very detailed, rarely used
 }
 ```
 
 **When to Use Each Level:**
 
-| Level | Usage | Examples |
-|-------|-------|----------|
-| **ERROR** | Unhandled exceptions, critical failures | Database connection lost, API timeout |
-| **WARN** | Recoverable issues, degraded performance | Retry attempt, fallback used |
-| **INFO** | Normal operations, business events | User login, wine created, API request |
-| **DEBUG** | Diagnostic information for development | Query parameters, function entry/exit |
-| **TRACE** | Extremely detailed debugging | Variable values, loop iterations |
+| Level     | Usage                                    | Examples                              |
+| --------- | ---------------------------------------- | ------------------------------------- |
+| **ERROR** | Unhandled exceptions, critical failures  | Database connection lost, API timeout |
+| **WARN**  | Recoverable issues, degraded performance | Retry attempt, fallback used          |
+| **INFO**  | Normal operations, business events       | User login, wine created, API request |
+| **DEBUG** | Diagnostic information for development   | Query parameters, function entry/exit |
+| **TRACE** | Extremely detailed debugging             | Variable values, loop iterations      |
 
 ## Logger Configuration
 
@@ -60,7 +64,7 @@ const logLevels = {
   warn: 1,
   info: 2,
   debug: 3,
-  trace: 4
+  trace: 4,
 };
 
 export const logger = winston.createLogger({
@@ -73,7 +77,7 @@ export const logger = winston.createLogger({
   ),
   defaultMeta: {
     service: 'wine-cellar-api',
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
   },
   transports: [
     // Console output (development)
@@ -81,28 +85,28 @@ export const logger = winston.createLogger({
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.simple()
-      )
+      ),
     }),
     // File output (production)
     new winston.transports.File({
       filename: 'logs/error.log',
       level: 'error',
       maxsize: 5242880, // 5MB
-      maxFiles: 5
+      maxFiles: 5,
     }),
     new winston.transports.File({
       filename: 'logs/combined.log',
       maxsize: 5242880,
-      maxFiles: 5
-    })
-  ]
+      maxFiles: 5,
+    }),
+  ],
 });
 
 // Stream for Morgan HTTP logging
 export const httpLogStream = {
   write: (message: string) => {
     logger.info(message.trim());
-  }
+  },
 };
 ```
 
@@ -126,7 +130,7 @@ export const requestIdMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  req.id = req.headers['x-request-id'] as string || randomUUID();
+  req.id = (req.headers['x-request-id'] as string) || randomUUID();
   res.setHeader('X-Request-ID', req.id);
   next();
 };
@@ -140,12 +144,14 @@ import { logger as baseLogger } from '@wine-cellar/logger';
 import { Request } from 'express';
 
 export const createLogger = (req?: Request) => {
-  const meta = req ? {
-    requestId: req.id,
-    method: req.method,
-    path: req.path,
-    userId: req.user?.id
-  } : {};
+  const meta = req
+    ? {
+        requestId: req.id,
+        method: req.method,
+        path: req.path,
+        userId: req.user?.id,
+      }
+    : {};
 
   return {
     error: (message: string, error?: Error, extra?: object) => {
@@ -159,7 +165,7 @@ export const createLogger = (req?: Request) => {
     },
     debug: (message: string, extra?: object) => {
       baseLogger.debug(message, { ...meta, ...extra });
-    }
+    },
   };
 };
 
@@ -203,7 +209,10 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  constructor(message: string, public fields?: Record<string, string[]>) {
+  constructor(
+    message: string,
+    public fields?: Record<string, string[]>
+  ) {
     super(400, message, true, 'VALIDATION_ERROR');
   }
 }
@@ -236,7 +245,10 @@ export class ConflictError extends AppError {
 }
 
 export class DatabaseError extends AppError {
-  constructor(message: string, public originalError?: Error) {
+  constructor(
+    message: string,
+    public originalError?: Error
+  ) {
     super(500, message, true, 'DATABASE_ERROR');
   }
 }
@@ -244,7 +256,7 @@ export class DatabaseError extends AppError {
 // Usage:
 throw new NotFoundError('Wine', wineId);
 throw new ValidationError('Invalid wine data', {
-  vintage: ['Must be between 1900 and current year']
+  vintage: ['Must be between 1900 and current year'],
 });
 ```
 
@@ -281,7 +293,7 @@ export const errorHandler = (
       error: 'Validation failed',
       errorCode: 'VALIDATION_ERROR',
       fields,
-      requestId: req.id
+      requestId: req.id,
     });
   }
 
@@ -294,7 +306,7 @@ export const errorHandler = (
       return res.status(409).json({
         error: 'A record with this value already exists',
         errorCode: 'DUPLICATE_ENTRY',
-        requestId: req.id
+        requestId: req.id,
       });
     }
 
@@ -303,7 +315,7 @@ export const errorHandler = (
       return res.status(404).json({
         error: 'Record not found',
         errorCode: 'NOT_FOUND',
-        requestId: req.id
+        requestId: req.id,
       });
     }
 
@@ -311,7 +323,7 @@ export const errorHandler = (
     return res.status(500).json({
       error: 'Database operation failed',
       errorCode: 'DATABASE_ERROR',
-      requestId: req.id
+      requestId: req.id,
     });
   }
 
@@ -320,14 +332,14 @@ export const errorHandler = (
     log.warn('Application error', {
       statusCode: error.statusCode,
       errorCode: error.errorCode,
-      message: error.message
+      message: error.message,
     });
 
     return res.status(error.statusCode).json({
       error: error.message,
       errorCode: error.errorCode,
       ...(error instanceof ValidationError && { fields: error.fields }),
-      requestId: req.id
+      requestId: req.id,
     });
   }
 
@@ -337,12 +349,10 @@ export const errorHandler = (
   const isProduction = process.env.NODE_ENV === 'production';
 
   res.status(500).json({
-    error: isProduction
-      ? 'An unexpected error occurred'
-      : error.message,
+    error: isProduction ? 'An unexpected error occurred' : error.message,
     errorCode: 'INTERNAL_SERVER_ERROR',
     requestId: req.id,
-    ...(isProduction ? {} : { stack: error.stack })
+    ...(isProduction ? {} : { stack: error.stack }),
   });
 };
 
@@ -358,7 +368,7 @@ export const notFoundHandler = (
   res.status(404).json({
     error: `Cannot ${req.method} ${req.path}`,
     errorCode: 'ROUTE_NOT_FOUND',
-    requestId: req.id
+    requestId: req.id,
   });
 };
 ```
@@ -371,39 +381,46 @@ import { z } from 'zod';
 import { WineColor } from '@prisma/client';
 
 export const createWineSchema = z.object({
-  name: z.string()
+  name: z
+    .string()
     .min(1, 'Name is required')
     .max(200, 'Name must be less than 200 characters'),
 
-  vintage: z.number()
+  vintage: z
+    .number()
     .int('Vintage must be a whole number')
     .min(1900, 'Vintage must be 1900 or later')
     .max(new Date().getFullYear(), 'Vintage cannot be in the future'),
 
-  producer: z.string()
+  producer: z
+    .string()
     .min(1, 'Producer is required')
     .max(200, 'Producer must be less than 200 characters'),
 
-  country: z.string()
+  country: z
+    .string()
     .min(1, 'Country is required')
     .max(100, 'Country must be less than 100 characters'),
 
-  region: z.string()
+  region: z
+    .string()
     .max(200, 'Region must be less than 200 characters')
     .optional(),
 
   color: z.nativeEnum(WineColor, {
-    errorMap: () => ({ message: 'Invalid wine color' })
+    errorMap: () => ({ message: 'Invalid wine color' }),
   }),
 
-  quantity: z.number()
+  quantity: z
+    .number()
     .int('Quantity must be a whole number')
     .min(0, 'Quantity cannot be negative')
     .default(1),
 
-  notes: z.string()
+  notes: z
+    .string()
     .max(2000, 'Notes must be less than 2000 characters')
-    .optional()
+    .optional(),
 });
 
 export const updateWineSchema = createWineSchema.partial();
@@ -536,8 +553,8 @@ export async function fetchApi<T>(
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        ...options?.headers
-      }
+        ...options?.headers,
+      },
     });
 
     const data = await response.json();
@@ -608,7 +625,7 @@ if (process.env.NODE_ENV === 'production') {
         return null;
       }
       return event;
-    }
+    },
   });
 
   app.use(Sentry.Handlers.requestHandler());
@@ -636,7 +653,7 @@ if (process.env.NODE_ENV === 'production') {
     environment: process.env.NODE_ENV,
     tracesSampleRate: 0.1,
     replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0
+    replaysOnErrorSampleRate: 1.0,
   });
 }
 ```
@@ -678,7 +695,7 @@ router.get('/health', async (req, res) => {
     timestamp: Date.now(),
     database: 'unknown',
     memory: process.memoryUsage(),
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
   };
 
   try {
@@ -699,6 +716,7 @@ export default router;
 ### Log Aggregation
 
 **For Production:**
+
 - Use log aggregation service (Datadog, LogDNA, CloudWatch)
 - Set up alerts for error rate spikes
 - Create dashboards for key metrics
@@ -751,14 +769,13 @@ interface ErrorResponse {
 // __tests__/errorHandling.test.ts
 describe('Error Handling', () => {
   it('returns 404 for non-existent wine', async () => {
-    const response = await request(app)
-      .get('/api/wines/invalid-id');
+    const response = await request(app).get('/api/wines/invalid-id');
 
     expect(response.status).toBe(404);
     expect(response.body).toMatchObject({
       error: expect.stringContaining('not found'),
       errorCode: 'NOT_FOUND',
-      requestId: expect.any(String)
+      requestId: expect.any(String),
     });
   });
 
@@ -774,13 +791,11 @@ describe('Error Handling', () => {
 
   it('handles database errors gracefully', async () => {
     // Mock database failure
-    jest.spyOn(prisma.wine, 'create').mockRejectedValue(
-      new Error('Database connection lost')
-    );
+    jest
+      .spyOn(prisma.wine, 'create')
+      .mockRejectedValue(new Error('Database connection lost'));
 
-    const response = await request(app)
-      .post('/api/wines')
-      .send(validWineData);
+    const response = await request(app).post('/api/wines').send(validWineData);
 
     expect(response.status).toBe(500);
     expect(response.body.errorCode).toBe('INTERNAL_SERVER_ERROR');
@@ -811,6 +826,7 @@ describe('Error Handling', () => {
 ### ❌ Don't:
 
 1. **Swallow errors silently**
+
    ```typescript
    try {
      await doSomething();
@@ -820,11 +836,13 @@ describe('Error Handling', () => {
    ```
 
 2. **Log sensitive data**
+
    ```typescript
    logger.info('User login', { password: user.password }); // BAD!
    ```
 
 3. **Use console.log in production**
+
    ```typescript
    console.log('Debug info'); // Use logger instead
    ```
@@ -837,6 +855,7 @@ describe('Error Handling', () => {
 ### ✅ Do:
 
 1. **Always handle errors**
+
    ```typescript
    try {
      await doSomething();
@@ -847,20 +866,20 @@ describe('Error Handling', () => {
    ```
 
 2. **Use contextual logging**
+
    ```typescript
    logger.info('User login', { userId: user.id, email: user.email });
    ```
 
 3. **Use proper logger**
+
    ```typescript
    logger.debug('Debug info', { context });
    ```
 
 4. **Sanitize error messages**
    ```typescript
-   const message = isProduction
-     ? 'An error occurred'
-     : error.message;
+   const message = isProduction ? 'An error occurred' : error.message;
    ```
 
 ## When to Update This Skill

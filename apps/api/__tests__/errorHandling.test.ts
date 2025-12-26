@@ -13,7 +13,7 @@ const createValidWineData = (overrides: any = {}): any => ({
   country: 'France',
   color: WineColor.RED,
   quantity: 1,
-  ...overrides
+  ...overrides,
 });
 
 // Clean up database before each test
@@ -33,12 +33,10 @@ describe('Error Handling and Validation', () => {
         vintage: 2020,
         producer: 'Test',
         country: 'France',
-        color: WineColor.RED
+        color: WineColor.RED,
       };
 
-      const response = await request(app)
-        .post('/api/wines')
-        .send(invalidData);
+      const response = await request(app).post('/api/wines').send(invalidData);
 
       expect(response.status).toBe(400);
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
@@ -51,12 +49,10 @@ describe('Error Handling and Validation', () => {
         name: 'Test Wine',
         producer: 'Test',
         country: 'France',
-        color: WineColor.RED
+        color: WineColor.RED,
       };
 
-      const response = await request(app)
-        .post('/api/wines')
-        .send(invalidData);
+      const response = await request(app).post('/api/wines').send(invalidData);
 
       expect(response.status).toBe(400);
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
@@ -156,12 +152,10 @@ describe('Error Handling and Validation', () => {
         producer: 'Test',
         country: 'France',
         color: 'INVALID', // Invalid color
-        quantity: -5 // Negative quantity
+        quantity: -5, // Negative quantity
       };
 
-      const response = await request(app)
-        .post('/api/wines')
-        .send(invalidData);
+      const response = await request(app).post('/api/wines').send(invalidData);
 
       expect(response.status).toBe(400);
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
@@ -171,15 +165,13 @@ describe('Error Handling and Validation', () => {
 
     it('rejects unknown fields in update', async () => {
       const wine = await prisma.wine.create({
-        data: createValidWineData()
+        data: createValidWineData(),
       });
 
-      const response = await request(app)
-        .put(`/api/wines/${wine.id}`)
-        .send({
-          quantity: 5,
-          unknownField: 'should be rejected'
-        });
+      const response = await request(app).put(`/api/wines/${wine.id}`).send({
+        quantity: 5,
+        unknownField: 'should be rejected',
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
@@ -188,8 +180,7 @@ describe('Error Handling and Validation', () => {
 
   describe('Not Found Errors (404)', () => {
     it('returns 404 when getting non-existent wine', async () => {
-      const response = await request(app)
-        .get('/api/wines/nonexistent-id');
+      const response = await request(app).get('/api/wines/nonexistent-id');
 
       expect(response.status).toBe(404);
       expect(response.body.error).toContain('Wine');
@@ -199,25 +190,21 @@ describe('Error Handling and Validation', () => {
     });
 
     it('returns 404 when updating non-existent wine', async () => {
-      const response = await request(app)
-        .put('/api/wines/nonexistent-id')
-        .send({ quantity: 5 });
+      const response = await request(app).put('/api/wines/nonexistent-id').send({ quantity: 5 });
 
       expect(response.status).toBe(404);
       expect(response.body.errorCode).toBe('NOT_FOUND');
     });
 
     it('returns 404 when deleting non-existent wine', async () => {
-      const response = await request(app)
-        .delete('/api/wines/nonexistent-id');
+      const response = await request(app).delete('/api/wines/nonexistent-id');
 
       expect(response.status).toBe(404);
       expect(response.body.errorCode).toBe('NOT_FOUND');
     });
 
     it('returns 404 for undefined routes', async () => {
-      const response = await request(app)
-        .get('/api/undefined-route');
+      const response = await request(app).get('/api/undefined-route');
 
       expect(response.status).toBe(404);
       expect(response.body.error).toContain('Cannot GET /api/undefined-route');
@@ -228,15 +215,13 @@ describe('Error Handling and Validation', () => {
 
   describe('Request ID Tracking', () => {
     it('includes request ID in successful response headers', async () => {
-      const response = await request(app)
-        .get('/api/wines');
+      const response = await request(app).get('/api/wines');
 
       expect(response.headers['x-request-id']).toBeDefined();
     });
 
     it('includes request ID in error responses', async () => {
-      const response = await request(app)
-        .get('/api/wines/nonexistent-id');
+      const response = await request(app).get('/api/wines/nonexistent-id');
 
       expect(response.status).toBe(404);
       expect(response.body.requestId).toBeDefined();
@@ -247,9 +232,7 @@ describe('Error Handling and Validation', () => {
     it('accepts and uses custom request ID from header', async () => {
       const customRequestId = 'custom-test-request-id-123';
 
-      const response = await request(app)
-        .get('/api/wines')
-        .set('X-Request-ID', customRequestId);
+      const response = await request(app).get('/api/wines').set('X-Request-ID', customRequestId);
 
       expect(response.headers['x-request-id']).toBe(customRequestId);
     });
@@ -257,8 +240,7 @@ describe('Error Handling and Validation', () => {
 
   describe('Error Response Format', () => {
     it('has consistent error format with error message', async () => {
-      const response = await request(app)
-        .get('/api/wines/nonexistent-id');
+      const response = await request(app).get('/api/wines/nonexistent-id');
 
       expect(response.body).toHaveProperty('error');
       expect(response.body).toHaveProperty('errorCode');
@@ -269,9 +251,13 @@ describe('Error Handling and Validation', () => {
     });
 
     it('includes field-specific errors for validation failures', async () => {
-      const response = await request(app)
-        .post('/api/wines')
-        .send({ name: '', vintage: 1800, producer: 'Test', country: 'France', color: WineColor.RED });
+      const response = await request(app).post('/api/wines').send({
+        name: '',
+        vintage: 1800,
+        producer: 'Test',
+        country: 'France',
+        color: WineColor.RED,
+      });
 
       expect(response.body).toHaveProperty('fields');
       expect(typeof response.body.fields).toBe('object');
@@ -282,8 +268,7 @@ describe('Error Handling and Validation', () => {
 
   describe('Health Check Endpoint', () => {
     it('returns 200 when healthy', async () => {
-      const response = await request(app)
-        .get('/api/health');
+      const response = await request(app).get('/api/health');
 
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('ok');
@@ -356,9 +341,7 @@ describe('Error Handling and Validation', () => {
 
   describe('Edge Cases', () => {
     it('handles empty object in POST request', async () => {
-      const response = await request(app)
-        .post('/api/wines')
-        .send({});
+      const response = await request(app).post('/api/wines').send({});
 
       expect(response.status).toBe(400);
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
@@ -368,12 +351,14 @@ describe('Error Handling and Validation', () => {
     it('handles null values correctly', async () => {
       const response = await request(app)
         .post('/api/wines')
-        .send(createValidWineData({
-          region: null,
-          grapeVariety: null,
-          notes: null,
-          rating: null
-        }));
+        .send(
+          createValidWineData({
+            region: null,
+            grapeVariety: null,
+            notes: null,
+            rating: null,
+          })
+        );
 
       expect(response.status).toBe(201);
       expect(response.body.region).toBeNull();
@@ -383,8 +368,7 @@ describe('Error Handling and Validation', () => {
     });
 
     it('validates ID parameter in GET request', async () => {
-      const response = await request(app)
-        .get('/api/wines/');
+      const response = await request(app).get('/api/wines/');
 
       // Should match GET /api/wines instead
       expect(response.status).toBe(200);

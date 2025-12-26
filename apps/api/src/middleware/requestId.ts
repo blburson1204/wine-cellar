@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 
 // Extend Express Request type to include id
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       id: string;
@@ -10,11 +11,7 @@ declare global {
   }
 }
 
-export const requestIdMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const requestIdMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   // Use existing request ID from header or generate new one
   req.id = (req.headers['x-request-id'] as string) || randomUUID();
 

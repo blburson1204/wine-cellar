@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config';
 
 // Set test database URL
-process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5433/wine_cellar_test";
+process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
 
 export default defineConfig({
   test: {
@@ -19,8 +19,8 @@ export default defineConfig({
         branches: 70,
         functions: 80,
         lines: 80,
-        statements: 80
-      }
-    }
-  }
+        statements: 80,
+      },
+    },
+  },
 });

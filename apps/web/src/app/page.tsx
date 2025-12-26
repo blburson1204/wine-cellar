@@ -22,19 +22,20 @@ const WINE_COLORS: Record<string, string> = {
   ROSE: '#D4A5A5',
   SPARKLING: '#FFD700',
   DESSERT: '#8B4513',
-  FORTIFIED: '#4A1C26'
+  FORTIFIED: '#4A1C26',
 };
 
-export default function Home() {
+export default function Home(): React.JSX.Element {
   const [wines, setWines] = useState<Wine[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchWines();
+    void fetchWines();
   }, []);
 
-  const fetchWines = async () => {
+  const fetchWines = async (): Promise<void> => {
     try {
       const res = await fetch('/api/wines');
       const data = await res.json();
@@ -46,7 +47,7 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const wine = {
@@ -65,20 +66,26 @@ export default function Home() {
         body: JSON.stringify(wine),
       });
       setShowForm(false);
-      fetchWines();
+      void fetchWines();
       (e.target as HTMLFormElement).reset();
     } catch (error) {
       console.error('Error adding wine:', error);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this wine from your cellar?')) return;
+  const handleDelete = async (id: string): Promise<void> => {
+    setDeleteConfirm(id);
+  };
+
+  const confirmDelete = async (): Promise<void> => {
+    if (!deleteConfirm) return;
     try {
-      await fetch(`/api/wines/${id}`, { method: 'DELETE' });
-      fetchWines();
+      await fetch(`/api/wines/${deleteConfirm}`, { method: 'DELETE' });
+      void fetchWines();
     } catch (error) {
       console.error('Error deleting wine:', error);
+    } finally {
+      setDeleteConfirm(null);
     }
   };
 
@@ -92,8 +99,82 @@ export default function Home() {
 
   return (
     <div>
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setDeleteConfirm(null)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              padding: '32px',
+              borderRadius: '8px',
+              maxWidth: '400px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#4A1C26' }}>Confirm Delete</h3>
+            <p style={{ marginBottom: '24px', color: '#7C2D3C' }}>
+              Are you sure you want to delete this wine from your cellar?
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: 'transparent',
+                  color: '#7C2D3C',
+                  border: '1px solid #7C2D3C',
+                  borderRadius: '6px',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#C73E3A',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Action Bar */}
-      <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: '32px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#4A1C26' }}>
           {wines.length} {wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection
         </h2>
@@ -109,7 +190,7 @@ export default function Home() {
               fontSize: '16px',
               cursor: 'pointer',
               fontWeight: '500',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#F5F1E8';
@@ -133,7 +214,7 @@ export default function Home() {
               cursor: 'pointer',
               fontWeight: '500',
               transition: 'all 0.2s',
-              boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)'
+              boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#5f2330';
@@ -157,14 +238,31 @@ export default function Home() {
             backgroundColor: '#F5F1E8',
             borderRadius: '8px',
             border: '1px solid #E5DFD0',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
           }}
         >
-          <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#4A1C26', fontSize: '18px' }}>Add New Wine</h3>
+          <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#4A1C26', fontSize: '18px' }}>
+            Add New Wine
+          </h3>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+              marginBottom: '16px',
+            }}
+          >
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#4A1C26' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#4A1C26',
+                }}
+              >
                 Wine Name *
               </label>
               <input
@@ -178,13 +276,21 @@ export default function Home() {
                   borderRadius: '4px',
                   width: '100%',
                   backgroundColor: 'white',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
                 }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#4A1C26' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#4A1C26',
+                }}
+              >
                 Vintage *
               </label>
               <input
@@ -201,15 +307,30 @@ export default function Home() {
                   borderRadius: '4px',
                   width: '100%',
                   backgroundColor: 'white',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
                 }}
               />
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+              marginBottom: '16px',
+            }}
+          >
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#4A1C26' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#4A1C26',
+                }}
+              >
                 Producer *
               </label>
               <input
@@ -223,13 +344,21 @@ export default function Home() {
                   borderRadius: '4px',
                   width: '100%',
                   backgroundColor: 'white',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
                 }}
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#4A1C26' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#4A1C26',
+                }}
+              >
                 Country *
               </label>
               <input
@@ -243,15 +372,30 @@ export default function Home() {
                   borderRadius: '4px',
                   width: '100%',
                   backgroundColor: 'white',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
                 }}
               />
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+              marginBottom: '20px',
+            }}
+          >
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#4A1C26' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#4A1C26',
+                }}
+              >
                 Wine Color *
               </label>
               <select
@@ -265,7 +409,7 @@ export default function Home() {
                   width: '100%',
                   backgroundColor: 'white',
                   cursor: 'pointer',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
                 }}
               >
                 <option value="RED">Red</option>
@@ -278,7 +422,15 @@ export default function Home() {
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#4A1C26' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#4A1C26',
+                }}
+              >
                 Quantity
               </label>
               <input
@@ -293,7 +445,7 @@ export default function Home() {
                   borderRadius: '4px',
                   width: '100%',
                   backgroundColor: 'white',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
                 }}
               />
             </div>
@@ -310,7 +462,7 @@ export default function Home() {
               fontSize: '16px',
               cursor: 'pointer',
               fontWeight: '500',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#5f2330';
@@ -326,16 +478,22 @@ export default function Home() {
 
       {/* Wine List */}
       {wines.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '64px 24px',
-          backgroundColor: '#F5F1E8',
-          borderRadius: '8px',
-          border: '1px solid #E5DFD0'
-        }}>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '64px 24px',
+            backgroundColor: '#F5F1E8',
+            borderRadius: '8px',
+            border: '1px solid #E5DFD0',
+          }}
+        >
           <div style={{ fontSize: '64px', marginBottom: '16px' }}>🍷</div>
-          <h3 style={{ color: '#4A1C26', fontSize: '20px', marginBottom: '8px' }}>Your cellar is empty</h3>
-          <p style={{ color: '#7C2D3C', fontSize: '16px', marginBottom: '24px' }}>Add your first bottle to start building your collection!</p>
+          <h3 style={{ color: '#4A1C26', fontSize: '20px', marginBottom: '8px' }}>
+            Your cellar is empty
+          </h3>
+          <p style={{ color: '#7C2D3C', fontSize: '16px', marginBottom: '24px' }}>
+            Add your first bottle to start building your collection!
+          </p>
           <button
             onClick={() => setShowForm(true)}
             style={{
@@ -346,7 +504,7 @@ export default function Home() {
               borderRadius: '6px',
               fontSize: '16px',
               cursor: 'pointer',
-              fontWeight: '500'
+              fontWeight: '500',
             }}
           >
             + Add Your First Wine
@@ -354,16 +512,88 @@ export default function Home() {
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+            }}
+          >
             <thead>
               <tr style={{ backgroundColor: '#4A1C26', color: 'white' }}>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Wine</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Vintage</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Producer</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Country</th>
-                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Type</th>
-                <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '14px', fontWeight: '600' }}>Qty</th>
-                <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '14px', fontWeight: '600' }}>Actions</th>
+                <th
+                  style={{
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Wine
+                </th>
+                <th
+                  style={{
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Vintage
+                </th>
+                <th
+                  style={{
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Producer
+                </th>
+                <th
+                  style={{
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Country
+                </th>
+                <th
+                  style={{
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Type
+                </th>
+                <th
+                  style={{
+                    padding: '12px 16px',
+                    textAlign: 'center',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Qty
+                </th>
+                <th
+                  style={{
+                    padding: '12px 16px',
+                    textAlign: 'center',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -372,7 +602,7 @@ export default function Home() {
                   key={wine.id}
                   style={{
                     borderBottom: index < wines.length - 1 ? '1px solid #E5DFD0' : 'none',
-                    transition: 'background-color 0.2s'
+                    transition: 'background-color 0.2s',
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.backgroundColor = '#F5F1E8';
@@ -381,7 +611,9 @@ export default function Home() {
                     e.currentTarget.style.backgroundColor = 'white';
                   }}
                 >
-                  <td style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <td
+                    style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  >
                     <div
                       style={{
                         width: '12px',
@@ -389,7 +621,7 @@ export default function Home() {
                         borderRadius: '50%',
                         backgroundColor: WINE_COLORS[wine.color] || '#7C2D3C',
                         border: wine.color === 'WHITE' ? '1px solid #D4A5A5' : 'none',
-                        flexShrink: 0
+                        flexShrink: 0,
                       }}
                     />
                     <span style={{ fontWeight: '500', color: '#4A1C26' }}>{wine.name}</span>
@@ -398,18 +630,27 @@ export default function Home() {
                   <td style={{ padding: '16px', color: '#4A1C26' }}>{wine.producer}</td>
                   <td style={{ padding: '16px', color: '#4A1C26' }}>{wine.country}</td>
                   <td style={{ padding: '16px' }}>
-                    <span style={{
-                      padding: '4px 8px',
-                      backgroundColor: '#F5F1E8',
-                      color: '#7C2D3C',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      fontWeight: '500'
-                    }}>
+                    <span
+                      style={{
+                        padding: '4px 8px',
+                        backgroundColor: '#F5F1E8',
+                        color: '#7C2D3C',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                      }}
+                    >
                       {wine.color}
                     </span>
                   </td>
-                  <td style={{ padding: '16px', textAlign: 'center', color: '#4A1C26', fontWeight: '500' }}>
+                  <td
+                    style={{
+                      padding: '16px',
+                      textAlign: 'center',
+                      color: '#4A1C26',
+                      fontWeight: '500',
+                    }}
+                  >
                     {wine.quantity}
                   </td>
                   <td style={{ padding: '16px', textAlign: 'center' }}>
@@ -424,7 +665,7 @@ export default function Home() {
                         fontSize: '14px',
                         cursor: 'pointer',
                         fontWeight: '500',
-                        transition: 'all 0.2s'
+                        transition: 'all 0.2s',
                       }}
                       onMouseOver={(e) => {
                         e.currentTarget.style.backgroundColor = '#a33330';

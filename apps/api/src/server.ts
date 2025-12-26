@@ -7,6 +7,6 @@ const app = createApp();
 app.listen(PORT, () => {
   logger.info(`API server running on http://localhost:${PORT}`, {
     port: PORT,
-    nodeEnv: process.env.NODE_ENV || 'development'
+    nodeEnv: process.env.NODE_ENV || 'development',
   });
 });
