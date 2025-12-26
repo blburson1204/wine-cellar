@@ -4,7 +4,7 @@ import { z } from 'zod';
 /**
  * Recursively trims all string values in an object
  */
-function trimStrings(obj: any): any {
+function trimStrings(obj: unknown): unknown {
   if (obj === null || obj === undefined) return obj;
 
   if (typeof obj === 'string') {
@@ -16,10 +16,10 @@ function trimStrings(obj: any): any {
   }
 
   if (typeof obj === 'object') {
-    const trimmed: any = {};
-    for (const key in obj) {
+    const trimmed: Record<string, unknown> = {};
+    for (const key in obj as Record<string, unknown>) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        trimmed[key] = trimStrings(obj[key]);
+        trimmed[key] = trimStrings((obj as Record<string, unknown>)[key]);
       }
     }
     return trimmed;

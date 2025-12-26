@@ -6,6 +6,7 @@ import { createApp } from '../src/app';
 const app = createApp();
 
 // Test data factory
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const createWineData = (overrides: any = {}): any => ({
   name: 'Test Wine',
   vintage: 2020,

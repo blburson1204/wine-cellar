@@ -2,13 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import { AppError, ValidationError } from '../errors/AppError';
 import { createLogger } from '../utils/logger';
 import { ZodError } from 'zod';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@wine-cellar/database';
 
 /**
  * Centralized error handling middleware
  * Should be registered after all routes
  */
-export const errorHandler = (error: Error, req: Request, res: Response, _next: NextFunction) => {
+export const errorHandler = (
+  error: Error,
+  req: Request,
+  res: Response,
+  _next: NextFunction
+): Response => {
   const log = createLogger(req);
 
   // Handle Zod validation errors
@@ -102,7 +107,7 @@ export const errorHandler = (error: Error, req: Request, res: Response, _next: N
  * 404 handler for undefined routes
  * Should be registered before errorHandler but after all defined routes
  */
-export const notFoundHandler = (req: Request, res: Response, _next: NextFunction) => {
+export const notFoundHandler = (req: Request, res: Response, _next: NextFunction): Response => {
   const log = createLogger(req);
   log.warn('Route not found', { method: req.method, path: req.path });
 

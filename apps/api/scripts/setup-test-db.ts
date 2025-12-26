@@ -20,9 +20,9 @@ async function setupTestDatabase(): Promise<void> {
         `psql "postgresql://postgres:postgres@localhost:5433/postgres" -c "CREATE DATABASE wine_cellar_test;"`
       );
       console.log('✓ Test database created');
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Database might already exist, which is fine
-      if (error.message.includes('already exists')) {
+      if (error instanceof Error && error.message.includes('already exists')) {
         console.log('✓ Test database already exists');
       } else {
         console.log('Note: Could not create database (it may already exist)');
@@ -42,8 +42,9 @@ async function setupTestDatabase(): Promise<void> {
     }
 
     console.log('✓ Test database schema is ready');
-  } catch (error: any) {
-    console.error('Error setting up test database:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error setting up test database:', message);
     // Don't fail - the database might already be set up
   }
 }

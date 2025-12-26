@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { WineColor } from '@prisma/client';
+import { WineColor } from '@wine-cellar/database';
 
 /**
  * Schema for creating a new wine
