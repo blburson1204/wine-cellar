@@ -8,12 +8,7 @@ import { Prisma } from '@prisma/client';
  * Centralized error handling middleware
  * Should be registered after all routes
  */
-export const errorHandler = (
-  error: Error,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-): void => {
+export const errorHandler = (error: Error, req: Request, res: Response, _next: NextFunction) => {
   const log = createLogger(req);
 
   // Handle Zod validation errors
@@ -95,7 +90,7 @@ export const errorHandler = (
 
   const isProduction = process.env.NODE_ENV === 'production';
 
-  res.status(500).json({
+  return res.status(500).json({
     error: isProduction ? 'An unexpected error occurred' : error.message,
     errorCode: 'INTERNAL_SERVER_ERROR',
     requestId: req.id,
@@ -107,11 +102,11 @@ export const errorHandler = (
  * 404 handler for undefined routes
  * Should be registered before errorHandler but after all defined routes
  */
-export const notFoundHandler = (req: Request, res: Response, _next: NextFunction): void => {
+export const notFoundHandler = (req: Request, res: Response, _next: NextFunction) => {
   const log = createLogger(req);
   log.warn('Route not found', { method: req.method, path: req.path });
 
-  res.status(404).json({
+  return res.status(404).json({
     error: `Cannot ${req.method} ${req.path}`,
     errorCode: 'ROUTE_NOT_FOUND',
     requestId: req.id,

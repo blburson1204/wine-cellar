@@ -108,6 +108,27 @@ throw new ValidationError('Invalid data', {
 - Consistent error response format
 - Automatic logging of all errors
 
+**Function Signature:**
+
+```typescript
+export const errorHandler = (
+  error: Error,
+  req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
+  // Handles all errors and returns appropriate responses
+};
+
+export const notFoundHandler = (
+  req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
+  // Handles 404 errors for undefined routes
+};
+```
+
 **Error Response Format:**
 
 ```json
@@ -236,8 +257,9 @@ try {
 
 **Test Results:**
 
-- ✅ **49 total tests passing** (18 API tests + 31 error handling tests)
-- Test duration: ~851ms
+- ✅ **60 total tests passing** (18 API tests + 31 error handling tests + 11 web
+  tests)
+- Test duration: ~1.8s total (~850ms API, ~940ms web)
 - Zero failures
 
 **Test Coverage:**
@@ -403,4 +425,23 @@ The following items are marked for future implementation:
 
 ---
 
-**Last Updated:** December 24, 2025 **Status:** ✅ Production Ready
+---
+
+## 🔧 Recent Updates
+
+**December 26, 2025:**
+
+- Fixed TypeScript type check errors (19 errors + 9 warnings → 0)
+  - Removed explicit `: void` return types from error handlers
+  - Added `return` statements to all response paths
+  - Fixed unused parameter warnings with `_` prefix
+  - Updated web tsconfig.json: `moduleResolution: "bundler"`, added
+    `types: ["vitest/globals"]`
+- Fixed web test failures (2 failing → all passing)
+  - Updated delete tests to work with custom confirmation modal
+  - Fixed button selection in modal tests
+- All 60 tests now passing (49 API + 11 web)
+
+---
+
+**Last Updated:** December 26, 2025 **Status:** ✅ Production Ready

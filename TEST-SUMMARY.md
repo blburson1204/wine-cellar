@@ -1,25 +1,37 @@
-# Wine Cellar API - Test Summary
+# Wine Cellar - Test Summary
 
-## ✅ All Tests Passing (49/49)
+## ✅ All Tests Passing (60/60)
 
 ### Test Suite Results
 
+**API Tests:**
+
 ```
-✓ __tests__/wines.test.ts (18 tests) 215ms
-✓ __tests__/errorHandling.test.ts (31 tests) 162ms
+✓ apps/api/__tests__/wines.test.ts (18 tests) 215ms
+✓ apps/api/__tests__/errorHandling.test.ts (31 tests) 162ms
 
 Test Files  2 passed (2)
 Tests       49 passed (49)
-Duration    851ms
+Duration    ~850ms
+```
+
+**Web Tests:**
+
+```
+✓ apps/web/__tests__/page.test.tsx (11 tests) 394ms
+
+Test Files  1 passed (1)
+Tests       11 passed (11)
+Duration    ~940ms
 ```
 
 ### Quick Stats
 
 - **Test Runner**: Vitest 4.0.16
-- **Total Tests**: 49
+- **Total Tests**: 60 (49 API + 11 web)
 - **Pass Rate**: 100%
-- **Execution Time**: ~851ms
-- **Test Files**: 2
+- **Execution Time**: ~1.8s
+- **Test Files**: 3 (2 API + 1 web)
 
 ---
 
@@ -131,6 +143,46 @@ Duration    851ms
 
 ---
 
+### page.test.tsx (11 tests)
+
+#### Loading State
+
+- ✓ displays loading message initially
+
+#### Empty Collection
+
+- ✓ shows empty state when no wines exist
+
+#### Wine List
+
+- ✓ displays wine count correctly
+- ✓ renders wine details
+
+#### Add Wine Form
+
+- ✓ toggles form when Add Wine button clicked
+- ✓ submits wine with correct data
+
+#### Delete Wine
+
+- ✓ calls delete API when confirmed
+- ✓ does not delete when cancelled
+
+#### Error Handling
+
+- ✓ handles fetch error gracefully
+- ✓ handles add wine error
+- ✓ handles delete error
+
+**Test Features:**
+
+- Uses custom confirmation modal for delete operations (not window.confirm)
+- Tests user interactions with @testing-library/user-event
+- Validates API integration and error handling
+- Ensures proper UI state management
+
+---
+
 ## Running Tests
 
 ### Run all tests:
@@ -218,6 +270,11 @@ export default defineConfig({
 
 ### Recent Changes
 
+- **December 26, 2025**: Fixed TypeScript type check errors and web tests
+  - Resolved 19 TypeScript errors and 9 warnings across API and web
+  - Fixed 2 failing web tests related to delete confirmation modal
+  - Updated test count from 49 to 60 (added 11 web tests to documentation)
+  - All tests now passing with 100% success rate
 - **December 24, 2025**: Upgraded Zod from 4.2.1 (experimental) to 3.25.76
   (stable)
   - Fixed validation errors returning 500 instead of 400

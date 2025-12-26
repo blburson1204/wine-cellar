@@ -63,7 +63,7 @@ describe('Home Page - Wine Cellar', () => {
       vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => mockWines,
-      });
+      } as Response);
 
       render(<Home />);
 
@@ -76,7 +76,7 @@ describe('Home Page - Wine Cellar', () => {
       vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => mockWines,
-      });
+      } as Response);
 
       render(<Home />);
 
@@ -96,7 +96,7 @@ describe('Home Page - Wine Cellar', () => {
       vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => [],
-      });
+      } as Response);
 
       render(<Home />);
 
@@ -121,7 +121,7 @@ describe('Home Page - Wine Cellar', () => {
       vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => [],
-      });
+      } as Response);
 
       render(<Home />);
 
@@ -170,20 +170,19 @@ describe('Home Page - Wine Cellar', () => {
 
     it('calls delete API when confirmed', async () => {
       const user = userEvent.setup();
-      window.confirm = vi.fn(() => true);
 
       // Mock fetch to return wine initially, then empty after delete
       let callCount = 0;
-      vi.mocked(global.fetch).mockImplementation((url, options) => {
+      vi.mocked(global.fetch).mockImplementation((_url, options): Promise<Response> => {
         if (options?.method === 'DELETE') {
-          return Promise.resolve({ ok: true, json: async () => ({}) });
+          return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
         }
         // GET requests
         callCount++;
         if (callCount === 1) {
-          return Promise.resolve({ ok: true, json: async () => [mockWine] });
+          return Promise.resolve({ ok: true, json: async () => [mockWine] } as Response);
         }
-        return Promise.resolve({ ok: true, json: async () => [] });
+        return Promise.resolve({ ok: true, json: async () => [] } as Response);
       });
 
       render(<Home />);
@@ -192,23 +191,43 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getAllByText('Test Wine').length).toBeGreaterThan(0);
       });
 
-      await user.click(screen.getByText('Delete'));
+      // Click the delete button in the table
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
 
+      // Confirm modal should appear
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/wines/1', {
-          method: 'DELETE',
-        });
+        expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
       });
+
+      // The Delete button appears twice now: once in the table, once in the modal
+      // We need to click the one in the modal (which appears after the table one)
+      await waitFor(() => {
+        const allDeleteButtons = screen.getAllByRole('button', { name: 'Delete' });
+        expect(allDeleteButtons.length).toBe(2); // One in table, one in modal
+      });
+
+      const allDeleteButtons = screen.getAllByRole('button', { name: 'Delete' });
+      // Click the first Delete button (the one in the modal DIV, not the table TD)
+      await user.click(allDeleteButtons[0]);
+
+      // Wait for the DELETE request to be made
+      await waitFor(
+        () => {
+          expect(global.fetch).toHaveBeenCalledWith('/api/wines/1', {
+            method: 'DELETE',
+          });
+        },
+        { timeout: 2000 }
+      );
     });
 
     it('does not delete when cancelled', async () => {
       const user = userEvent.setup();
-      window.confirm = vi.fn(() => false);
 
       vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => [mockWine],
-      });
+      } as Response);
 
       render(<Home />);
 
@@ -217,9 +236,21 @@ describe('Home Page - Wine Cellar', () => {
       });
 
       const fetchCallCount = vi.mocked(global.fetch).mock.calls.length;
-      await user.click(screen.getByText('Delete'));
 
-      // Verify DELETE was NOT called
+      // Click the delete button in the table
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+      // Confirm modal should appear - click the cancel button
+      await waitFor(() => {
+        expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      // Modal should close and DELETE was NOT called
+      await waitFor(() => {
+        expect(screen.queryByText('Confirm Delete')).not.toBeInTheDocument();
+      });
       expect(vi.mocked(global.fetch).mock.calls.length).toBe(fetchCallCount);
     });
   });
@@ -245,11 +276,11 @@ describe('Home Page - Wine Cellar', () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       // Mock initial fetch to succeed, POST to fail
-      vi.mocked(global.fetch).mockImplementation((url, options) => {
+      vi.mocked(global.fetch).mockImplementation((_url, options): Promise<Response> => {
         if (options?.method === 'POST') {
           return Promise.reject(new Error('Server error'));
         }
-        return Promise.resolve({ ok: true, json: async () => [] });
+        return Promise.resolve({ ok: true, json: async () => [] } as Response);
       });
 
       render(<Home />);
@@ -275,7 +306,6 @@ describe('Home Page - Wine Cellar', () => {
     it('handles delete error', async () => {
       const user = userEvent.setup();
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      window.confirm = vi.fn(() => true);
 
       const mockWine = {
         id: '1',
@@ -291,11 +321,11 @@ describe('Home Page - Wine Cellar', () => {
         notes: null,
       };
 
-      vi.mocked(global.fetch).mockImplementation((url, options) => {
+      vi.mocked(global.fetch).mockImplementation((_url, options): Promise<Response> => {
         if (options?.method === 'DELETE') {
           return Promise.reject(new Error('Delete failed'));
         }
-        return Promise.resolve({ ok: true, json: async () => [mockWine] });
+        return Promise.resolve({ ok: true, json: async () => [mockWine] } as Response);
       });
 
       render(<Home />);
@@ -304,11 +334,31 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getAllByText('Test Wine').length).toBeGreaterThan(0);
       });
 
-      await user.click(screen.getByText('Delete'));
+      // Click the delete button in the table
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
 
+      // Confirm modal should appear
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Error deleting wine:', expect.any(Error));
+        expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
       });
+
+      // Wait for both Delete buttons to be present
+      await waitFor(() => {
+        const allDeleteButtons = screen.getAllByRole('button', { name: 'Delete' });
+        expect(allDeleteButtons.length).toBe(2); // One in table, one in modal
+      });
+
+      // Click the first Delete button (the one in the modal DIV, not the table TD)
+      const allDeleteButtons = screen.getAllByRole('button', { name: 'Delete' });
+      await user.click(allDeleteButtons[0]);
+
+      // Wait for the error to be logged
+      await waitFor(
+        () => {
+          expect(consoleErrorSpy).toHaveBeenCalledWith('Error deleting wine:', expect.any(Error));
+        },
+        { timeout: 2000 }
+      );
 
       consoleErrorSpy.mockRestore();
     });

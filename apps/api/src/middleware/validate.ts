@@ -32,7 +32,7 @@ function trimStrings(obj: any): any {
  * Middleware factory for validating request body, params, or query
  */
 export const validate = (schema: z.ZodSchema, source: 'body' | 'params' | 'query' = 'body') => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       // Trim all strings BEFORE validation
       const trimmedData = trimStrings(req[source]);
