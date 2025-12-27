@@ -43,7 +43,17 @@
 - [x] Automated code quality checks (GitHub Actions workflow)
 - [x] Documentation standards (skill documentation)
 
-#### 3. Security Best Practices
+#### 3. Test Coverage Improvement
+
+- [ ] Increase API test coverage to meet original thresholds
+  - Current: Functions 76.66%, Branches 57.37%, Lines ~75%, Statements ~75%
+  - Target: Functions 80%, Branches 70%, Lines 80%, Statements 80%
+  - Focus areas: Error handling edge cases, validation paths, utility functions
+- [ ] Add integration tests for complete API workflows
+- [ ] Add tests for uncovered branches in error handlers
+- [ ] Document testing patterns and best practices
+
+#### 4. Security Best Practices
 
 - [ ] Input validation and sanitization (zod)
 - [ ] SQL injection prevention (Prisma already helps)
@@ -60,7 +70,7 @@
 - [ ] CORS configuration
 - [ ] Session security
 
-#### 4. Performance Optimization
+#### 5. Performance Optimization
 
 - [ ] Database query optimization
 - [ ] Add database indexes
@@ -77,7 +87,7 @@
 - [ ] Load testing (k6 or Artillery)
 - [ ] Monitoring and profiling
 
-#### 5. Database Design and Management
+#### 6. Database Design and Management
 
 - [ ] Review and optimize schema design
 - [ ] Add database constraints
@@ -90,7 +100,7 @@
 - [ ] Database replication for reliability
 - [ ] Schema versioning
 
-#### 6. API Design
+#### 7. API Design
 
 - [ ] RESTful API conventions
 - [ ] API versioning strategy
@@ -105,7 +115,7 @@
 - [ ] Webhook support
 - [ ] API analytics
 
-#### 7. CI/CD and DevOps
+#### 8. CI/CD and DevOps
 
 - [ ] GitHub Actions CI/CD pipeline
   - [ ] Run tests on PR
