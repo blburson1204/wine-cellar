@@ -1,6 +1,7 @@
 {
   "name": "@wine-cellar/database",
   "version": "1.0.0",
+  "type": "module",
   "main": "./src/index.ts",
   "scripts": {
     "generate": "prisma generate",
