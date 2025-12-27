@@ -35,7 +35,7 @@ wine-cellar/
 
 ### Prerequisites
 
-- Node.js 18.17+ (or 18.3+ for Next.js 13)
+- Node.js 20+ (required for test runner compatibility)
 - Docker Desktop
 - npm
 
