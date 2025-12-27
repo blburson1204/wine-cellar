@@ -4,7 +4,9 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-const TEST_DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
+// Use DATABASE_URL from environment if set (for CI), otherwise default to local test DB on port 5433
+const TEST_DATABASE_URL =
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
 
 /* eslint-disable no-console */
 async function setupTestDatabase(): Promise<void> {

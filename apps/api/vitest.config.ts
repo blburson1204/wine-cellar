@@ -1,7 +1,9 @@
 import { defineConfig } from 'vitest/config';
 
-// Set test database URL
-process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
+// Set test database URL if not already set (allows CI to override)
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
+}
 
 export default defineConfig({
   test: {
