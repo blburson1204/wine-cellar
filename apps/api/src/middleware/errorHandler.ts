@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AppError, ValidationError } from '../errors/AppError';
 import { createLogger } from '../utils/logger';
 import { ZodError } from 'zod';
-import { Prisma } from '@wine-cellar/database';
+import { Prisma } from '@prisma/client';
 
 /**
  * Centralized error handling middleware
