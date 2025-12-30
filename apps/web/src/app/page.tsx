@@ -27,17 +27,18 @@ interface Wine {
 export default function Home(): React.JSX.Element {
   const [wines, setWines] = useState<Wine[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [selectedWine, setSelectedWine] = useState<Wine | null>(null);
+  const [modalMode, setModalMode] = useState<'view' | 'add' | null>(null);
 
   // Filter and sort state
   const [searchText, setSearchText] = useState('');
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [vintageRange, setVintageRange] = useState<[number, number] | null>(null);
-  const [sortBy, setSortBy] = useState<'name' | 'vintage' | 'rating' | 'createdAt'>('createdAt');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'vintage' | 'producer' | 'price'>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Derived state for filters
   const countries = useMemo(() => {
@@ -53,6 +54,22 @@ export default function Home(): React.JSX.Element {
   const vintageMax = useMemo(() => {
     if (wines.length === 0) return new Date().getFullYear();
     return Math.max(...wines.map((w) => w.vintage));
+  }, [wines]);
+
+  const priceMin = useMemo(() => {
+    if (wines.length === 0) return 0;
+    const prices = wines
+      .map((w) => w.purchasePrice)
+      .filter((p): p is number => p !== null && p !== undefined);
+    return prices.length > 0 ? Math.floor(Math.min(...prices)) : 0;
+  }, [wines]);
+
+  const priceMax = useMemo(() => {
+    if (wines.length === 0) return 1000;
+    const prices = wines
+      .map((w) => w.purchasePrice)
+      .filter((p): p is number => p !== null && p !== undefined);
+    return prices.length > 0 ? Math.ceil(Math.max(...prices)) : 1000;
   }, [wines]);
 
   // Filtered and sorted wines
@@ -87,7 +104,15 @@ export default function Home(): React.JSX.Element {
       );
     }
 
-    // Stage 5: Sorting
+    // Stage 5: Price range filter
+    if (priceRange) {
+      result = result.filter((wine) => {
+        if (wine.purchasePrice === null || wine.purchasePrice === undefined) return false;
+        return wine.purchasePrice >= priceRange[0] && wine.purchasePrice <= priceRange[1];
+      });
+    }
+
+    // Stage 6: Sorting
     result.sort((a, b) => {
       let comparison = 0;
       switch (sortBy) {
@@ -97,27 +122,36 @@ export default function Home(): React.JSX.Element {
         case 'vintage':
           comparison = a.vintage - b.vintage;
           break;
-        case 'rating':
-          comparison = (a.rating ?? 0) - (b.rating ?? 0);
+        case 'producer':
+          comparison = a.producer.localeCompare(b.producer);
           break;
-        case 'createdAt':
-          // Keep original order for createdAt (already sorted by DB)
-          comparison = 0;
+        case 'price':
+          comparison = (a.purchasePrice ?? 0) - (b.purchasePrice ?? 0);
           break;
       }
       return sortDirection === 'asc' ? comparison : -comparison;
     });
 
     return result;
-  }, [wines, searchText, selectedColors, selectedCountry, vintageRange, sortBy, sortDirection]);
+  }, [
+    wines,
+    searchText,
+    selectedColors,
+    selectedCountry,
+    vintageRange,
+    priceRange,
+    sortBy,
+    sortDirection,
+  ]);
 
   const handleClearFilters = (): void => {
     setSearchText('');
     setSelectedColors([]);
     setSelectedCountry(null);
     setVintageRange(null);
-    setSortBy('createdAt');
-    setSortDirection('desc');
+    setPriceRange(null);
+    setSortBy('name');
+    setSortDirection('asc');
   };
 
   useEffect(() => {
@@ -136,29 +170,29 @@ export default function Home(): React.JSX.Element {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const wine = {
-      name: formData.get('name'),
-      vintage: parseInt(formData.get('vintage') as string),
-      producer: formData.get('producer'),
-      country: formData.get('country'),
-      color: formData.get('color'),
-      quantity: parseInt(formData.get('quantity') as string) || 1,
-    };
-
+  const handleCreateWine = async (data: Omit<Wine, 'id'>): Promise<void> => {
     try {
-      await fetch('/api/wines', {
+      const response = await fetch('/api/wines', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(wine),
+        body: JSON.stringify(data),
       });
-      setShowForm(false);
-      void fetchWines();
-      (e.target as HTMLFormElement).reset();
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ POST request failed:', errorText);
+        throw new Error(`Failed to create wine: ${response.status} ${errorText}`);
+      }
+
+      // Fetch fresh list
+      const res = await fetch('/api/wines');
+      const updatedWines = await res.json();
+      setWines(updatedWines);
+      setModalMode(null);
+      setSelectedWine(null);
     } catch (error) {
-      console.error('Error adding wine:', error);
+      console.error('❌ Error creating wine:', error);
+      throw error;
     }
   };
 
@@ -301,345 +335,112 @@ export default function Home(): React.JSX.Element {
         }}
       >
         <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#4A1C26' }}>
-          {wines.length} {wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection
+          {filteredAndSortedWines.length !== wines.length
+            ? `Showing ${filteredAndSortedWines.length} of ${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'}`
+            : `${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection`}
         </h2>
-        {showForm ? (
-          <button
-            onClick={() => setShowForm(false)}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: 'transparent',
-              color: '#7C2D3C',
-              border: '1px solid #7C2D3C',
-              borderRadius: '6px',
-              fontSize: '16px',
-              cursor: 'pointer',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#F5F1E8';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            Cancel
-          </button>
-        ) : (
-          <button
-            onClick={() => setShowForm(true)}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#7C2D3C',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              cursor: 'pointer',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-              boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#5f2330';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#7C2D3C';
-            }}
-          >
-            + Add Wine
-          </button>
-        )}
-      </div>
-
-      {/* Add Wine Form */}
-      {showForm && (
-        <form
-          onSubmit={handleSubmit}
+        <button
+          onClick={() => setModalMode('add')}
           style={{
-            marginBottom: '24px',
-            padding: '24px',
-            backgroundColor: '#F5F1E8',
-            borderRadius: '8px',
-            border: '1px solid #E5DFD0',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+            padding: '10px 20px',
+            backgroundColor: '#7C2D3C',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            fontWeight: '500',
+            transition: 'all 0.2s',
+            boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = '#5f2330';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = '#7C2D3C';
           }}
         >
-          <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#4A1C26', fontSize: '18px' }}>
-            Add New Wine
-          </h3>
+          + Add Wine
+        </button>
+      </div>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '16px',
-              marginBottom: '16px',
-            }}
-          >
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#4A1C26',
-                }}
-              >
-                Wine Name *
-              </label>
-              <input
-                name="name"
-                required
-                placeholder="e.g., Chateau Margaux"
-                style={{
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  width: '100%',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#4A1C26',
-                }}
-              >
-                Vintage *
-              </label>
-              <input
-                name="vintage"
-                type="number"
-                required
-                placeholder="2015"
-                min="1900"
-                max={new Date().getFullYear()}
-                style={{
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  width: '100%',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
+      {/* Main Content: Sidebar + Table Layout */}
+      <div style={{ display: 'flex', gap: '20px' }}>
+        {/* Left Sidebar - Filters (25%) */}
+        {wines.length > 0 && (
+          <div style={{ flex: '0 0 25%' }}>
+            <WineFilters
+              searchText={searchText}
+              onSearchChange={setSearchText}
+              selectedColors={selectedColors}
+              onColorsChange={setSelectedColors}
+              selectedCountry={selectedCountry}
+              onCountryChange={setSelectedCountry}
+              countries={countries}
+              vintageRange={vintageRange}
+              onVintageRangeChange={setVintageRange}
+              vintageMin={vintageMin}
+              vintageMax={vintageMax}
+              priceRange={priceRange}
+              onPriceRangeChange={setPriceRange}
+              priceMin={priceMin}
+              priceMax={priceMax}
+              onClearAll={handleClearFilters}
+            />
           </div>
+        )}
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '16px',
-              marginBottom: '16px',
+        {/* Right Content - Table (67%) */}
+        <div style={{ flex: wines.length > 0 ? '1' : '1 1 100%' }}>
+          <WineTable
+            wines={filteredAndSortedWines}
+            onRowClick={(wine) => {
+              setSelectedWine(wine);
+              setModalMode('view');
             }}
-          >
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#4A1C26',
-                }}
-              >
-                Producer *
-              </label>
-              <input
-                name="producer"
-                required
-                placeholder="e.g., Opus One"
-                style={{
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  width: '100%',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#4A1C26',
-                }}
-              >
-                Country *
-              </label>
-              <input
-                name="country"
-                required
-                placeholder="e.g., France"
-                style={{
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  width: '100%',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '16px',
-              marginBottom: '20px',
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            onSort={(column) => {
+              if (sortBy === column) {
+                // Toggle direction if clicking the same column
+                setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+              } else {
+                // Set new column with ascending as default
+                setSortBy(column);
+                setSortDirection('asc');
+              }
             }}
-          >
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#4A1C26',
-                }}
-              >
-                Wine Color *
-              </label>
-              <select
-                name="color"
-                required
-                style={{
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  width: '100%',
-                  backgroundColor: 'white',
-                  cursor: 'pointer',
-                  boxSizing: 'border-box',
-                }}
-              >
-                <option value="RED">Red</option>
-                <option value="WHITE">White</option>
-                <option value="ROSE">Rosé</option>
-                <option value="SPARKLING">Sparkling</option>
-                <option value="DESSERT">Dessert</option>
-                <option value="FORTIFIED">Fortified</option>
-              </select>
-            </div>
+          />
+        </div>
+      </div>
 
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#4A1C26',
-                }}
-              >
-                Quantity
-              </label>
-              <input
-                name="quantity"
-                type="number"
-                defaultValue={1}
-                min="1"
-                style={{
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  width: '100%',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#7C2D3C',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              cursor: 'pointer',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#5f2330';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#7C2D3C';
-            }}
-          >
-            Save Wine
-          </button>
-        </form>
-      )}
-
-      {/* Filters */}
-      {wines.length > 0 && (
-        <WineFilters
-          searchText={searchText}
-          onSearchChange={setSearchText}
-          selectedColors={selectedColors}
-          onColorsChange={setSelectedColors}
-          selectedCountry={selectedCountry}
-          onCountryChange={setSelectedCountry}
-          countries={countries}
-          vintageRange={vintageRange}
-          onVintageRangeChange={setVintageRange}
-          vintageMin={vintageMin}
-          vintageMax={vintageMax}
-          sortBy={sortBy}
-          sortDirection={sortDirection}
-          onSortChange={(newSortBy, newDirection) => {
-            setSortBy(newSortBy as 'name' | 'vintage' | 'rating' | 'createdAt');
-            setSortDirection(newDirection);
+      {/* Wine Detail Modal */}
+      {modalMode === 'view' && (
+        <WineDetailModal
+          wine={selectedWine}
+          mode="view"
+          onClose={() => {
+            setSelectedWine(null);
+            setModalMode(null);
           }}
-          onClearAll={handleClearFilters}
-          totalCount={wines.length}
-          filteredCount={filteredAndSortedWines.length}
+          onUpdate={handleUpdateWine}
+          onDelete={handleDelete}
         />
       )}
 
-      {/* Wine List */}
-      <WineTable
-        wines={filteredAndSortedWines}
-        onDelete={handleDelete}
-        onRowClick={setSelectedWine}
-      />
-
-      {/* Wine Detail Modal */}
-      <WineDetailModal
-        wine={selectedWine}
-        onClose={() => setSelectedWine(null)}
-        onUpdate={handleUpdateWine}
-      />
+      {/* Add Wine Modal */}
+      {modalMode === 'add' && (
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={() => {
+            setModalMode(null);
+            setSelectedWine(null);
+          }}
+          onUpdate={handleUpdateWine}
+          onCreate={handleCreateWine}
+        />
+      )}
     </div>
   );
 }

@@ -10,12 +10,11 @@ interface WineFiltersProps {
   onVintageRangeChange: (range: [number, number] | null) => void;
   vintageMin: number;
   vintageMax: number;
-  sortBy: string;
-  sortDirection: 'asc' | 'desc';
-  onSortChange: (sortBy: string, direction: 'asc' | 'desc') => void;
+  priceRange: [number, number] | null;
+  onPriceRangeChange: (range: [number, number] | null) => void;
+  priceMin: number;
+  priceMax: number;
   onClearAll: () => void;
-  totalCount: number;
-  filteredCount: number;
 }
 
 const WINE_COLORS = [
@@ -25,42 +24,6 @@ const WINE_COLORS = [
   { value: 'SPARKLING', label: 'Sparkling', color: '#FFD700' },
   { value: 'DESSERT', label: 'Dessert', color: '#8B4513' },
   { value: 'FORTIFIED', label: 'Fortified', color: '#4A1C26' },
-];
-
-const SORT_OPTIONS = [
-  { value: 'name-asc', label: 'Name (A-Z)', sortBy: 'name', direction: 'asc' as const },
-  { value: 'name-desc', label: 'Name (Z-A)', sortBy: 'name', direction: 'desc' as const },
-  {
-    value: 'vintage-asc',
-    label: 'Vintage (Old-New)',
-    sortBy: 'vintage',
-    direction: 'asc' as const,
-  },
-  {
-    value: 'vintage-desc',
-    label: 'Vintage (New-Old)',
-    sortBy: 'vintage',
-    direction: 'desc' as const,
-  },
-  {
-    value: 'rating-desc',
-    label: 'Rating (High-Low)',
-    sortBy: 'rating',
-    direction: 'desc' as const,
-  },
-  { value: 'rating-asc', label: 'Rating (Low-High)', sortBy: 'rating', direction: 'asc' as const },
-  {
-    value: 'createdAt-desc',
-    label: 'Recently Added',
-    sortBy: 'createdAt',
-    direction: 'desc' as const,
-  },
-  {
-    value: 'createdAt-asc',
-    label: 'Oldest First',
-    sortBy: 'createdAt',
-    direction: 'asc' as const,
-  },
 ];
 
 export default function WineFilters({
@@ -75,20 +38,18 @@ export default function WineFilters({
   onVintageRangeChange,
   vintageMin,
   vintageMax,
-  sortBy,
-  sortDirection,
-  onSortChange,
+  priceRange,
+  onPriceRangeChange,
+  priceMin,
+  priceMax,
   onClearAll,
-  totalCount,
-  filteredCount,
 }: WineFiltersProps): React.JSX.Element {
   const hasActiveFilters =
     searchText !== '' ||
     selectedColors.length > 0 ||
     selectedCountry !== null ||
     vintageRange !== null ||
-    sortBy !== 'createdAt' ||
-    sortDirection !== 'desc';
+    priceRange !== null;
 
   const handleColorToggle = (colorValue: string): void => {
     if (selectedColors.includes(colorValue)) {
@@ -97,15 +58,6 @@ export default function WineFilters({
     } else {
       // Add color to selection
       onColorsChange([...selectedColors, colorValue]);
-    }
-  };
-
-  const currentSortValue = `${sortBy}-${sortDirection}`;
-
-  const handleSortSelectChange = (value: string): void => {
-    const option = SORT_OPTIONS.find((opt) => opt.value === value);
-    if (option) {
-      onSortChange(option.sortBy, option.direction);
     }
   };
 
@@ -119,104 +71,174 @@ export default function WineFilters({
     onVintageRangeChange([min, value]);
   };
 
+  const handlePriceMinChange = (value: number): void => {
+    const max = priceRange?.[1] ?? priceMax;
+    onPriceRangeChange([value, max]);
+  };
+
+  const handlePriceMaxChange = (value: number): void => {
+    const min = priceRange?.[0] ?? priceMin;
+    onPriceRangeChange([min, value]);
+  };
+
   return (
     <div
       style={{
-        marginBottom: '20px',
         padding: '16px',
         backgroundColor: '#F5F1E8',
         borderRadius: '8px',
         border: '1px solid #E5DFD0',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
       }}
     >
-      {/* Search and Sort Row */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr auto',
-          gap: '12px',
-          marginBottom: '12px',
-        }}
-      >
-        <div>
-          <label
-            htmlFor="search"
-            style={{
-              display: 'block',
-              marginBottom: '4px',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#4A1C26',
-            }}
-          >
-            Search
-          </label>
-          <input
-            id="search"
-            type="text"
-            placeholder="Search by name, producer, or region..."
-            value={searchText}
-            onChange={(e) => onSearchChange(e.target.value)}
-            style={{
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #D4A5A5',
-              borderRadius: '4px',
-              width: '100%',
-              backgroundColor: 'white',
-              boxSizing: 'border-box',
-            }}
-          />
-        </div>
+      {/* Filter Criteria */}
+      <div>
+        <label
+          htmlFor="search"
+          style={{
+            display: 'block',
+            marginBottom: '4px',
+            fontSize: '16px',
+            fontWeight: '600',
+            color: '#4A1C26',
+          }}
+        >
+          Filter Criteria
+        </label>
+        <input
+          id="search"
+          type="text"
+          placeholder="Name, producer, region..."
+          value={searchText}
+          onChange={(e) => onSearchChange(e.target.value)}
+          style={{
+            padding: '8px',
+            fontSize: '14px',
+            border: '1px solid #D4A5A5',
+            borderRadius: '4px',
+            width: '100%',
+            backgroundColor: 'white',
+            boxSizing: 'border-box',
+          }}
+        />
+      </div>
 
-        <div style={{ minWidth: '200px' }}>
-          <label
-            htmlFor="sort"
-            style={{
-              display: 'block',
-              marginBottom: '4px',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#4A1C26',
-            }}
-          >
-            Sort By
-          </label>
-          <select
-            id="sort"
-            value={currentSortValue}
-            onChange={(e) => handleSortSelectChange(e.target.value)}
-            style={{
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #D4A5A5',
-              borderRadius: '4px',
-              width: '100%',
-              backgroundColor: 'white',
-              cursor: 'pointer',
-              boxSizing: 'border-box',
-            }}
-          >
-            {SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+      {/* Wine Type */}
+      <div>
+        <label
+          style={{
+            display: 'block',
+            marginBottom: '4px',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#4A1C26',
+          }}
+        >
+          Wine Type
+        </label>
+        <div
+          style={{
+            padding: '8px',
+            backgroundColor: 'white',
+            border: '1px solid #D4A5A5',
+            borderRadius: '6px',
+          }}
+        >
+          {WINE_COLORS.map((color) => {
+            const isSelected = selectedColors.includes(color.value);
+            return (
+              <label
+                key={color.value}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 6px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  borderRadius: '4px',
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#FAFAF8';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => handleColorToggle(color.value)}
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    cursor: 'pointer',
+                    accentColor: '#7C2D3C',
+                    flexShrink: 0,
+                  }}
+                />
+                <div
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: color.color,
+                    border: color.value === 'WHITE' ? '1px solid #D4A5A5' : 'none',
+                    flexShrink: 0,
+                  }}
+                />
+                <span style={{ fontSize: '13px', color: '#4A1C26', fontWeight: '500' }}>
+                  {color.label}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
 
-      {/* Wine Type and Filters Row */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '20px',
-          marginBottom: '12px',
-          alignItems: 'start',
-        }}
-      >
-        {/* Wine Type Filter */}
+      {/* Country */}
+      <div>
+        <label
+          htmlFor="country"
+          style={{
+            display: 'block',
+            marginBottom: '4px',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#4A1C26',
+          }}
+        >
+          Country
+        </label>
+        <select
+          id="country"
+          value={selectedCountry ?? ''}
+          onChange={(e) => onCountryChange(e.target.value || null)}
+          style={{
+            padding: '8px',
+            fontSize: '14px',
+            border: '1px solid #D4A5A5',
+            borderRadius: '4px',
+            width: '100%',
+            backgroundColor: 'white',
+            cursor: 'pointer',
+            boxSizing: 'border-box',
+          }}
+        >
+          <option value="">All Countries</option>
+          {countries.map((country) => (
+            <option key={country} value={country}>
+              {country}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Vintage and Price Range - Side by Side */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        {/* Vintage Range */}
         <div>
           <label
             style={{
@@ -227,208 +249,172 @@ export default function WineFilters({
               color: '#4A1C26',
             }}
           >
-            Wine Type
+            Vintage
           </label>
-          <div
-            style={{
-              padding: '8px',
-              backgroundColor: 'white',
-              border: '1px solid #D4A5A5',
-              borderRadius: '6px',
-              marginTop: '21px',
-            }}
-          >
-            {WINE_COLORS.map((color) => {
-              const isSelected = selectedColors.includes(color.value);
-              return (
-                <label
-                  key={color.value}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '4px 6px',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s',
-                    borderRadius: '4px',
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#FAFAF8';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => handleColorToggle(color.value)}
-                    style={{
-                      width: '16px',
-                      height: '16px',
-                      cursor: 'pointer',
-                      accentColor: '#7C2D3C',
-                      flexShrink: 0,
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      backgroundColor: color.color,
-                      border: color.value === 'WHITE' ? '1px solid #D4A5A5' : 'none',
-                      flexShrink: 0,
-                    }}
-                  />
-                  <span style={{ fontSize: '13px', color: '#4A1C26', fontWeight: '500' }}>
-                    {color.label}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Vintage Range and Country Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {/* Vintage Range */}
-          <div>
-            <label
-              style={{
-                display: 'block',
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#4A1C26',
-              }}
-            >
-              Vintage Range
-            </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div>
-                <label
-                  htmlFor="vintage-from"
-                  style={{
-                    display: 'block',
-                    marginBottom: '2px',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    color: '#7C2D3C',
-                  }}
-                >
-                  From
-                </label>
-                <input
-                  id="vintage-from"
-                  type="number"
-                  min={vintageMin}
-                  max={vintageMax}
-                  value={vintageRange?.[0] ?? vintageMin}
-                  onChange={(e) => handleVintageMinChange(parseInt(e.target.value) || vintageMin)}
-                  disabled={vintageMin === vintageMax}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    fontSize: '14px',
-                    border: '1px solid #D4A5A5',
-                    borderRadius: '4px',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                    cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
-                  }}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="vintage-to"
-                  style={{
-                    display: 'block',
-                    marginBottom: '2px',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    color: '#7C2D3C',
-                  }}
-                >
-                  To
-                </label>
-                <input
-                  id="vintage-to"
-                  type="number"
-                  min={vintageMin}
-                  max={vintageMax}
-                  value={vintageRange?.[1] ?? vintageMax}
-                  onChange={(e) => handleVintageMaxChange(parseInt(e.target.value) || vintageMax)}
-                  disabled={vintageMin === vintageMax}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    fontSize: '14px',
-                    border: '1px solid #D4A5A5',
-                    borderRadius: '4px',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                    cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
-                  }}
-                />
-              </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div>
+              <label
+                htmlFor="vintage-from"
+                style={{
+                  display: 'block',
+                  marginBottom: '2px',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  color: '#7C2D3C',
+                }}
+              >
+                From
+              </label>
+              <input
+                id="vintage-from"
+                type="number"
+                min={vintageMin}
+                max={vintageMax}
+                value={vintageRange?.[0] ?? vintageMin}
+                onChange={(e) => handleVintageMinChange(parseInt(e.target.value) || vintageMin)}
+                disabled={vintageMin === vintageMax}
+                style={{
+                  width: '100%',
+                  padding: '6px',
+                  fontSize: '13px',
+                  border: '1px solid #D4A5A5',
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  boxSizing: 'border-box',
+                  cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
+                }}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="vintage-to"
+                style={{
+                  display: 'block',
+                  marginBottom: '2px',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  color: '#7C2D3C',
+                }}
+              >
+                To
+              </label>
+              <input
+                id="vintage-to"
+                type="number"
+                min={vintageMin}
+                max={vintageMax}
+                value={vintageRange?.[1] ?? vintageMax}
+                onChange={(e) => handleVintageMaxChange(parseInt(e.target.value) || vintageMax)}
+                disabled={vintageMin === vintageMax}
+                style={{
+                  width: '100%',
+                  padding: '6px',
+                  fontSize: '13px',
+                  border: '1px solid #D4A5A5',
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  boxSizing: 'border-box',
+                  cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
+                }}
+              />
             </div>
           </div>
+        </div>
 
-          {/* Country */}
-          <div>
-            <label
-              htmlFor="country"
-              style={{
-                display: 'block',
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#4A1C26',
-              }}
-            >
-              Country
-            </label>
-            <select
-              id="country"
-              value={selectedCountry ?? ''}
-              onChange={(e) => onCountryChange(e.target.value || null)}
-              style={{
-                padding: '8px',
-                fontSize: '14px',
-                border: '1px solid #D4A5A5',
-                borderRadius: '4px',
-                width: '100%',
-                backgroundColor: 'white',
-                cursor: 'pointer',
-                boxSizing: 'border-box',
-              }}
-            >
-              <option value="">All Countries</option>
-              {countries.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
-            </select>
+        {/* Price Range */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '4px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#4A1C26',
+            }}
+          >
+            Price ($)
+          </label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div>
+              <label
+                htmlFor="price-from"
+                style={{
+                  display: 'block',
+                  marginBottom: '2px',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  color: '#7C2D3C',
+                }}
+              >
+                From
+              </label>
+              <input
+                id="price-from"
+                type="number"
+                min={priceMin}
+                max={priceMax}
+                step="0.01"
+                value={priceRange?.[0] ?? priceMin}
+                onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
+                disabled={priceMin === priceMax}
+                style={{
+                  width: '100%',
+                  padding: '6px',
+                  fontSize: '13px',
+                  border: '1px solid #D4A5A5',
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  boxSizing: 'border-box',
+                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                }}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="price-to"
+                style={{
+                  display: 'block',
+                  marginBottom: '2px',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  color: '#7C2D3C',
+                }}
+              >
+                To
+              </label>
+              <input
+                id="price-to"
+                type="number"
+                min={priceMin}
+                max={priceMax}
+                step="0.01"
+                value={priceRange?.[1] ?? priceMax}
+                onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
+                disabled={priceMin === priceMax}
+                style={{
+                  width: '100%',
+                  padding: '6px',
+                  fontSize: '13px',
+                  border: '1px solid #D4A5A5',
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  boxSizing: 'border-box',
+                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Results Count and Clear Button */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingTop: '12px',
-          borderTop: '1px solid #E5DFD0',
-        }}
-      >
-        <span style={{ fontSize: '14px', color: '#4A1C26', fontWeight: '500' }}>
-          Showing {filteredCount} of {totalCount} wines
-        </span>
-        {hasActiveFilters && (
+      {/* Clear Button at Bottom */}
+      {hasActiveFilters && (
+        <div
+          style={{
+            paddingTop: '12px',
+            borderTop: '1px solid #E5DFD0',
+          }}
+        >
           <button
             type="button"
             onClick={onClearAll}
@@ -442,6 +428,7 @@ export default function WineFilters({
               cursor: 'pointer',
               fontWeight: '500',
               transition: 'all 0.2s',
+              width: '100%',
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = '#FAFAF8';
@@ -452,8 +439,8 @@ export default function WineFilters({
           >
             Clear All Filters
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

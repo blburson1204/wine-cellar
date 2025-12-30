@@ -26,15 +26,23 @@ const WINE_COLORS: Record<string, string> = {
 
 interface WineTableProps {
   wines: Wine[];
-  onDelete: (id: string) => void;
   onRowClick: (wine: Wine) => void;
+  sortBy: 'name' | 'vintage' | 'producer' | 'price';
+  sortDirection: 'asc' | 'desc';
+  onSort: (column: 'name' | 'vintage' | 'producer' | 'price') => void;
 }
 
 export default function WineTable({
   wines,
-  onDelete,
   onRowClick,
+  sortBy,
+  sortDirection,
+  onSort,
 }: WineTableProps): React.JSX.Element {
+  const getSortIndicator = (column: 'name' | 'vintage' | 'producer' | 'price'): string => {
+    if (sortBy !== column) return '';
+    return sortDirection === 'asc' ? ' ↑' : ' ↓';
+  };
   if (wines.length === 0) {
     return (
       <div
@@ -70,48 +78,29 @@ export default function WineTable({
         <thead>
           <tr style={{ backgroundColor: '#4A1C26', color: 'white' }}>
             <th
+              onClick={() => onSort('name')}
               style={{
-                padding: '12px 16px',
+                padding: '10px 12px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '600',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5f2330';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              Wine
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Wine</span>
+              {getSortIndicator('name')}
             </th>
             <th
               style={{
-                padding: '12px 16px',
-                textAlign: 'left',
-                fontSize: '14px',
-                fontWeight: '600',
-              }}
-            >
-              Vintage
-            </th>
-            <th
-              style={{
-                padding: '12px 16px',
-                textAlign: 'left',
-                fontSize: '14px',
-                fontWeight: '600',
-              }}
-            >
-              Producer
-            </th>
-            <th
-              style={{
-                padding: '12px 16px',
-                textAlign: 'left',
-                fontSize: '14px',
-                fontWeight: '600',
-              }}
-            >
-              Country
-            </th>
-            <th
-              style={{
-                padding: '12px 16px',
+                padding: '10px 12px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '600',
@@ -120,8 +109,61 @@ export default function WineTable({
               Type
             </th>
             <th
+              onClick={() => onSort('producer')}
               style={{
-                padding: '12px 16px',
+                padding: '10px 12px',
+                textAlign: 'left',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5f2330';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Producer</span>
+              {getSortIndicator('producer')}
+            </th>
+            <th
+              style={{
+                padding: '10px 12px',
+                textAlign: 'left',
+                fontSize: '14px',
+                fontWeight: '600',
+              }}
+            >
+              Country
+            </th>
+            <th
+              onClick={() => onSort('vintage')}
+              style={{
+                padding: '10px 12px',
+                textAlign: 'left',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
+                minWidth: '90px',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5f2330';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Vintage</span>
+              {getSortIndicator('vintage')}
+            </th>
+            <th
+              style={{
+                padding: '10px 12px',
                 textAlign: 'center',
                 fontSize: '14px',
                 fontWeight: '600',
@@ -130,14 +172,25 @@ export default function WineTable({
               Qty
             </th>
             <th
+              onClick={() => onSort('price')}
               style={{
-                padding: '12px 16px',
-                textAlign: 'center',
+                padding: '10px 12px',
+                textAlign: 'right',
                 fontSize: '14px',
                 fontWeight: '600',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5f2330';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              Actions
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Price</span>
+              {getSortIndicator('price')}
             </th>
           </tr>
         </thead>
@@ -158,7 +211,7 @@ export default function WineTable({
               }}
               onClick={() => onRowClick(wine)}
             >
-              <td style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <td style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div
                   style={{
                     width: '12px',
@@ -171,10 +224,7 @@ export default function WineTable({
                 />
                 <span style={{ fontWeight: '500', color: '#4A1C26' }}>{wine.name}</span>
               </td>
-              <td style={{ padding: '16px', color: '#4A1C26' }}>{wine.vintage}</td>
-              <td style={{ padding: '16px', color: '#4A1C26' }}>{wine.producer}</td>
-              <td style={{ padding: '16px', color: '#4A1C26' }}>{wine.country}</td>
-              <td style={{ padding: '16px' }}>
+              <td style={{ padding: '12px' }}>
                 <span
                   style={{
                     padding: '4px 8px',
@@ -188,42 +238,23 @@ export default function WineTable({
                   {wine.color}
                 </span>
               </td>
+              <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.producer}</td>
+              <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.country}</td>
+              <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.vintage}</td>
+              <td style={{ padding: '12px', textAlign: 'center', color: '#4A1C26' }}>
+                {wine.quantity}
+              </td>
               <td
                 style={{
-                  padding: '16px',
-                  textAlign: 'center',
+                  padding: '12px',
+                  textAlign: 'right',
                   color: '#4A1C26',
                   fontWeight: '500',
                 }}
               >
-                {wine.quantity}
-              </td>
-              <td style={{ padding: '16px', textAlign: 'center' }}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(wine.id);
-                  }}
-                  style={{
-                    padding: '6px 12px',
-                    backgroundColor: '#C73E3A',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#a33330';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = '#C73E3A';
-                  }}
-                >
-                  Delete
-                </button>
+                {wine.purchasePrice !== null && wine.purchasePrice !== undefined
+                  ? `$${wine.purchasePrice.toFixed(2)}`
+                  : '—'}
               </td>
             </tr>
           ))}

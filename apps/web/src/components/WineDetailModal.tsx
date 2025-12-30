@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Wine {
   id: string;
@@ -21,8 +21,11 @@ interface Wine {
 
 interface WineDetailModalProps {
   wine: Wine | null;
+  mode?: 'view' | 'add'; // 'view' for viewing existing wine, 'add' for creating new wine
   onClose: () => void;
   onUpdate: (id: string, data: Partial<Wine>) => Promise<void>;
+  onCreate?: (data: Omit<Wine, 'id'>) => Promise<void>;
+  onDelete?: (id: string) => void;
 }
 
 const WINE_COLORS: Record<string, string> = {
@@ -101,33 +104,67 @@ const StarRating = ({ rating }: { rating: number | null }): React.JSX.Element =>
 
 export default function WineDetailModal({
   wine,
+  mode = 'view',
   onClose,
   onUpdate,
+  onCreate,
+  onDelete,
 }: WineDetailModalProps): React.JSX.Element | null {
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(mode === 'add');
   const [editForm, setEditForm] = useState<Partial<Wine>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
 
-  if (!wine) return null;
+  // Initialize form with default values for add mode
+  useEffect(() => {
+    if (mode === 'add') {
+      setEditForm({
+        name: '',
+        vintage: new Date().getFullYear(),
+        producer: '',
+        region: null,
+        country: '',
+        grapeVariety: null,
+        color: 'RED',
+        quantity: 1,
+        purchasePrice: null,
+        purchaseDate: null,
+        drinkByDate: null,
+        rating: null,
+        notes: null,
+      });
+    } else if (wine) {
+      setEditForm(wine);
+    }
+  }, [mode, wine]);
+
+  if (mode === 'view' && !wine) return null;
 
   const handleEditClick = (): void => {
-    setEditForm(wine);
+    if (wine) {
+      setEditForm(wine);
+    }
     setErrors({});
     setIsEditMode(true);
   };
 
   const handleCancelEdit = (): void => {
-    const hasChanges = JSON.stringify(editForm) !== JSON.stringify(wine);
-    if (hasChanges) {
-      // eslint-disable-next-line no-alert
-      if (!window.confirm('You have unsaved changes. Are you sure you want to cancel?')) {
-        return;
+    if (mode === 'add') {
+      // For add mode, just close the modal
+      onClose();
+    } else {
+      // For edit mode, check for unsaved changes
+      const hasChanges = JSON.stringify(editForm) !== JSON.stringify(wine);
+      if (hasChanges) {
+        // eslint-disable-next-line no-alert
+        if (!window.confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+          return;
+        }
       }
+      setIsEditMode(false);
+      setEditForm({});
+      setErrors({});
     }
-    setIsEditMode(false);
-    setEditForm({});
-    setErrors({});
   };
 
   const validateForm = (): boolean => {
@@ -232,13 +269,29 @@ export default function WineDetailModal({
 
     setIsSaving(true);
     try {
-      await onUpdate(wine.id, editForm);
-      setIsEditMode(false);
-      setEditForm({});
-      setErrors({});
+      if (mode === 'add') {
+        // Create new wine
+        if (!onCreate) {
+          throw new Error('onCreate handler is required for add mode');
+        }
+        await onCreate(editForm as Omit<Wine, 'id'>);
+        onClose(); // Close modal after successful creation
+      } else {
+        // Update existing wine
+        if (!wine) {
+          throw new Error('Wine is required for update mode');
+        }
+        await onUpdate(wine.id, editForm);
+        onClose(); // Close modal after successful update
+      }
     } catch (error) {
       console.error('❌ Error in handleSave:', error);
-      setErrors({ _general: 'Failed to update wine. Please try again.' });
+      setErrors({
+        _general:
+          mode === 'add'
+            ? 'Failed to add wine. Please try again.'
+            : 'Failed to update wine. Please try again.',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -274,30 +327,34 @@ export default function WineDetailModal({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+        {/* Header - only show for view mode (not edit/add mode) */}
+        {mode === 'view' && wine && !isEditMode && (
+          <div style={{ marginBottom: '24px' }}>
             <div
-              style={{
-                width: '16px',
-                height: '16px',
-                borderRadius: '50%',
-                backgroundColor: WINE_COLORS[wine.color] || '#7C2D3C',
-                border: wine.color === 'WHITE' ? '1px solid #D4A5A5' : 'none',
-                flexShrink: 0,
-              }}
-            />
-            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#4A1C26' }}>
-              {wine.name}
-            </h2>
+              style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}
+            >
+              <div
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  backgroundColor: WINE_COLORS[wine.color] || '#7C2D3C',
+                  border: wine.color === 'WHITE' ? '1px solid #D4A5A5' : 'none',
+                  flexShrink: 0,
+                }}
+              />
+              <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#4A1C26' }}>
+                {wine.name}
+              </h2>
+            </div>
+            <p style={{ margin: 0, fontSize: '16px', color: '#7C2D3C' }}>
+              {wine.vintage} · {wine.producer}
+            </p>
           </div>
-          <p style={{ margin: 0, fontSize: '16px', color: '#7C2D3C' }}>
-            {wine.vintage} · {wine.producer}
-          </p>
-        </div>
+        )}
 
-        {/* Read-Only View */}
-        {!isEditMode && (
+        {/* Read-Only View - only for view mode */}
+        {!isEditMode && mode === 'view' && wine && (
           <div>
             {/* Details Grid */}
             <div
@@ -526,66 +583,100 @@ export default function WineDetailModal({
             )}
 
             {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button
-                onClick={onClose}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: 'transparent',
-                  color: '#7C2D3C',
-                  border: '1px solid #7C2D3C',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  transition: 'all 0.2s',
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F5F1E8';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }}
-              >
-                Close
-              </button>
-              <button
-                onClick={handleEditClick}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#7C2D3C',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#5f2330';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = '#7C2D3C';
-                }}
-              >
-                Edit Wine
-              </button>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+              {/* Delete button on the left */}
+              {onDelete && wine && (
+                <button
+                  onClick={() => {
+                    if (wine) {
+                      onClose(); // Close the detail modal first
+                      onDelete(wine.id); // Then show the delete confirmation modal
+                    }
+                  }}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: 'transparent',
+                    color: '#C73E3A',
+                    border: '1px solid #C73E3A',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FEE';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  Delete Wine
+                </button>
+              )}
+
+              {/* Close and Edit buttons on the right */}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={onClose}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: 'transparent',
+                    color: '#7C2D3C',
+                    border: '1px solid #7C2D3C',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F5F1E8';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  Close
+                </button>
+                <button
+                  onClick={handleEditClick}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#7C2D3C',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#5f2330';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = '#7C2D3C';
+                  }}
+                >
+                  Edit Wine
+                </button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Edit Mode */}
+        {/* Edit Mode / Add Mode */}
         {isEditMode && (
           <div>
             {/* Header */}
             <div style={{ marginBottom: '24px' }}>
               <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#4A1C26' }}>
-                Edit Wine
+                {mode === 'add' ? 'Add New Wine' : 'Edit Wine'}
               </h2>
               <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#7C2D3C' }}>
-                Update wine details
+                {mode === 'add' ? 'Add a new wine to your collection' : 'Update wine details'}
               </p>
             </div>
 
@@ -943,6 +1034,49 @@ export default function WineDetailModal({
                 )}
               </div>
 
+              {/* Rating */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '4px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#4A1C26',
+                  }}
+                >
+                  Rating (1.0 - 5.0)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="1.0"
+                  max="5.0"
+                  value={editForm.rating ?? ''}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      rating: e.target.value ? parseFloat(e.target.value) : null,
+                    })
+                  }
+                  placeholder="e.g., 3.6"
+                  style={{
+                    padding: '10px',
+                    fontSize: '16px',
+                    border: `1px solid ${errors.rating ? '#C73E3A' : '#D4A5A5'}`,
+                    borderRadius: '4px',
+                    width: '100%',
+                    backgroundColor: 'white',
+                    boxSizing: 'border-box',
+                  }}
+                />
+                {errors.rating && (
+                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                    {errors.rating}
+                  </span>
+                )}
+              </div>
+
               {/* Purchase Date */}
               <div>
                 <label
@@ -1118,49 +1252,6 @@ export default function WineDetailModal({
               </div>
             </div>
 
-            {/* Rating - Full Width */}
-            <div style={{ marginBottom: '24px' }}>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#4A1C26',
-                }}
-              >
-                Rating (1.0 - 5.0)
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                min="1.0"
-                max="5.0"
-                value={editForm.rating ?? ''}
-                onChange={(e) =>
-                  setEditForm({
-                    ...editForm,
-                    rating: e.target.value ? parseFloat(e.target.value) : null,
-                  })
-                }
-                placeholder="e.g., 3.6"
-                style={{
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: `1px solid ${errors.rating ? '#C73E3A' : '#D4A5A5'}`,
-                  borderRadius: '4px',
-                  width: '200px',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                }}
-              />
-              {errors.rating && (
-                <div style={{ fontSize: '12px', color: '#C73E3A', marginTop: '4px' }}>
-                  {errors.rating}
-                </div>
-              )}
-            </div>
-
             {/* Notes - Full Width */}
             <div style={{ marginBottom: '24px' }}>
               <label
@@ -1255,7 +1346,13 @@ export default function WineDetailModal({
                   if (!isSaving) e.currentTarget.style.backgroundColor = '#7C2D3C';
                 }}
               >
-                {isSaving ? 'Saving...' : 'Save Changes'}
+                {isSaving
+                  ? mode === 'add'
+                    ? 'Adding...'
+                    : 'Saving...'
+                  : mode === 'add'
+                    ? 'Add Wine'
+                    : 'Save Changes'}
               </button>
             </div>
           </div>
