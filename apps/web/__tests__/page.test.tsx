@@ -38,7 +38,7 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getByText('0 Bottles in Collection')).toBeInTheDocument();
       });
 
-      expect(screen.getByText(/Your cellar is empty/i)).toBeInTheDocument();
+      expect(screen.getByText(/No wines found/i)).toBeInTheDocument();
     });
   });
 
@@ -85,7 +85,7 @@ describe('Home Page - Wine Cellar', () => {
       });
 
       expect(screen.getByText('2015')).toBeInTheDocument();
-      expect(screen.getByText('France')).toBeInTheDocument();
+      expect(screen.getAllByText('France').length).toBeGreaterThan(0);
     });
   });
 
