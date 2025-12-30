@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import WineTable from '../components/WineTable';
+import WineFilters from '../components/WineFilters';
+import WineDetailModal from '../components/WineDetailModal';
 
 interface Wine {
   id: string;
@@ -12,24 +15,110 @@ interface Wine {
   grapeVariety: string | null;
   color: string;
   quantity: number;
+  purchasePrice: number | null;
+  purchaseDate: string | null;
+  drinkByDate: string | null;
   rating: number | null;
   notes: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
-
-const WINE_COLORS: Record<string, string> = {
-  RED: '#7C2D3C',
-  WHITE: '#F5F1E8',
-  ROSE: '#D4A5A5',
-  SPARKLING: '#FFD700',
-  DESSERT: '#8B4513',
-  FORTIFIED: '#4A1C26',
-};
 
 export default function Home(): React.JSX.Element {
   const [wines, setWines] = useState<Wine[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [selectedWine, setSelectedWine] = useState<Wine | null>(null);
+
+  // Filter and sort state
+  const [searchText, setSearchText] = useState('');
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [vintageRange, setVintageRange] = useState<[number, number] | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'vintage' | 'rating' | 'createdAt'>('createdAt');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  // Derived state for filters
+  const countries = useMemo(() => {
+    const uniqueCountries = [...new Set(wines.map((w) => w.country))];
+    return uniqueCountries.sort();
+  }, [wines]);
+
+  const vintageMin = useMemo(() => {
+    if (wines.length === 0) return new Date().getFullYear();
+    return Math.min(...wines.map((w) => w.vintage));
+  }, [wines]);
+
+  const vintageMax = useMemo(() => {
+    if (wines.length === 0) return new Date().getFullYear();
+    return Math.max(...wines.map((w) => w.vintage));
+  }, [wines]);
+
+  // Filtered and sorted wines
+  const filteredAndSortedWines = useMemo(() => {
+    let result = [...wines];
+
+    // Stage 1: Text search (name, producer, region)
+    if (searchText) {
+      const search = searchText.toLowerCase();
+      result = result.filter(
+        (wine) =>
+          wine.name.toLowerCase().includes(search) ||
+          wine.producer.toLowerCase().includes(search) ||
+          (wine.region?.toLowerCase().includes(search) ?? false)
+      );
+    }
+
+    // Stage 2: Color filter (multiple selection)
+    if (selectedColors.length > 0) {
+      result = result.filter((wine) => selectedColors.includes(wine.color));
+    }
+
+    // Stage 3: Country filter
+    if (selectedCountry) {
+      result = result.filter((wine) => wine.country === selectedCountry);
+    }
+
+    // Stage 4: Vintage range filter
+    if (vintageRange) {
+      result = result.filter(
+        (wine) => wine.vintage >= vintageRange[0] && wine.vintage <= vintageRange[1]
+      );
+    }
+
+    // Stage 5: Sorting
+    result.sort((a, b) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'vintage':
+          comparison = a.vintage - b.vintage;
+          break;
+        case 'rating':
+          comparison = (a.rating ?? 0) - (b.rating ?? 0);
+          break;
+        case 'createdAt':
+          // Keep original order for createdAt (already sorted by DB)
+          comparison = 0;
+          break;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+    return result;
+  }, [wines, searchText, selectedColors, selectedCountry, vintageRange, sortBy, sortDirection]);
+
+  const handleClearFilters = (): void => {
+    setSearchText('');
+    setSelectedColors([]);
+    setSelectedCountry(null);
+    setVintageRange(null);
+    setSortBy('createdAt');
+    setSortDirection('desc');
+  };
 
   useEffect(() => {
     void fetchWines();
@@ -86,6 +175,42 @@ export default function Home(): React.JSX.Element {
       console.error('Error deleting wine:', error);
     } finally {
       setDeleteConfirm(null);
+    }
+  };
+
+  const handleUpdateWine = async (id: string, data: Partial<Wine>): Promise<void> => {
+    try {
+      // Filter out read-only fields that the API doesn't accept
+      const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...updateData } = data as Wine;
+
+      const updateResponse = await fetch(`/api/wines/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!updateResponse.ok) {
+        const errorText = await updateResponse.text();
+        console.error('❌ PUT request failed:', errorText);
+        throw new Error(`Failed to update wine: ${updateResponse.status} ${errorText}`);
+      }
+
+      // Fetch fresh list
+      const res = await fetch('/api/wines');
+      const updatedWines = await res.json();
+      setWines(updatedWines);
+
+      // Update the selected wine with fresh data from server
+      const updatedWine = updatedWines.find((w: Wine) => w.id === id);
+
+      if (updatedWine) {
+        setSelectedWine(updatedWine);
+      } else {
+        console.error('❌ Could not find updated wine in fresh list');
+      }
+    } catch (error) {
+      console.error('❌ Error updating wine:', error);
+      throw error;
     }
   };
 
@@ -169,7 +294,7 @@ export default function Home(): React.JSX.Element {
       {/* Action Bar */}
       <div
         style={{
-          marginBottom: '32px',
+          marginBottom: '24px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -233,7 +358,7 @@ export default function Home(): React.JSX.Element {
         <form
           onSubmit={handleSubmit}
           style={{
-            marginBottom: '32px',
+            marginBottom: '24px',
             padding: '24px',
             backgroundColor: '#F5F1E8',
             borderRadius: '8px',
@@ -476,213 +601,45 @@ export default function Home(): React.JSX.Element {
         </form>
       )}
 
-      {/* Wine List */}
-      {wines.length === 0 ? (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '64px 24px',
-            backgroundColor: '#F5F1E8',
-            borderRadius: '8px',
-            border: '1px solid #E5DFD0',
+      {/* Filters */}
+      {wines.length > 0 && (
+        <WineFilters
+          searchText={searchText}
+          onSearchChange={setSearchText}
+          selectedColors={selectedColors}
+          onColorsChange={setSelectedColors}
+          selectedCountry={selectedCountry}
+          onCountryChange={setSelectedCountry}
+          countries={countries}
+          vintageRange={vintageRange}
+          onVintageRangeChange={setVintageRange}
+          vintageMin={vintageMin}
+          vintageMax={vintageMax}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onSortChange={(newSortBy, newDirection) => {
+            setSortBy(newSortBy as 'name' | 'vintage' | 'rating' | 'createdAt');
+            setSortDirection(newDirection);
           }}
-        >
-          <div style={{ fontSize: '64px', marginBottom: '16px' }}>🍷</div>
-          <h3 style={{ color: '#4A1C26', fontSize: '20px', marginBottom: '8px' }}>
-            Your cellar is empty
-          </h3>
-          <p style={{ color: '#7C2D3C', fontSize: '16px', marginBottom: '24px' }}>
-            Add your first bottle to start building your collection!
-          </p>
-          <button
-            onClick={() => setShowForm(true)}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#7C2D3C',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              cursor: 'pointer',
-              fontWeight: '500',
-            }}
-          >
-            + Add Your First Wine
-          </button>
-        </div>
-      ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-            }}
-          >
-            <thead>
-              <tr style={{ backgroundColor: '#4A1C26', color: 'white' }}>
-                <th
-                  style={{
-                    padding: '12px 16px',
-                    textAlign: 'left',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                  }}
-                >
-                  Wine
-                </th>
-                <th
-                  style={{
-                    padding: '12px 16px',
-                    textAlign: 'left',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                  }}
-                >
-                  Vintage
-                </th>
-                <th
-                  style={{
-                    padding: '12px 16px',
-                    textAlign: 'left',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                  }}
-                >
-                  Producer
-                </th>
-                <th
-                  style={{
-                    padding: '12px 16px',
-                    textAlign: 'left',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                  }}
-                >
-                  Country
-                </th>
-                <th
-                  style={{
-                    padding: '12px 16px',
-                    textAlign: 'left',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                  }}
-                >
-                  Type
-                </th>
-                <th
-                  style={{
-                    padding: '12px 16px',
-                    textAlign: 'center',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                  }}
-                >
-                  Qty
-                </th>
-                <th
-                  style={{
-                    padding: '12px 16px',
-                    textAlign: 'center',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                  }}
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {wines.map((wine, index) => (
-                <tr
-                  key={wine.id}
-                  style={{
-                    borderBottom: index < wines.length - 1 ? '1px solid #E5DFD0' : 'none',
-                    transition: 'background-color 0.2s',
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#F5F1E8';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'white';
-                  }}
-                >
-                  <td
-                    style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                  >
-                    <div
-                      style={{
-                        width: '12px',
-                        height: '12px',
-                        borderRadius: '50%',
-                        backgroundColor: WINE_COLORS[wine.color] || '#7C2D3C',
-                        border: wine.color === 'WHITE' ? '1px solid #D4A5A5' : 'none',
-                        flexShrink: 0,
-                      }}
-                    />
-                    <span style={{ fontWeight: '500', color: '#4A1C26' }}>{wine.name}</span>
-                  </td>
-                  <td style={{ padding: '16px', color: '#4A1C26' }}>{wine.vintage}</td>
-                  <td style={{ padding: '16px', color: '#4A1C26' }}>{wine.producer}</td>
-                  <td style={{ padding: '16px', color: '#4A1C26' }}>{wine.country}</td>
-                  <td style={{ padding: '16px' }}>
-                    <span
-                      style={{
-                        padding: '4px 8px',
-                        backgroundColor: '#F5F1E8',
-                        color: '#7C2D3C',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: '500',
-                      }}
-                    >
-                      {wine.color}
-                    </span>
-                  </td>
-                  <td
-                    style={{
-                      padding: '16px',
-                      textAlign: 'center',
-                      color: '#4A1C26',
-                      fontWeight: '500',
-                    }}
-                  >
-                    {wine.quantity}
-                  </td>
-                  <td style={{ padding: '16px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => handleDelete(wine.id)}
-                      style={{
-                        padding: '6px 12px',
-                        backgroundColor: '#C73E3A',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        fontWeight: '500',
-                        transition: 'all 0.2s',
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = '#a33330';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = '#C73E3A';
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          onClearAll={handleClearFilters}
+          totalCount={wines.length}
+          filteredCount={filteredAndSortedWines.length}
+        />
       )}
+
+      {/* Wine List */}
+      <WineTable
+        wines={filteredAndSortedWines}
+        onDelete={handleDelete}
+        onRowClick={setSelectedWine}
+      />
+
+      {/* Wine Detail Modal */}
+      <WineDetailModal
+        wine={selectedWine}
+        onClose={() => setSelectedWine(null)}
+        onUpdate={handleUpdateWine}
+      />
     </div>
   );
 }

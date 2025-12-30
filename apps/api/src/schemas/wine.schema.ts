@@ -49,9 +49,9 @@ export const createWineSchema = z.object({
 
   rating: z
     .number()
-    .int('Rating must be a whole number')
-    .min(1, 'Rating must be between 1 and 100')
-    .max(100, 'Rating must be between 1 and 100')
+    .min(1, 'Rating must be between 1.0 and 5.0')
+    .max(5, 'Rating must be between 1.0 and 5.0')
+    .multipleOf(0.1, 'Rating must be in 0.1 increments')
     .optional()
     .nullable(),
 
@@ -117,9 +117,9 @@ export const updateWineSchema = z
 
     rating: z
       .number()
-      .int('Rating must be a whole number')
-      .min(1, 'Rating must be between 1 and 100')
-      .max(100, 'Rating must be between 1 and 100')
+      .min(1, 'Rating must be between 1.0 and 5.0')
+      .max(5, 'Rating must be between 1.0 and 5.0')
+      .multipleOf(0.1, 'Rating must be in 0.1 increments')
       .optional()
       .nullable(),
 

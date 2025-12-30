@@ -20,7 +20,7 @@ model Wine {
   purchasePrice Float?
   purchaseDate  DateTime?
   drinkByDate   DateTime?
-  rating      Int?     // 1-100 scale
+  rating      Float?   // 1.0-5.0 scale with 0.1 precision
   notes       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
