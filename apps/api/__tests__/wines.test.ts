@@ -57,7 +57,7 @@ describe('Wine API', () => {
       const wineData = createWineData({
         region: 'Bordeaux',
         grapeVariety: 'Cabernet Sauvignon',
-        rating: 95,
+        rating: 4.8,
         notes: 'Excellent vintage',
       });
 
@@ -66,7 +66,7 @@ describe('Wine API', () => {
       expect(response.status).toBe(201);
       expect(response.body.region).toBe('Bordeaux');
       expect(response.body.grapeVariety).toBe('Cabernet Sauvignon');
-      expect(response.body.rating).toBe(95);
+      expect(response.body.rating).toBe(4.8);
     });
 
     it('creates wine with different colors', async () => {
@@ -174,7 +174,7 @@ describe('Wine API', () => {
 
       const updates = {
         quantity: 10,
-        rating: 98,
+        rating: 4.9,
         notes: 'Updated notes',
       };
 
@@ -182,7 +182,7 @@ describe('Wine API', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.quantity).toBe(10);
-      expect(response.body.rating).toBe(98);
+      expect(response.body.rating).toBe(4.9);
       expect(response.body.notes).toBe('Updated notes');
     });
 
@@ -242,7 +242,7 @@ describe('Wine API', () => {
       // Update
       const updateResponse = await request(app)
         .put(`/api/wines/${wineId}`)
-        .send({ quantity: 3, rating: 90 });
+        .send({ quantity: 3, rating: 4.5 });
       expect(updateResponse.status).toBe(200);
       expect(updateResponse.body.quantity).toBe(3);
 

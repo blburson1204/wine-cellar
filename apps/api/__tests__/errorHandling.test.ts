@@ -105,7 +105,7 @@ describe('Error Handling and Validation', () => {
     it('returns 400 for rating out of range (too low)', async () => {
       const response = await request(app)
         .post('/api/wines')
-        .send(createValidWineData({ rating: 0 }));
+        .send(createValidWineData({ rating: 0.5 }));
 
       expect(response.status).toBe(400);
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
@@ -115,7 +115,7 @@ describe('Error Handling and Validation', () => {
     it('returns 400 for rating out of range (too high)', async () => {
       const response = await request(app)
         .post('/api/wines')
-        .send(createValidWineData({ rating: 101 }));
+        .send(createValidWineData({ rating: 5.5 }));
 
       expect(response.status).toBe(400);
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
@@ -299,15 +299,15 @@ describe('Error Handling and Validation', () => {
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
     });
 
-    it('returns 400 for rating as decimal', async () => {
+    it('returns 400 for rating with invalid increment', async () => {
       const response = await request(app)
         .post('/api/wines')
-        .send(createValidWineData({ rating: 95.5 }));
+        .send(createValidWineData({ rating: 4.75 }));
 
       expect(response.status).toBe(400);
       expect(response.body.errorCode).toBe('VALIDATION_ERROR');
       expect(response.body.fields?.rating).toBeDefined();
-      expect(response.body.fields?.rating[0]).toContain('whole number');
+      expect(response.body.fields?.rating[0]).toContain('0.1 increments');
     });
   });
 
