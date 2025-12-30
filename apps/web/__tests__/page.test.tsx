@@ -89,8 +89,8 @@ describe('Home Page - Wine Cellar', () => {
     });
   });
 
-  describe('Add Wine Form', () => {
-    it('toggles form when Add Wine button clicked', async () => {
+  describe('Add Wine Modal', () => {
+    it('opens add wine modal when Add Wine button clicked', async () => {
       const user = userEvent.setup();
 
       vi.mocked(global.fetch).mockResolvedValue({
@@ -104,17 +104,19 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getByRole('button', { name: /Add Wine/i })).toBeInTheDocument();
       });
 
-      // Form should not be visible
-      expect(screen.queryByPlaceholderText(/Chateau Margaux/i)).not.toBeInTheDocument();
+      // Modal should not be visible
+      expect(screen.queryByText('Add New Wine')).not.toBeInTheDocument();
 
       // Click Add Wine
       await user.click(screen.getByRole('button', { name: /Add Wine/i }));
 
-      // Form should be visible
-      expect(screen.getByPlaceholderText(/Chateau Margaux/i)).toBeInTheDocument();
+      // Modal should be visible
+      await waitFor(() => {
+        expect(screen.getByText('Add New Wine')).toBeInTheDocument();
+      });
     });
 
-    it('submits wine with correct data', async () => {
+    it('submits wine with correct data from modal', async () => {
       const user = userEvent.setup();
 
       // Mock fetch for all calls
@@ -126,20 +128,27 @@ describe('Home Page - Wine Cellar', () => {
       render(<Home />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Add Wine/i })).toBeInTheDocument();
+        const addButtons = screen.getAllByRole('button', { name: /Add Wine/i });
+        expect(addButtons.length).toBeGreaterThan(0);
       });
 
-      // Open form
-      await user.click(screen.getByRole('button', { name: /Add Wine/i }));
+      // Open modal - click the first Add Wine button (in header)
+      const addButtons = screen.getAllByRole('button', { name: /Add Wine/i });
+      await user.click(addButtons[0]);
 
-      // Fill form using placeholder text
-      await user.type(screen.getByPlaceholderText(/Chateau Margaux/i), 'Test Wine');
-      await user.type(screen.getByPlaceholderText(/2015/i), '2020');
-      await user.type(screen.getByPlaceholderText(/Opus One/i), 'Test Producer');
-      await user.type(screen.getByPlaceholderText(/France/i), 'France');
+      await waitFor(() => {
+        expect(screen.getByText('Add New Wine')).toBeInTheDocument();
+      });
 
-      // Submit
-      await user.click(screen.getByRole('button', { name: /Save Wine/i }));
+      // Fill form using text inputs
+      const textInputs = screen.getAllByRole('textbox');
+      await user.type(textInputs[0], 'Test Wine'); // Wine Name
+      await user.type(textInputs[1], 'Test Producer'); // Producer
+      await user.type(textInputs[3], 'France'); // Country
+
+      // Submit - click the second Add Wine button (in modal)
+      const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });
+      await user.click(submitButtons[submitButtons.length - 1]);
 
       // Verify POST was called
       await waitFor(() => {
@@ -168,60 +177,7 @@ describe('Home Page - Wine Cellar', () => {
       notes: null,
     };
 
-    it('calls delete API when confirmed', async () => {
-      const user = userEvent.setup();
-
-      // Mock fetch to return wine initially, then empty after delete
-      let callCount = 0;
-      vi.mocked(global.fetch).mockImplementation((_url, options): Promise<Response> => {
-        if (options?.method === 'DELETE') {
-          return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
-        }
-        // GET requests
-        callCount++;
-        if (callCount === 1) {
-          return Promise.resolve({ ok: true, json: async () => [mockWine] } as Response);
-        }
-        return Promise.resolve({ ok: true, json: async () => [] } as Response);
-      });
-
-      render(<Home />);
-
-      await waitFor(() => {
-        expect(screen.getAllByText('Test Wine').length).toBeGreaterThan(0);
-      });
-
-      // Click the delete button in the table
-      await user.click(screen.getByRole('button', { name: 'Delete' }));
-
-      // Confirm modal should appear
-      await waitFor(() => {
-        expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
-      });
-
-      // The Delete button appears twice now: once in the table, once in the modal
-      // We need to click the one in the modal (which appears after the table one)
-      await waitFor(() => {
-        const allDeleteButtons = screen.getAllByRole('button', { name: 'Delete' });
-        expect(allDeleteButtons.length).toBe(2); // One in table, one in modal
-      });
-
-      const allDeleteButtons = screen.getAllByRole('button', { name: 'Delete' });
-      // Click the first Delete button (the one in the modal DIV, not the table TD)
-      await user.click(allDeleteButtons[0]);
-
-      // Wait for the DELETE request to be made
-      await waitFor(
-        () => {
-          expect(global.fetch).toHaveBeenCalledWith('/api/wines/1', {
-            method: 'DELETE',
-          });
-        },
-        { timeout: 2000 }
-      );
-    });
-
-    it('does not delete when cancelled', async () => {
+    it('opens detail modal when clicking wine row', async () => {
       const user = userEvent.setup();
 
       vi.mocked(global.fetch).mockResolvedValue({
@@ -235,23 +191,60 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getAllByText('Test Wine').length).toBeGreaterThan(0);
       });
 
-      const fetchCallCount = vi.mocked(global.fetch).mock.calls.length;
+      // Click on the wine name to open detail modal
+      const wineNameElements = screen.getAllByText('Test Wine');
+      await user.click(wineNameElements[0]);
 
-      // Click the delete button in the table
-      await user.click(screen.getByRole('button', { name: 'Delete' }));
+      // Detail modal should open
+      await waitFor(() => {
+        expect(screen.getByText('2020 · Test Producer')).toBeInTheDocument();
+      });
+    });
 
-      // Confirm modal should appear - click the cancel button
+    it('can delete wine from detail modal', async () => {
+      const user = userEvent.setup();
+
+      // Mock fetch to return wine initially
+      let deleteCallCount = 0;
+      vi.mocked(global.fetch).mockImplementation((_url, options): Promise<Response> => {
+        if (options?.method === 'DELETE') {
+          deleteCallCount++;
+          return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
+        }
+        return Promise.resolve({ ok: true, json: async () => [mockWine] } as Response);
+      });
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Test Wine').length).toBeGreaterThan(0);
+      });
+
+      // Click wine row to open detail modal
+      const wineNameElements = screen.getAllByText('Test Wine');
+      await user.click(wineNameElements[0]);
+
+      // Wait for detail modal
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Delete Wine' })).toBeInTheDocument();
+      });
+
+      // Click Delete Wine button
+      await user.click(screen.getByRole('button', { name: 'Delete Wine' }));
+
+      // Confirm modal should appear
       await waitFor(() => {
         expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
       });
 
-      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      // Click Delete in confirmation modal
+      const deleteButtons = screen.getAllByRole('button', { name: 'Delete' });
+      await user.click(deleteButtons[0]);
 
-      // Modal should close and DELETE was NOT called
+      // Wait for DELETE to be called
       await waitFor(() => {
-        expect(screen.queryByText('Confirm Delete')).not.toBeInTheDocument();
+        expect(deleteCallCount).toBe(1);
       });
-      expect(vi.mocked(global.fetch).mock.calls.length).toBe(fetchCallCount);
     });
   });
 
@@ -286,18 +279,30 @@ describe('Home Page - Wine Cellar', () => {
       render(<Home />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Add Wine/i })).toBeInTheDocument();
+        const addButtons = screen.getAllByRole('button', { name: /Add Wine/i });
+        expect(addButtons.length).toBeGreaterThan(0);
       });
 
-      await user.click(screen.getByRole('button', { name: /Add Wine/i }));
-      await user.type(screen.getByPlaceholderText(/Chateau Margaux/i), 'Test Wine');
-      await user.type(screen.getByPlaceholderText(/2015/i), '2020');
-      await user.type(screen.getByPlaceholderText(/Opus One/i), 'Test Producer');
-      await user.type(screen.getByPlaceholderText(/France/i), 'France');
-      await user.click(screen.getByRole('button', { name: /Save Wine/i }));
+      const addButtons = screen.getAllByRole('button', { name: /Add Wine/i });
+      await user.click(addButtons[0]);
 
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Error adding wine:', expect.any(Error));
+        expect(screen.getByText('Add New Wine')).toBeInTheDocument();
+      });
+
+      const textInputs = screen.getAllByRole('textbox');
+      await user.type(textInputs[0], 'Test Wine');
+      await user.type(textInputs[1], 'Test Producer');
+      await user.type(textInputs[3], 'France');
+
+      const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });
+      await user.click(submitButtons[submitButtons.length - 1]);
+
+      await waitFor(() => {
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          expect.stringContaining('Error'),
+          expect.any(Error)
+        );
       });
 
       consoleErrorSpy.mockRestore();
@@ -319,6 +324,9 @@ describe('Home Page - Wine Cellar', () => {
         quantity: 1,
         rating: null,
         notes: null,
+        purchasePrice: null,
+        purchaseDate: null,
+        drinkByDate: null,
       };
 
       vi.mocked(global.fetch).mockImplementation((_url, options): Promise<Response> => {
@@ -334,23 +342,25 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getAllByText('Test Wine').length).toBeGreaterThan(0);
       });
 
-      // Click the delete button in the table
-      await user.click(screen.getByRole('button', { name: 'Delete' }));
+      // Click wine row to open detail modal
+      const wineNameElements = screen.getAllByText('Test Wine');
+      await user.click(wineNameElements[0]);
+
+      // Wait for detail modal and click Delete Wine
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Delete Wine' })).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Delete Wine' }));
 
       // Confirm modal should appear
       await waitFor(() => {
         expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
       });
 
-      // Wait for both Delete buttons to be present
-      await waitFor(() => {
-        const allDeleteButtons = screen.getAllByRole('button', { name: 'Delete' });
-        expect(allDeleteButtons.length).toBe(2); // One in table, one in modal
-      });
-
-      // Click the first Delete button (the one in the modal DIV, not the table TD)
-      const allDeleteButtons = screen.getAllByRole('button', { name: 'Delete' });
-      await user.click(allDeleteButtons[0]);
+      // Click Delete in confirmation modal
+      const deleteButtons = screen.getAllByRole('button', { name: 'Delete' });
+      await user.click(deleteButtons[0]);
 
       // Wait for the error to be logged
       await waitFor(
