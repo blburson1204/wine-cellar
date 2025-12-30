@@ -218,7 +218,7 @@ describe('WineDetailModal', () => {
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     });
 
-    it('returns to view mode when cancel clicked without changes', async () => {
+    it('closes modal when cancel clicked without changes', async () => {
       const user = userEvent.setup();
 
       render(
@@ -235,10 +235,8 @@ describe('WineDetailModal', () => {
 
       await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
-      // Should return to view mode - look for view mode buttons
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Edit Wine' })).toBeInTheDocument();
-      });
+      // Should close the modal
+      expect(mockOnClose).toHaveBeenCalled();
     });
 
     it('shows confirmation when canceling with unsaved changes', async () => {

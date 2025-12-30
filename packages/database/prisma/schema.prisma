@@ -15,6 +15,7 @@ model Wine {
   region      String?
   country     String
   grapeVariety String?
+  blendDetail String?
   color       WineColor
   quantity    Int      @default(1)
   purchasePrice Float?

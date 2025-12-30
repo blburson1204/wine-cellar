@@ -10,6 +10,7 @@ interface Wine {
   region: string | null;
   country: string;
   grapeVariety: string | null;
+  blendDetail: string | null;
   color: string;
   quantity: number;
   purchasePrice: number | null;
@@ -125,6 +126,7 @@ export default function WineDetailModal({
         region: null,
         country: '',
         grapeVariety: null,
+        blendDetail: null,
         color: 'RED',
         quantity: 1,
         purchasePrice: null,
@@ -153,7 +155,7 @@ export default function WineDetailModal({
       // For add mode, just close the modal
       onClose();
     } else {
-      // For edit mode, check for unsaved changes
+      // For edit mode, check for unsaved changes then close the modal
       const hasChanges = JSON.stringify(editForm) !== JSON.stringify(wine);
       if (hasChanges) {
         // eslint-disable-next-line no-alert
@@ -161,9 +163,8 @@ export default function WineDetailModal({
           return;
         }
       }
-      setIsEditMode(false);
-      setEditForm({});
-      setErrors({});
+      // Close the modal instead of returning to view mode
+      onClose();
     }
   };
 
@@ -423,6 +424,26 @@ export default function WineDetailModal({
                 </p>
               </div>
 
+              {/* Blend Details */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '4px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#7C2D3C',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  Blend Details
+                </label>
+                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
+                  {wine.blendDetail || '—'}
+                </p>
+              </div>
+
               {/* Wine Type */}
               <div>
                 <label
@@ -670,14 +691,79 @@ export default function WineDetailModal({
         {/* Edit Mode / Add Mode */}
         {isEditMode && (
           <div>
-            {/* Header */}
-            <div style={{ marginBottom: '24px' }}>
-              <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#4A1C26' }}>
-                {mode === 'add' ? 'Add New Wine' : 'Edit Wine'}
-              </h2>
-              <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#7C2D3C' }}>
-                {mode === 'add' ? 'Add a new wine to your collection' : 'Update wine details'}
-              </p>
+            {/* Header with Action Buttons */}
+            <div
+              style={{
+                marginBottom: '24px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+              }}
+            >
+              <div>
+                <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#4A1C26' }}>
+                  {mode === 'add' ? 'Add New Wine' : 'Edit Wine'}
+                </h2>
+                <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#7C2D3C' }}>
+                  {mode === 'add' ? 'Add a new wine to your collection' : 'Update wine details'}
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: 'transparent',
+                    color: '#7C2D3C',
+                    border: '1px solid #7C2D3C',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    cursor: isSaving ? 'not-allowed' : 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    opacity: isSaving ? 0.5 : 1,
+                  }}
+                  onMouseOver={(e) => {
+                    if (!isSaving) e.currentTarget.style.backgroundColor = '#F5F1E8';
+                  }}
+                  onMouseOut={(e) => {
+                    if (!isSaving) e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: isSaving ? '#9a4a59' : '#7C2D3C',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    cursor: isSaving ? 'not-allowed' : 'pointer',
+                    fontWeight: '500',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
+                  }}
+                  onMouseOver={(e) => {
+                    if (!isSaving) e.currentTarget.style.backgroundColor = '#5f2330';
+                  }}
+                  onMouseOut={(e) => {
+                    if (!isSaving) e.currentTarget.style.backgroundColor = '#7C2D3C';
+                  }}
+                >
+                  {isSaving
+                    ? mode === 'add'
+                      ? 'Adding...'
+                      : 'Saving...'
+                    : mode === 'add'
+                      ? 'Add Wine'
+                      : 'Save Changes'}
+                </button>
+              </div>
             </div>
 
             {/* General Error */}
@@ -912,6 +998,43 @@ export default function WineDetailModal({
                 {errors.grapeVariety && (
                   <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
                     {errors.grapeVariety}
+                  </span>
+                )}
+              </div>
+
+              {/* Blend Details */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '4px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#4A1C26',
+                  }}
+                >
+                  Blend Details
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Cabernet Sauvignon 60%, Merlot 30%, Cabernet Franc 10%"
+                  value={editForm.blendDetail || ''}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, blendDetail: e.target.value || null })
+                  }
+                  style={{
+                    padding: '10px',
+                    fontSize: '16px',
+                    border: `1px solid ${errors.blendDetail ? '#C73E3A' : '#D4A5A5'}`,
+                    borderRadius: '4px',
+                    width: '100%',
+                    backgroundColor: 'white',
+                    boxSizing: 'border-box',
+                  }}
+                />
+                {errors.blendDetail && (
+                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                    {errors.blendDetail}
                   </span>
                 )}
               </div>
@@ -1296,64 +1419,6 @@ export default function WineDetailModal({
                   <span style={{ fontSize: '12px', color: '#C73E3A' }}>{errors.notes}</span>
                 )}
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button
-                onClick={handleCancelEdit}
-                disabled={isSaving}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: 'transparent',
-                  color: '#7C2D3C',
-                  border: '1px solid #7C2D3C',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  cursor: isSaving ? 'not-allowed' : 'pointer',
-                  fontWeight: '500',
-                  transition: 'all 0.2s',
-                  opacity: isSaving ? 0.5 : 1,
-                }}
-                onMouseOver={(e) => {
-                  if (!isSaving) e.currentTarget.style.backgroundColor = '#F5F1E8';
-                }}
-                onMouseOut={(e) => {
-                  if (!isSaving) e.currentTarget.style.backgroundColor = 'transparent';
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: isSaving ? '#9a4a59' : '#7C2D3C',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  cursor: isSaving ? 'not-allowed' : 'pointer',
-                  fontWeight: '500',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
-                }}
-                onMouseOver={(e) => {
-                  if (!isSaving) e.currentTarget.style.backgroundColor = '#5f2330';
-                }}
-                onMouseOut={(e) => {
-                  if (!isSaving) e.currentTarget.style.backgroundColor = '#7C2D3C';
-                }}
-              >
-                {isSaving
-                  ? mode === 'add'
-                    ? 'Adding...'
-                    : 'Saving...'
-                  : mode === 'add'
-                    ? 'Add Wine'
-                    : 'Save Changes'}
-              </button>
             </div>
           </div>
         )}

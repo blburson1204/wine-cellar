@@ -31,6 +31,12 @@ export const createWineSchema = z.object({
     .optional()
     .nullable(),
 
+  blendDetail: z
+    .string()
+    .max(500, 'Blend detail must be less than 500 characters')
+    .optional()
+    .nullable(),
+
   color: z.nativeEnum(WineColor, {
     message: 'Invalid wine color. Must be one of: RED, WHITE, ROSE, SPARKLING, DESSERT, FORTIFIED',
   }),
@@ -93,6 +99,12 @@ export const updateWineSchema = z
     grapeVariety: z
       .string()
       .max(200, 'Grape variety must be less than 200 characters')
+      .optional()
+      .nullable(),
+
+    blendDetail: z
+      .string()
+      .max(500, 'Blend detail must be less than 500 characters')
       .optional()
       .nullable(),
 

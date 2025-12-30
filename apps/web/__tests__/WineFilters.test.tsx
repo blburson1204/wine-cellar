@@ -6,6 +6,7 @@ import WineFilters from '../src/components/WineFilters';
 describe('WineFilters', () => {
   const mockOnSearchChange = vi.fn();
   const mockOnColorsChange = vi.fn();
+  const mockOnGrapeVarietyChange = vi.fn();
   const mockOnCountryChange = vi.fn();
   const mockOnVintageRangeChange = vi.fn();
   const mockOnPriceRangeChange = vi.fn();
@@ -16,6 +17,9 @@ describe('WineFilters', () => {
     onSearchChange: mockOnSearchChange,
     selectedColors: [],
     onColorsChange: mockOnColorsChange,
+    selectedGrapeVariety: null,
+    onGrapeVarietyChange: mockOnGrapeVarietyChange,
+    grapeVarieties: ['Cabernet Sauvignon', 'Merlot', 'Pinot Noir', 'Chardonnay'],
     selectedCountry: null,
     onCountryChange: mockOnCountryChange,
     countries: ['France', 'Italy', 'Spain', 'USA'],

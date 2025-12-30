@@ -13,6 +13,7 @@ interface Wine {
   region: string | null;
   country: string;
   grapeVariety: string | null;
+  blendDetail: string | null;
   color: string;
   quantity: number;
   purchasePrice: number | null;
@@ -34,6 +35,7 @@ export default function Home(): React.JSX.Element {
   // Filter and sort state
   const [searchText, setSearchText] = useState('');
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedGrapeVariety, setSelectedGrapeVariety] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [vintageRange, setVintageRange] = useState<[number, number] | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
@@ -41,6 +43,13 @@ export default function Home(): React.JSX.Element {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Derived state for filters
+  const grapeVarieties = useMemo(() => {
+    const uniqueVarieties = wines
+      .map((w) => w.grapeVariety)
+      .filter((v): v is string => v !== null && v !== undefined && v.trim() !== '');
+    return [...new Set(uniqueVarieties)].sort();
+  }, [wines]);
+
   const countries = useMemo(() => {
     const uniqueCountries = [...new Set(wines.map((w) => w.country))];
     return uniqueCountries.sort();
@@ -92,19 +101,24 @@ export default function Home(): React.JSX.Element {
       result = result.filter((wine) => selectedColors.includes(wine.color));
     }
 
-    // Stage 3: Country filter
+    // Stage 3: Grape variety filter
+    if (selectedGrapeVariety) {
+      result = result.filter((wine) => wine.grapeVariety === selectedGrapeVariety);
+    }
+
+    // Stage 4: Country filter
     if (selectedCountry) {
       result = result.filter((wine) => wine.country === selectedCountry);
     }
 
-    // Stage 4: Vintage range filter
+    // Stage 5: Vintage range filter
     if (vintageRange) {
       result = result.filter(
         (wine) => wine.vintage >= vintageRange[0] && wine.vintage <= vintageRange[1]
       );
     }
 
-    // Stage 5: Price range filter
+    // Stage 6: Price range filter
     if (priceRange) {
       result = result.filter((wine) => {
         if (wine.purchasePrice === null || wine.purchasePrice === undefined) return false;
@@ -112,7 +126,7 @@ export default function Home(): React.JSX.Element {
       });
     }
 
-    // Stage 6: Sorting
+    // Stage 7: Sorting
     result.sort((a, b) => {
       let comparison = 0;
       switch (sortBy) {
@@ -137,6 +151,7 @@ export default function Home(): React.JSX.Element {
     wines,
     searchText,
     selectedColors,
+    selectedGrapeVariety,
     selectedCountry,
     vintageRange,
     priceRange,
@@ -147,6 +162,7 @@ export default function Home(): React.JSX.Element {
   const handleClearFilters = (): void => {
     setSearchText('');
     setSelectedColors([]);
+    setSelectedGrapeVariety(null);
     setSelectedCountry(null);
     setVintageRange(null);
     setPriceRange(null);
@@ -374,6 +390,9 @@ export default function Home(): React.JSX.Element {
               onSearchChange={setSearchText}
               selectedColors={selectedColors}
               onColorsChange={setSelectedColors}
+              selectedGrapeVariety={selectedGrapeVariety}
+              onGrapeVarietyChange={setSelectedGrapeVariety}
+              grapeVarieties={grapeVarieties}
               selectedCountry={selectedCountry}
               onCountryChange={setSelectedCountry}
               countries={countries}

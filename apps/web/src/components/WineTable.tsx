@@ -6,6 +6,7 @@ interface Wine {
   region: string | null;
   country: string;
   grapeVariety: string | null;
+  blendDetail: string | null;
   color: string;
   quantity: number;
   purchasePrice: number | null;

@@ -3,6 +3,9 @@ interface WineFiltersProps {
   onSearchChange: (value: string) => void;
   selectedColors: string[];
   onColorsChange: (colors: string[]) => void;
+  selectedGrapeVariety: string | null;
+  onGrapeVarietyChange: (variety: string | null) => void;
+  grapeVarieties: string[];
   selectedCountry: string | null;
   onCountryChange: (country: string | null) => void;
   countries: string[];
@@ -19,10 +22,10 @@ interface WineFiltersProps {
 
 const WINE_COLORS = [
   { value: 'RED', label: 'Red', color: '#7C2D3C' },
-  { value: 'WHITE', label: 'White', color: '#F5F1E8' },
-  { value: 'ROSE', label: 'Rosé', color: '#D4A5A5' },
   { value: 'SPARKLING', label: 'Sparkling', color: '#FFD700' },
+  { value: 'WHITE', label: 'White', color: '#F5F1E8' },
   { value: 'DESSERT', label: 'Dessert', color: '#8B4513' },
+  { value: 'ROSE', label: 'Rosé', color: '#D4A5A5' },
   { value: 'FORTIFIED', label: 'Fortified', color: '#4A1C26' },
 ];
 
@@ -31,6 +34,9 @@ export default function WineFilters({
   onSearchChange,
   selectedColors,
   onColorsChange,
+  selectedGrapeVariety,
+  onGrapeVarietyChange,
+  grapeVarieties,
   selectedCountry,
   onCountryChange,
   countries,
@@ -47,6 +53,7 @@ export default function WineFilters({
   const hasActiveFilters =
     searchText !== '' ||
     selectedColors.length > 0 ||
+    selectedGrapeVariety !== null ||
     selectedCountry !== null ||
     vintageRange !== null ||
     priceRange !== null;
@@ -144,6 +151,9 @@ export default function WineFilters({
             backgroundColor: 'white',
             border: '1px solid #D4A5A5',
             borderRadius: '6px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '4px',
           }}
         >
           {WINE_COLORS.map((color) => {
@@ -196,6 +206,44 @@ export default function WineFilters({
             );
           })}
         </div>
+      </div>
+
+      {/* Grape Variety */}
+      <div>
+        <label
+          htmlFor="grape-variety"
+          style={{
+            display: 'block',
+            marginBottom: '4px',
+            fontSize: '14px',
+            fontWeight: '500',
+            color: '#4A1C26',
+          }}
+        >
+          Grape Variety
+        </label>
+        <select
+          id="grape-variety"
+          value={selectedGrapeVariety ?? ''}
+          onChange={(e) => onGrapeVarietyChange(e.target.value || null)}
+          style={{
+            padding: '8px',
+            fontSize: '14px',
+            border: '1px solid #D4A5A5',
+            borderRadius: '4px',
+            width: '100%',
+            backgroundColor: 'white',
+            cursor: 'pointer',
+            boxSizing: 'border-box',
+          }}
+        >
+          <option value="">All Varieties</option>
+          {grapeVarieties.map((variety) => (
+            <option key={variety} value={variety}>
+              {variety}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Country */}
