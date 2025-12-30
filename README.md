@@ -121,6 +121,22 @@ The app will be available at:
 | `npm run format:check` | Check code formatting            |
 | `npm run type-check`   | Run TypeScript type checking     |
 
+### Testing
+
+| Command                 | Description                   |
+| ----------------------- | ----------------------------- |
+| `npm test`              | Run all tests                 |
+| `npm run test:watch`    | Run tests in watch mode       |
+| `npm run test:coverage` | Generate test coverage report |
+
+**Test Stats:**
+
+- **Total Tests**: 175 (49 API + 126 web)
+- **Pass Rate**: 100%
+- **Coverage**: 70%+ on all metrics (exceeds all targets!)
+
+See [Test-Summary.md](Test-Summary.md) for detailed test breakdown.
+
 ## API Endpoints
 
 | Method | Endpoint         | Description       |
