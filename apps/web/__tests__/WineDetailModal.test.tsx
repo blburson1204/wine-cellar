@@ -12,6 +12,7 @@ describe('WineDetailModal', () => {
     region: 'Bordeaux',
     country: 'France',
     grapeVariety: 'Cabernet Sauvignon',
+    blendDetail: null,
     color: 'RED',
     quantity: 2,
     purchasePrice: 150.0,
