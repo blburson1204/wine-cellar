@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: December 30, 2025
+**Last Updated**: December 31, 2025
 
 ## Project Overview
 
@@ -279,6 +279,14 @@ detailed test breakdown.
 
 - [x] Wine-themed color palette (#7C2D3C burgundy, #F5F1E8 off-white)
 - [x] Sticky header with wine bottle emoji
+- [x] Two-column layout: 25% filter sidebar, 75% wine table
+- [x] Background image with transparency effects (wine_cellar_4.jpg at 0.75
+      opacity)
+- [x] Semi-transparent components with frosted glass effect (0.6 opacity, 4px
+      blur)
+- [x] Unified burgundy headers (#7C2D3C) across all UI elements
+- [x] Bottle count header with filtered/total display
+- [x] Scrollable wine table with fixed headers
 - [x] Responsive table layout
 - [x] Hover effects and transitions
 - [x] Inter font family for clean typography

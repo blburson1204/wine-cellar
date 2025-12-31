@@ -91,204 +91,40 @@ export default function WineFilters({
   return (
     <div
       style={{
-        padding: '16px',
-        backgroundColor: '#F5F1E8',
+        backgroundColor: 'rgba(245, 241, 232, 0.6)',
         borderRadius: '8px',
-        border: '1px solid #E5DFD0',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
+        border: '1px solid #D4A5A5',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        backdropFilter: 'blur(4px)',
+        overflow: 'hidden',
       }}
     >
-      {/* Filter Criteria */}
-      <div>
-        <label
-          htmlFor="search"
-          style={{
-            display: 'block',
-            marginBottom: '4px',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: '#4A1C26',
-          }}
-        >
-          Filter Criteria
-        </label>
-        <input
-          id="search"
-          type="text"
-          placeholder="Name, producer, region..."
-          value={searchText}
-          onChange={(e) => onSearchChange(e.target.value)}
-          style={{
-            padding: '8px',
-            fontSize: '14px',
-            border: '1px solid #D4A5A5',
-            borderRadius: '4px',
-            width: '100%',
-            backgroundColor: 'white',
-            boxSizing: 'border-box',
-          }}
-        />
+      {/* Header */}
+      <div
+        style={{
+          backgroundColor: '#7C2D3C',
+          color: 'white',
+          padding: '10px 16px',
+          fontSize: '14px',
+          fontWeight: '600',
+        }}
+      >
+        Filter Criteria
       </div>
 
-      {/* Wine Type */}
-      <div>
-        <label
-          style={{
-            display: 'block',
-            marginBottom: '4px',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#4A1C26',
-          }}
-        >
-          Wine Type
-        </label>
-        <div
-          style={{
-            padding: '8px',
-            backgroundColor: 'white',
-            border: '1px solid #D4A5A5',
-            borderRadius: '6px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '4px',
-          }}
-        >
-          {WINE_COLORS.map((color) => {
-            const isSelected = selectedColors.includes(color.value);
-            return (
-              <label
-                key={color.value}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '4px 6px',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s',
-                  borderRadius: '4px',
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#FAFAF8';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  onChange={() => handleColorToggle(color.value)}
-                  style={{
-                    width: '16px',
-                    height: '16px',
-                    cursor: 'pointer',
-                    accentColor: '#7C2D3C',
-                    flexShrink: 0,
-                  }}
-                />
-                <div
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '50%',
-                    backgroundColor: color.color,
-                    border: color.value === 'WHITE' ? '1px solid #D4A5A5' : 'none',
-                    flexShrink: 0,
-                  }}
-                />
-                <span style={{ fontSize: '13px', color: '#4A1C26', fontWeight: '500' }}>
-                  {color.label}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Grape Variety */}
-      <div>
-        <label
-          htmlFor="grape-variety"
-          style={{
-            display: 'block',
-            marginBottom: '4px',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#4A1C26',
-          }}
-        >
-          Grape Variety
-        </label>
-        <select
-          id="grape-variety"
-          value={selectedGrapeVariety ?? ''}
-          onChange={(e) => onGrapeVarietyChange(e.target.value || null)}
-          style={{
-            padding: '8px',
-            fontSize: '14px',
-            border: '1px solid #D4A5A5',
-            borderRadius: '4px',
-            width: '100%',
-            backgroundColor: 'white',
-            cursor: 'pointer',
-            boxSizing: 'border-box',
-          }}
-        >
-          <option value="">All Varieties</option>
-          {grapeVarieties.map((variety) => (
-            <option key={variety} value={variety}>
-              {variety}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Country */}
-      <div>
-        <label
-          htmlFor="country"
-          style={{
-            display: 'block',
-            marginBottom: '4px',
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#4A1C26',
-          }}
-        >
-          Country
-        </label>
-        <select
-          id="country"
-          value={selectedCountry ?? ''}
-          onChange={(e) => onCountryChange(e.target.value || null)}
-          style={{
-            padding: '8px',
-            fontSize: '14px',
-            border: '1px solid #D4A5A5',
-            borderRadius: '4px',
-            width: '100%',
-            backgroundColor: 'white',
-            cursor: 'pointer',
-            boxSizing: 'border-box',
-          }}
-        >
-          <option value="">All Countries</option>
-          {countries.map((country) => (
-            <option key={country} value={country}>
-              {country}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Vintage and Price Range - Side by Side */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-        {/* Vintage Range */}
+      {/* Filter Content */}
+      <div
+        style={{
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        {/* Search Input */}
         <div>
           <label
+            htmlFor="search"
             style={{
               display: 'block',
               marginBottom: '4px',
@@ -297,198 +133,374 @@ export default function WineFilters({
               color: '#4A1C26',
             }}
           >
-            Vintage
+            Search
           </label>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div>
-              <label
-                htmlFor="vintage-from"
-                style={{
-                  display: 'block',
-                  marginBottom: '2px',
-                  fontSize: '11px',
-                  fontWeight: '500',
-                  color: '#7C2D3C',
-                }}
-              >
-                From
-              </label>
-              <input
-                id="vintage-from"
-                type="number"
-                min={vintageMin}
-                max={vintageMax}
-                value={vintageRange?.[0] ?? vintageMin}
-                onChange={(e) => handleVintageMinChange(parseInt(e.target.value) || vintageMin)}
-                disabled={vintageMin === vintageMax}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  fontSize: '13px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                  cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
-                }}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="vintage-to"
-                style={{
-                  display: 'block',
-                  marginBottom: '2px',
-                  fontSize: '11px',
-                  fontWeight: '500',
-                  color: '#7C2D3C',
-                }}
-              >
-                To
-              </label>
-              <input
-                id="vintage-to"
-                type="number"
-                min={vintageMin}
-                max={vintageMax}
-                value={vintageRange?.[1] ?? vintageMax}
-                onChange={(e) => handleVintageMaxChange(parseInt(e.target.value) || vintageMax)}
-                disabled={vintageMin === vintageMax}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  fontSize: '13px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                  cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Price Range */}
-        <div>
-          <label
+          <input
+            id="search"
+            type="text"
+            placeholder="Name, producer, region..."
+            value={searchText}
+            onChange={(e) => onSearchChange(e.target.value)}
             style={{
-              display: 'block',
-              marginBottom: '4px',
+              padding: '8px',
               fontSize: '14px',
-              fontWeight: '500',
-              color: '#4A1C26',
-            }}
-          >
-            Price ($)
-          </label>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div>
-              <label
-                htmlFor="price-from"
-                style={{
-                  display: 'block',
-                  marginBottom: '2px',
-                  fontSize: '11px',
-                  fontWeight: '500',
-                  color: '#7C2D3C',
-                }}
-              >
-                From
-              </label>
-              <input
-                id="price-from"
-                type="number"
-                min={priceMin}
-                max={priceMax}
-                step="0.01"
-                value={priceRange?.[0] ?? priceMin}
-                onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
-                disabled={priceMin === priceMax}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  fontSize: '13px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
-                }}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="price-to"
-                style={{
-                  display: 'block',
-                  marginBottom: '2px',
-                  fontSize: '11px',
-                  fontWeight: '500',
-                  color: '#7C2D3C',
-                }}
-              >
-                To
-              </label>
-              <input
-                id="price-to"
-                type="number"
-                min={priceMin}
-                max={priceMax}
-                step="0.01"
-                value={priceRange?.[1] ?? priceMax}
-                onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
-                disabled={priceMin === priceMax}
-                style={{
-                  width: '100%',
-                  padding: '6px',
-                  fontSize: '13px',
-                  border: '1px solid #D4A5A5',
-                  borderRadius: '4px',
-                  backgroundColor: 'white',
-                  boxSizing: 'border-box',
-                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Clear Button at Bottom */}
-      {hasActiveFilters && (
-        <div
-          style={{
-            paddingTop: '12px',
-            borderTop: '1px solid #E5DFD0',
-          }}
-        >
-          <button
-            type="button"
-            onClick={onClearAll}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: 'transparent',
-              color: '#7C2D3C',
-              border: '1px solid #7C2D3C',
+              border: '1px solid #D4A5A5',
               borderRadius: '4px',
-              fontSize: '14px',
-              cursor: 'pointer',
-              fontWeight: '500',
-              transition: 'all 0.2s',
               width: '100%',
+              backgroundColor: 'white',
+              boxSizing: 'border-box',
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#FAFAF8';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
+          />
+        </div>
+
+        {/* Wine Type */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '4px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#4A1C26',
             }}
           >
-            Clear All Filters
-          </button>
+            Wine Type
+          </label>
+          <div
+            style={{
+              padding: '8px',
+              backgroundColor: 'white',
+              border: '1px solid #D4A5A5',
+              borderRadius: '6px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '4px',
+            }}
+          >
+            {WINE_COLORS.map((color) => {
+              const isSelected = selectedColors.includes(color.value);
+              return (
+                <label
+                  key={color.value}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '4px 6px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                    borderRadius: '4px',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FAFAF8';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => handleColorToggle(color.value)}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      cursor: 'pointer',
+                      accentColor: '#7C2D3C',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span style={{ fontSize: '13px', color: '#4A1C26', fontWeight: '500' }}>
+                    {color.label}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
         </div>
-      )}
+
+        {/* Grape Variety */}
+        <div>
+          <label
+            htmlFor="grape-variety"
+            style={{
+              display: 'block',
+              marginBottom: '4px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#4A1C26',
+            }}
+          >
+            Grape Variety
+          </label>
+          <select
+            id="grape-variety"
+            value={selectedGrapeVariety ?? ''}
+            onChange={(e) => onGrapeVarietyChange(e.target.value || null)}
+            style={{
+              padding: '8px',
+              fontSize: '14px',
+              border: '1px solid #D4A5A5',
+              borderRadius: '4px',
+              width: '100%',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              boxSizing: 'border-box',
+            }}
+          >
+            <option value="">All Varieties</option>
+            {grapeVarieties.map((variety) => (
+              <option key={variety} value={variety}>
+                {variety}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Country */}
+        <div>
+          <label
+            htmlFor="country"
+            style={{
+              display: 'block',
+              marginBottom: '4px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#4A1C26',
+            }}
+          >
+            Country
+          </label>
+          <select
+            id="country"
+            value={selectedCountry ?? ''}
+            onChange={(e) => onCountryChange(e.target.value || null)}
+            style={{
+              padding: '8px',
+              fontSize: '14px',
+              border: '1px solid #D4A5A5',
+              borderRadius: '4px',
+              width: '100%',
+              backgroundColor: 'white',
+              cursor: 'pointer',
+              boxSizing: 'border-box',
+            }}
+          >
+            <option value="">All Countries</option>
+            {countries.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Vintage and Price Range - Side by Side */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          {/* Vintage Range */}
+          <div>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#4A1C26',
+              }}
+            >
+              Vintage
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div>
+                <label
+                  htmlFor="vintage-from"
+                  style={{
+                    display: 'block',
+                    marginBottom: '2px',
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    color: '#7C2D3C',
+                  }}
+                >
+                  From
+                </label>
+                <input
+                  id="vintage-from"
+                  type="number"
+                  min={vintageMin}
+                  max={vintageMax}
+                  value={vintageRange?.[0] ?? vintageMin}
+                  onChange={(e) => handleVintageMinChange(parseInt(e.target.value) || vintageMin)}
+                  disabled={vintageMin === vintageMax}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    fontSize: '13px',
+                    border: '1px solid #D4A5A5',
+                    borderRadius: '4px',
+                    backgroundColor: 'white',
+                    boxSizing: 'border-box',
+                    cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="vintage-to"
+                  style={{
+                    display: 'block',
+                    marginBottom: '2px',
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    color: '#7C2D3C',
+                  }}
+                >
+                  To
+                </label>
+                <input
+                  id="vintage-to"
+                  type="number"
+                  min={vintageMin}
+                  max={vintageMax}
+                  value={vintageRange?.[1] ?? vintageMax}
+                  onChange={(e) => handleVintageMaxChange(parseInt(e.target.value) || vintageMax)}
+                  disabled={vintageMin === vintageMax}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    fontSize: '13px',
+                    border: '1px solid #D4A5A5',
+                    borderRadius: '4px',
+                    backgroundColor: 'white',
+                    boxSizing: 'border-box',
+                    cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Price Range */}
+          <div>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#4A1C26',
+              }}
+            >
+              Price ($)
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div>
+                <label
+                  htmlFor="price-from"
+                  style={{
+                    display: 'block',
+                    marginBottom: '2px',
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    color: '#7C2D3C',
+                  }}
+                >
+                  From
+                </label>
+                <input
+                  id="price-from"
+                  type="number"
+                  min={priceMin}
+                  max={priceMax}
+                  step="0.01"
+                  value={priceRange?.[0] ?? priceMin}
+                  onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
+                  disabled={priceMin === priceMax}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    fontSize: '13px',
+                    border: '1px solid #D4A5A5',
+                    borderRadius: '4px',
+                    backgroundColor: 'white',
+                    boxSizing: 'border-box',
+                    cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="price-to"
+                  style={{
+                    display: 'block',
+                    marginBottom: '2px',
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    color: '#7C2D3C',
+                  }}
+                >
+                  To
+                </label>
+                <input
+                  id="price-to"
+                  type="number"
+                  min={priceMin}
+                  max={priceMax}
+                  step="0.01"
+                  value={priceRange?.[1] ?? priceMax}
+                  onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
+                  disabled={priceMin === priceMax}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    fontSize: '13px',
+                    border: '1px solid #D4A5A5',
+                    borderRadius: '4px',
+                    backgroundColor: 'white',
+                    boxSizing: 'border-box',
+                    cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Clear Button at Bottom */}
+        {hasActiveFilters && (
+          <div
+            style={{
+              paddingTop: '12px',
+              borderTop: '1px solid #E5DFD0',
+            }}
+          >
+            <button
+              type="button"
+              onClick={onClearAll}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: 'transparent',
+                color: '#7C2D3C',
+                border: '1px solid #7C2D3C',
+                borderRadius: '4px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                transition: 'all 0.2s',
+                width: '100%',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#FAFAF8';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              Clear All Filters
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

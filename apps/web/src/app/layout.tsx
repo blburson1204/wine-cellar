@@ -25,11 +25,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
           padding: 0,
           backgroundColor: '#FFFFFF',
           color: '#4A1C26',
+          position: 'relative',
+          minHeight: '100vh',
         }}
       >
+        {/* Background image with overlay */}
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: 'url(/images/wine_cellar_4.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.75,
+            zIndex: -1,
+          }}
+        />
         <header
           style={{
-            backgroundColor: '#7C2D3C',
+            backgroundColor: '#7C2D3C', // Lighter burgundy (alternative: #4A1C26 darker burgundy)
             color: 'white',
             padding: '16px 24px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',

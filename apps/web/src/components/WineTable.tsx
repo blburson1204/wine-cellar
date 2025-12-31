@@ -16,15 +16,6 @@ interface Wine {
   notes: string | null;
 }
 
-const WINE_COLORS: Record<string, string> = {
-  RED: '#7C2D3C',
-  WHITE: '#F5F1E8',
-  ROSE: '#D4A5A5',
-  SPARKLING: '#FFD700',
-  DESSERT: '#8B4513',
-  FORTIFIED: '#4A1C26',
-};
-
 interface WineTableProps {
   wines: Wine[];
   onRowClick: (wine: Wine) => void;
@@ -50,9 +41,11 @@ export default function WineTable({
         style={{
           textAlign: 'center',
           padding: '64px 24px',
-          backgroundColor: '#F5F1E8',
+          backgroundColor: 'rgba(245, 241, 232, 0.6)',
           borderRadius: '8px',
-          border: '1px solid #E5DFD0',
+          border: '1px solid #D4A5A5',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          backdropFilter: 'blur(4px)',
         }}
       >
         <div style={{ fontSize: '64px', marginBottom: '16px' }}>🍷</div>
@@ -65,19 +58,25 @@ export default function WineTable({
   }
 
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div
+      style={{
+        overflowX: 'auto',
+        borderRadius: '8px',
+        border: '1px solid #D4A5A5',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        backgroundColor: 'rgba(255, 255, 255, 0.6)',
+        backdropFilter: 'blur(4px)',
+      }}
+    >
       <table
         style={{
           width: '100%',
           borderCollapse: 'collapse',
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          overflow: 'hidden',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+          backgroundColor: 'transparent',
         }}
       >
         <thead>
-          <tr style={{ backgroundColor: '#4A1C26', color: 'white' }}>
+          <tr style={{ backgroundColor: '#7C2D3C', color: 'white' }}>
             <th
               onClick={() => onSort('name')}
               style={{
@@ -205,26 +204,14 @@ export default function WineTable({
                 cursor: 'pointer',
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#F5F1E8';
+                e.currentTarget.style.backgroundColor = 'rgba(245, 241, 232, 0.8)';
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.backgroundColor = 'transparent';
               }}
               onClick={() => onRowClick(wine)}
             >
-              <td style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    backgroundColor: WINE_COLORS[wine.color] || '#7C2D3C',
-                    border: wine.color === 'WHITE' ? '1px solid #D4A5A5' : 'none',
-                    flexShrink: 0,
-                  }}
-                />
-                <span style={{ fontWeight: '500', color: '#4A1C26' }}>{wine.name}</span>
-              </td>
+              <td style={{ padding: '12px', fontWeight: '500', color: '#4A1C26' }}>{wine.name}</td>
               <td style={{ padding: '12px' }}>
                 <span
                   style={{

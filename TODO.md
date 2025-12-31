@@ -4,6 +4,11 @@
 
 - [x] Full CRUD operations for wines
 - [x] Clean UI with wine collection management
+- [x] Two-column layout with filter sidebar and wine table
+- [x] Background image with transparency effects
+- [x] Semi-transparent components with frosted glass blur
+- [x] Unified burgundy color scheme across headers
+- [x] Scrollable wine table with bottle count display
 - [x] RESTful API with proper error handling
 - [x] Database with Prisma ORM
 - [x] Docker-based PostgreSQL setup
@@ -313,5 +318,5 @@
 
 ---
 
-**Last Updated**: December 30, 2025 (Coverage data from comprehensive testing
-improvement)
+**Last Updated**: December 31, 2025 (UI styling improvements with background
+image and transparency effects)

@@ -348,13 +348,31 @@ export default function Home(): React.JSX.Element {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          gap: '20px',
         }}
       >
-        <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#4A1C26' }}>
-          {filteredAndSortedWines.length !== wines.length
-            ? `Showing ${filteredAndSortedWines.length} of ${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'}`
-            : `${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection`}
-        </h2>
+        <div
+          style={{
+            flex: wines.length > 0 ? '0 0 calc(25% - 32px)' : '0 0 auto',
+            padding: '10px 16px',
+            backgroundColor: '#7C2D3C',
+            color: 'white',
+            borderRadius: '6px',
+            boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
+          }}
+        >
+          <h2
+            style={{
+              margin: 0,
+              fontSize: '18px',
+              fontWeight: '500',
+            }}
+          >
+            {filteredAndSortedWines.length !== wines.length
+              ? `Showing ${filteredAndSortedWines.length} of ${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'}`
+              : `${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection`}
+          </h2>
+        </div>
         <button
           onClick={() => setModalMode('add')}
           style={{
@@ -381,7 +399,7 @@ export default function Home(): React.JSX.Element {
       </div>
 
       {/* Main Content: Sidebar + Table Layout */}
-      <div style={{ display: 'flex', gap: '20px' }}>
+      <div style={{ display: 'flex', gap: '40px' }}>
         {/* Left Sidebar - Filters (25%) */}
         {wines.length > 0 && (
           <div style={{ flex: '0 0 25%' }}>
@@ -410,7 +428,13 @@ export default function Home(): React.JSX.Element {
         )}
 
         {/* Right Content - Table (67%) */}
-        <div style={{ flex: wines.length > 0 ? '1' : '1 1 100%' }}>
+        <div
+          style={{
+            flex: wines.length > 0 ? '1' : '1 1 100%',
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto',
+          }}
+        >
           <WineTable
             wines={filteredAndSortedWines}
             onRowClick={(wine) => {
