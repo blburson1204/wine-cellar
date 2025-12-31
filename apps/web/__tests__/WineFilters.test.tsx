@@ -42,7 +42,7 @@ describe('WineFilters', () => {
     it('renders all filter sections', () => {
       render(<WineFilters {...defaultProps} />);
 
-      expect(screen.getByLabelText('Filter Criteria')).toBeInTheDocument();
+      expect(screen.getByText('Filter Criteria')).toBeInTheDocument();
       expect(screen.getByText('Wine Type')).toBeInTheDocument();
       expect(screen.getByLabelText('Country')).toBeInTheDocument();
       expect(screen.getByText('Vintage')).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe('WineFilters', () => {
     it('displays current search text', () => {
       render(<WineFilters {...defaultProps} searchText="Bordeaux" />);
 
-      const searchInput = screen.getByLabelText('Filter Criteria');
+      const searchInput = screen.getByLabelText('Search');
       expect(searchInput).toHaveValue('Bordeaux');
     });
 
@@ -119,7 +119,7 @@ describe('WineFilters', () => {
       const user = userEvent.setup();
       render(<WineFilters {...defaultProps} />);
 
-      const searchInput = screen.getByLabelText('Filter Criteria');
+      const searchInput = screen.getByLabelText('Search');
       await user.type(searchInput, 'Margaux');
 
       expect(mockOnSearchChange).toHaveBeenCalled();

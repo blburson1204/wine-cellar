@@ -276,7 +276,7 @@ describe('WineTable', () => {
   });
 
   describe('Wine Colors', () => {
-    it('displays color indicator for RED wine', () => {
+    it('displays wine type badge for RED wine', () => {
       const redWine = [
         {
           ...mockWines[0],
@@ -284,14 +284,13 @@ describe('WineTable', () => {
         },
       ];
 
-      const { container } = render(<WineTable {...defaultProps} wines={redWine} />);
+      render(<WineTable {...defaultProps} wines={redWine} />);
 
-      // Check for color dot with RED color
-      const colorDot = container.querySelector('[style*="background-color: rgb(124, 45, 60)"]');
-      expect(colorDot).toBeInTheDocument();
+      // Check that the wine type is displayed in the Type column
+      expect(screen.getByText('RED')).toBeInTheDocument();
     });
 
-    it('displays color indicator for WHITE wine with border', () => {
+    it('displays wine type badge for WHITE wine', () => {
       const whiteWine = [
         {
           ...mockWines[1],
@@ -299,14 +298,13 @@ describe('WineTable', () => {
         },
       ];
 
-      const { container } = render(<WineTable {...defaultProps} wines={whiteWine} />);
+      render(<WineTable {...defaultProps} wines={whiteWine} />);
 
-      // Check for color dot with WHITE color
-      const colorDot = container.querySelector('[style*="background-color: rgb(245, 241, 232)"]');
-      expect(colorDot).toBeInTheDocument();
+      // Check that the wine type is displayed in the Type column
+      expect(screen.getByText('WHITE')).toBeInTheDocument();
     });
 
-    it('displays color indicator for SPARKLING wine', () => {
+    it('displays wine type badge for SPARKLING wine', () => {
       const sparklingWine = [
         {
           ...mockWines[2],
@@ -314,11 +312,10 @@ describe('WineTable', () => {
         },
       ];
 
-      const { container } = render(<WineTable {...defaultProps} wines={sparklingWine} />);
+      render(<WineTable {...defaultProps} wines={sparklingWine} />);
 
-      // Check for color dot with SPARKLING color
-      const colorDot = container.querySelector('[style*="background-color: rgb(255, 215, 0)"]');
-      expect(colorDot).toBeInTheDocument();
+      // Check that the wine type is displayed in the Type column
+      expect(screen.getByText('SPARKLING')).toBeInTheDocument();
     });
   });
 
