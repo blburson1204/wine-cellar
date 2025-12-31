@@ -5,3 +5,6 @@ dist
 *.log
 coverage
 *.tsbuildinfo
+
+# macOS
+.DS_Store
