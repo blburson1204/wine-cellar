@@ -431,8 +431,6 @@ export default function Home(): React.JSX.Element {
         <div
           style={{
             flex: wines.length > 0 ? '1' : '1 1 100%',
-            maxHeight: 'calc(100vh - 200px)',
-            overflowY: 'auto',
           }}
         >
           <WineTable
@@ -453,6 +451,7 @@ export default function Home(): React.JSX.Element {
                 setSortDirection('asc');
               }
             }}
+            maxHeight="calc(100vh - 200px)"
           />
         </div>
       </div>

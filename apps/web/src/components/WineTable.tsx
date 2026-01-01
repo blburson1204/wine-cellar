@@ -22,6 +22,7 @@ interface WineTableProps {
   sortBy: 'name' | 'vintage' | 'producer' | 'price';
   sortDirection: 'asc' | 'desc';
   onSort: (column: 'name' | 'vintage' | 'producer' | 'price') => void;
+  maxHeight?: string;
 }
 
 export default function WineTable({
@@ -30,6 +31,7 @@ export default function WineTable({
   sortBy,
   sortDirection,
   onSort,
+  maxHeight,
 }: WineTableProps): React.JSX.Element {
   const getSortIndicator = (column: 'name' | 'vintage' | 'producer' | 'price'): string => {
     if (sortBy !== column) return '';
@@ -60,22 +62,24 @@ export default function WineTable({
   return (
     <div
       style={{
-        overflowX: 'auto',
         borderRadius: '8px',
         border: '1px solid #D4A5A5',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         backgroundColor: 'rgba(255, 255, 255, 0.6)',
         backdropFilter: 'blur(4px)',
+        overflow: 'auto',
+        maxHeight: maxHeight,
       }}
     >
       <table
         style={{
           width: '100%',
-          borderCollapse: 'collapse',
+          borderCollapse: 'separate',
+          borderSpacing: 0,
           backgroundColor: 'transparent',
         }}
       >
-        <thead>
+        <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#7C2D3C' }}>
           <tr style={{ backgroundColor: '#7C2D3C', color: 'white' }}>
             <th
               onClick={() => onSort('name')}
