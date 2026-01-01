@@ -1,3 +1,7 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+
 interface Wine {
   id: string;
   name: string;
@@ -33,6 +37,36 @@ export default function WineTable({
   onSort,
   maxHeight,
 }: WineTableProps): React.JSX.Element {
+  const [focusedIndex, setFocusedIndex] = useState<number>(0);
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  // Set focus on first row when wines change (including initial load)
+  useEffect(() => {
+    if (wines.length > 0 && focusedIndex >= wines.length) {
+      setFocusedIndex(0);
+    }
+  }, [wines, focusedIndex]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      if (wines.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedIndex((prev) => Math.min(prev + 1, wines.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        onRowClick(wines[focusedIndex]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [wines, focusedIndex, onRowClick]);
   const getSortIndicator = (column: 'name' | 'vintage' | 'producer' | 'price'): string => {
     if (sortBy !== column) return '';
     return sortDirection === 'asc' ? ' ↑' : ' ↓';
@@ -61,6 +95,7 @@ export default function WineTable({
 
   return (
     <div
+      ref={tableRef}
       style={{
         borderRadius: '8px',
         border: '1px solid #D4A5A5',
@@ -199,57 +234,71 @@ export default function WineTable({
           </tr>
         </thead>
         <tbody>
-          {wines.map((wine, index) => (
-            <tr
-              key={wine.id}
-              style={{
-                borderBottom: index < wines.length - 1 ? '1px solid #E5DFD0' : 'none',
-                transition: 'background-color 0.2s',
-                cursor: 'pointer',
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(245, 241, 232, 0.8)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-              onClick={() => onRowClick(wine)}
-            >
-              <td style={{ padding: '12px', fontWeight: '500', color: '#4A1C26' }}>{wine.name}</td>
-              <td style={{ padding: '12px' }}>
-                <span
+          {wines.map((wine, index) => {
+            const isFocused = index === focusedIndex;
+            return (
+              <tr
+                key={wine.id}
+                style={{
+                  borderBottom: index < wines.length - 1 ? '1px solid #E5DFD0' : 'none',
+                  transition: 'background-color 0.2s, box-shadow 0.2s',
+                  cursor: 'pointer',
+                  backgroundColor: isFocused ? 'rgba(245, 241, 232, 0.8)' : 'transparent',
+                  boxShadow: isFocused ? 'inset 0 0 0 2px #7C2D3C' : 'none',
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(245, 241, 232, 0.8)';
+                }}
+                onMouseOut={(e) => {
+                  if (!isFocused) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  } else {
+                    e.currentTarget.style.backgroundColor = 'rgba(245, 241, 232, 0.8)';
+                  }
+                }}
+                onClick={() => {
+                  setFocusedIndex(index);
+                  onRowClick(wine);
+                }}
+              >
+                <td style={{ padding: '12px', fontWeight: '500', color: '#4A1C26' }}>
+                  {wine.name}
+                </td>
+                <td style={{ padding: '12px' }}>
+                  <span
+                    style={{
+                      padding: '4px 8px',
+                      backgroundColor: '#F5F1E8',
+                      color: '#7C2D3C',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                    }}
+                  >
+                    {wine.color}
+                  </span>
+                </td>
+                <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.producer}</td>
+                <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.country}</td>
+                <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.vintage}</td>
+                <td style={{ padding: '12px', textAlign: 'center', color: '#4A1C26' }}>
+                  {wine.quantity}
+                </td>
+                <td
                   style={{
-                    padding: '4px 8px',
-                    backgroundColor: '#F5F1E8',
-                    color: '#7C2D3C',
-                    borderRadius: '4px',
-                    fontSize: '12px',
+                    padding: '12px',
+                    textAlign: 'right',
+                    color: '#4A1C26',
                     fontWeight: '500',
                   }}
                 >
-                  {wine.color}
-                </span>
-              </td>
-              <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.producer}</td>
-              <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.country}</td>
-              <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.vintage}</td>
-              <td style={{ padding: '12px', textAlign: 'center', color: '#4A1C26' }}>
-                {wine.quantity}
-              </td>
-              <td
-                style={{
-                  padding: '12px',
-                  textAlign: 'right',
-                  color: '#4A1C26',
-                  fontWeight: '500',
-                }}
-              >
-                {wine.purchasePrice !== null && wine.purchasePrice !== undefined
-                  ? `$${wine.purchasePrice.toFixed(2)}`
-                  : '—'}
-              </td>
-            </tr>
-          ))}
+                  {wine.purchasePrice !== null && wine.purchasePrice !== undefined
+                    ? `$${wine.purchasePrice.toFixed(2)}`
+                    : '—'}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

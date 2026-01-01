@@ -5,9 +5,13 @@ PostgreSQL, and Prisma.
 
 ## Features
 
-- Add, view, and delete wines
-- Track vintage, producer, country, color, and quantity
-- Clean, simple UI
+- Add, view, edit, and delete wines
+- Track vintage, producer, country, color, quantity, and more
+- Search and filter wines (by type, variety, country, vintage, price)
+- Sortable table columns (name, vintage, producer, price)
+- Full keyboard navigation with arrow keys and Enter
+- Auto-focus for efficient data entry
+- Clean, wine-themed UI with consistent interactions
 - RESTful API
 
 ## Tech Stack

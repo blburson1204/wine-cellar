@@ -18,11 +18,12 @@ A full-stack web application for managing personal wine collections
 
 **Key Features:**
 
-- Clean, intuitive interface
-- Full CRUD operations
+- Clean, intuitive interface with keyboard navigation
+- Full CRUD operations with search and filtering
 - Real-time validation
 - Production-ready error handling
 - Comprehensive test coverage
+- Auto-focus and consistent interactions
 
 ---
 
@@ -39,8 +40,11 @@ A full-stack web application for managing personal wine collections
 **Design:**
 
 - Wine-themed color palette (#7C2D3C burgundy)
-- Sticky header with wine bottle emoji
-- Responsive table layout
+- Left-aligned sticky header with wine bottle emoji
+- Responsive table layout with keyboard navigation
+- Consistent background colors (`rgba(245, 241, 232, 0.8)`)
+- Visual focus indicators with burgundy borders
+- Auto-focus management in modals
 
 ---
 
@@ -340,7 +344,40 @@ A full-stack web application for managing personal wine collections
 
 ---
 
-## Slide 17: Recent Achievements
+## Slide 17: UI/UX Improvements
+
+**January 1, 2026 - Enhanced User Experience**
+
+**Keyboard Navigation:**
+
+- Arrow Up/Down to navigate wine table rows
+- Enter key to open wine details modal
+- Visual focus with burgundy inset borders
+- First row auto-focused on page load
+
+**Consistent Design:**
+
+- Unified background color (`rgba(245, 241, 232, 0.8)`) across:
+  - Filter inputs (search, dropdowns, number fields)
+  - Wine Type checkbox container
+  - Table row highlights (hover and focus)
+- Same styling for hover and keyboard focus
+- Burgundy borders distinguish keyboard focus
+
+**Smart Focus Management:**
+
+- View mode: Auto-focus Close button
+- Add/Edit mode: Auto-focus Name field
+- Efficient data entry workflow
+
+**Layout Refinements:**
+
+- Left-aligned header (full viewport width)
+- Filter sidebar and table properly aligned
+
+---
+
+## Slide 18: Recent Achievements
 
 **December 30, 2025 - Test Coverage Excellence**
 
@@ -484,11 +521,10 @@ npm run test:coverage # Coverage report
 
 1. No authentication (public access)
 2. No pagination (performance risk)
-3. No search/filter capabilities
-4. No image uploads
-5. Inline styles (no CSS modules)
-6. No optimistic updates
-7. Sentry not configured (infrastructure ready)
+3. No image uploads
+4. Inline styles (no CSS modules)
+5. No optimistic updates
+6. Sentry not configured (infrastructure ready)
 
 **Trade-offs for rapid development**
 
@@ -564,8 +600,9 @@ npm run test:coverage # Coverage report
 
 **Frontend:** http://localhost:3000
 
-- Wine list view
-- Add new wine form
+- Wine list view with search and filtering
+- Keyboard navigation (Arrow Up/Down, Enter)
+- Add new wine form with auto-focus
 - Edit/delete operations
 - Error handling
 

@@ -9,6 +9,9 @@ application UI.
 2. **Wine-Themed** - Use colors and aesthetics that evoke wine culture
 3. **Mobile-Friendly** - Responsive design for browsing collections on the go
 4. **Accessible** - WCAG 2.1 AA compliance for color contrast and navigation
+5. **Keyboard-First** - Full keyboard navigation with visual focus indicators
+6. **Consistent Interactions** - Unified hover/focus states across all
+   components
 
 ## Color Palette
 
@@ -139,10 +142,14 @@ font-family:
     border: '1px solid #D4A5A5',
     borderRadius: '4px',
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(245, 241, 232, 0.8)', // Unified cream background
   }}
 />
 ```
+
+**Filter Input Background**: All filter inputs (search, dropdowns, number
+fields) use `rgba(245, 241, 232, 0.8)` for visual consistency with table row
+highlights.
 
 **Select Dropdowns**:
 
@@ -165,10 +172,20 @@ font-family:
 
 **Wine List Table**:
 
-- Header: Dark background (`#4A1C26`), white text
-- Rows: Alternating cream/white backgrounds
-- Hover: Light burgundy highlight (`#F5E8EB`)
+- Header: Burgundy background (`#7C2D3C`), white text, sticky positioning
+- Rows: Transparent background by default
+- Hover: Cream highlight (`rgba(245, 241, 232, 0.8)`)
+- Keyboard Focus: Same cream background with burgundy inset border
+  (`inset 0 0 0 2px #7C2D3C`)
 - Borders: Subtle cream borders (`#E5DFD0`)
+- Cursor: Pointer to indicate clickability
+
+**Keyboard Navigation**:
+
+- Arrow Up/Down: Navigate between table rows
+- Enter: Open wine details modal for focused row
+- Focus indicator: Burgundy inset border with cream background
+- Consistent styling: Hover and focus use same background color for unified UX
 
 ## Layout Guidelines
 
@@ -238,13 +255,49 @@ font-family:
 </div>
 ```
 
+### Modals & Focus Management
+
+**Wine Details Modal**:
+
+- Auto-focus behavior depends on mode:
+  - **View Mode**: Focus moves to Close button on open
+  - **Add/Edit Mode**: Focus moves to first input field (Name) on open
+- Allows quick dismissal via Enter (when Close button focused) or Escape key
+- Background overlay with `rgba(0, 0, 0, 0.5)` for visual separation
+
+**Focus Management Principles**:
+
+1. Move focus to most relevant element when UI changes
+2. Predictable focus flow for keyboard users
+3. Visual indicators for all focused elements
+4. Consistent focus styling across components
+
+## Layout Structure
+
+**Page Header**:
+
+- Left-aligned (not centered with content)
+- Sticky positioning at top
+- Burgundy background with wine bottle emoji
+- Full width of viewport
+
+**Filter Sidebar & Table Layout**:
+
+- Two-column grid (25% sidebar, 75% table)
+- Both columns align with each other
+- Header spans full width above columns
+
 ## Accessibility Requirements
 
 1. **Color Contrast**: All text must have 4.5:1 contrast ratio
-2. **Focus States**: Visible focus outline on all interactive elements
+2. **Focus States**: Visible focus outline/border on all interactive elements
 3. **Labels**: All form inputs must have associated labels
 4. **Alt Text**: Wine images need descriptive alt text
 5. **Keyboard Navigation**: Full keyboard support for all features
+   - Table navigation with arrow keys
+   - Modal auto-focus on appropriate element
+   - Enter key to activate focused elements
+6. **Focus Indicators**: Burgundy borders (`#7C2D3C`) with sufficient contrast
 
 ## Animation Guidelines
 

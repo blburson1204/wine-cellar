@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Wine {
   id: string;
@@ -115,6 +115,8 @@ export default function WineDetailModal({
   const [editForm, setEditForm] = useState<Partial<Wine>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   // Initialize form with default values for add mode
   useEffect(() => {
@@ -139,6 +141,15 @@ export default function WineDetailModal({
       setEditForm(wine);
     }
   }, [mode, wine]);
+
+  // Auto-focus the name field when entering edit mode, or close button in view mode
+  useEffect(() => {
+    if (isEditMode && nameInputRef.current) {
+      nameInputRef.current.focus();
+    } else if (!isEditMode && mode === 'view' && closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+  }, [isEditMode, mode]);
 
   if (mode === 'view' && !wine) return null;
 
@@ -639,6 +650,7 @@ export default function WineDetailModal({
               {/* Close and Edit buttons on the right */}
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button
+                  ref={closeButtonRef}
                   onClick={onClose}
                   style={{
                     padding: '10px 20px',
@@ -806,6 +818,7 @@ export default function WineDetailModal({
                   Wine Name *
                 </label>
                 <input
+                  ref={nameInputRef}
                   type="text"
                   value={editForm.name || ''}
                   onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}

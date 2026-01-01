@@ -58,8 +58,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
         >
           <div
             style={{
-              maxWidth: '1200px',
-              margin: '0 auto',
               display: 'flex',
               alignItems: 'center',
               gap: '12px',

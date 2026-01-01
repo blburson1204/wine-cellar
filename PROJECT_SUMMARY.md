@@ -278,7 +278,7 @@ detailed test breakdown.
 ### Design & UX
 
 - [x] Wine-themed color palette (#7C2D3C burgundy, #F5F1E8 off-white)
-- [x] Sticky header with wine bottle emoji
+- [x] Left-aligned sticky header with wine bottle emoji
 - [x] Two-column layout: 25% filter sidebar, 75% wine table
 - [x] Background image with transparency effects (wine_cellar_4.jpg at 0.75
       opacity)
@@ -288,7 +288,14 @@ detailed test breakdown.
 - [x] Bottle count header with filtered/total display
 - [x] Scrollable wine table with fixed headers
 - [x] Responsive table layout
-- [x] Hover effects and transitions
+- [x] Consistent background colors (`rgba(245, 241, 232, 0.8)`) for filter
+      inputs and table highlights
+- [x] Keyboard navigation (Arrow Up/Down, Enter) for wine table
+- [x] Visual focus indicators with burgundy inset borders
+- [x] Unified hover/focus states for consistent UX
+- [x] Auto-focus management in modals (Close button in view mode, Name field in
+      add/edit mode)
+- [x] Hover effects and transitions (200ms)
 - [x] Inter font family for clean typography
 
 ### Error Handling & Logging ✅
@@ -526,11 +533,10 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 
 1. **No Authentication**: All wines are publicly accessible
 2. **No Pagination**: Large collections may have performance issues
-3. **No Search/Filter**: Users must scroll through entire list
-4. **No Image Upload**: Wine labels/photos not supported yet
-5. **Inline Styles**: No CSS modules or styled-components
-6. **No Optimistic Updates**: UI waits for API responses
-7. **No Sentry Integration**: Error tracking service not configured
+3. **No Image Upload**: Wine labels/photos not supported yet
+4. **Inline Styles**: No CSS modules or styled-components
+5. **No Optimistic Updates**: UI waits for API responses
+6. **No Sentry Integration**: Error tracking service not configured
    (infrastructure ready)
 
 ## Future Enhancements
