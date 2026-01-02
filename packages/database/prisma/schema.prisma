@@ -23,6 +23,7 @@ model Wine {
   drinkByDate   DateTime?
   rating      Float?   // 1.0-5.0 scale with 0.1 precision
   notes       String?
+  wineLink    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -34,4 +35,28 @@ enum WineColor {
   SPARKLING
   DESSERT
   FORTIFIED
+}
+
+model VivinoExport {
+  id                    String    @id @default(cuid())
+  winery                String?
+  wine_name             String?
+  vintage               String?
+  region                String?
+  country               String?
+  regional_wine_style   String?
+  average_rating        String?
+  scan_date             String?
+  scan_review_location  String?
+  your_rating           String?
+  your_review           String?
+  personal_note         String?
+  wine_type             String?
+  drinking_window       String?
+  link_to_wine          String?
+  label_image           String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("vivino_export")
 }
