@@ -8,5 +8,11 @@ coverage
 
 # macOS
 .DS_Store
+
+# Data files
 full_wine_list.csv
 scripts/import-vivino.ts
+
+# Wine label images (can be re-downloaded via script)
+assets/wine-labels/*.jpg
+assets/wine-labels/*.png
