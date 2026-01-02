@@ -8,3 +8,5 @@ coverage
 
 # macOS
 .DS_Store
+full_wine_list.csv
+scripts/import-vivino.ts
