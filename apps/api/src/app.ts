@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import express, { Express } from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { prisma } from '@wine-cellar/database';
 import { requestIdMiddleware } from './middleware/requestId';
 import { httpLogger } from './middleware/httpLogger';
@@ -9,6 +12,9 @@ import { validate } from './middleware/validate';
 import { createWineSchema, updateWineSchema, wineIdSchema } from './schemas/wine.schema';
 import { NotFoundError } from './errors/AppError';
 import { createLogger } from './utils/logger';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const createApp = (): Express => {
   const app = express();
@@ -87,6 +93,80 @@ export const createApp = (): Express => {
       log.info('Wine retrieved successfully', { wineId: id });
       res.json(wine);
     } catch (error) {
+      next(error);
+    }
+  });
+
+  // Get wine label image
+  app.get('/api/wines/:id/image', validate(wineIdSchema, 'params'), async (req, res, next) => {
+    const log = createLogger(req);
+
+    try {
+      const { id } = req.params;
+      log.info('Fetching wine image', { wineId: id });
+
+      // Find wine by ID
+      const wine = await prisma.wine.findUnique({
+        where: { id },
+      });
+
+      if (!wine) {
+        log.warn('Wine not found', { wineId: id });
+        throw new NotFoundError('Wine', id);
+      }
+
+      // Check if wine has an image
+      if (!wine.imageUrl) {
+        log.warn('Wine has no image', { wineId: id });
+        return res.status(404).json({
+          error: 'No image found for this wine',
+          errorCode: 'IMAGE_NOT_FOUND',
+        });
+      }
+
+      // Construct path to image file
+      const imagePath = path.join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'assets',
+        'wine-labels',
+        wine.imageUrl
+      );
+
+      // Check if file exists
+      if (!fs.existsSync(imagePath)) {
+        log.error('Image file not found on disk', new Error('Image file not found'), {
+          wineId: id,
+          imageUrl: wine.imageUrl,
+          imagePath,
+        });
+        return res.status(404).json({
+          error: 'Image file not found',
+          errorCode: 'IMAGE_FILE_NOT_FOUND',
+        });
+      }
+
+      // Determine MIME type from extension
+      const ext = path.extname(wine.imageUrl).toLowerCase();
+      const mimeTypes: { [key: string]: string } = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.webp': 'image/webp',
+      };
+      const mimeType = mimeTypes[ext] || 'image/jpeg';
+
+      // Set caching headers (cache for 1 year since images are immutable)
+      res.setHeader('Content-Type', mimeType);
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+
+      // Send the file
+      log.info('Serving wine image', { wineId: id, imageUrl: wine.imageUrl });
+      return res.sendFile(imagePath);
+    } catch (error) {
+      log.error('Error serving wine image', error as Error);
       next(error);
     }
   });

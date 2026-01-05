@@ -24,6 +24,10 @@ model Wine {
   rating      Float?   // 1.0-5.0 scale with 0.1 precision
   notes       String?
   wineLink    String?
+
+  // Image field (stores filename from assets/wine-labels)
+  imageUrl    String?  // e.g., "cmjx1sc6s0000yr445n60tinv.jpg"
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

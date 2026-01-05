@@ -1,11 +1,12 @@
 # Quick Start Guide - Phase 1 Wine Label Images
 
-**Updated**: January 4, 2026
+**Updated**: January 5, 2026
 
-**IMPORTANT**: Wine label images (~220) have already been downloaded and saved
-in [assets/wine-labels](../assets/wine-labels), keyed by Wine ID. Phase 1 now
-focuses on **displaying these existing images** in the Wine Detail modals, then
-adding upload/edit capabilities.
+**STATUS**: Phase 1A COMPLETED ✅
+
+Wine label images (217) have been successfully integrated into the Wine Detail
+modals. Images are displayed with a side-by-side layout (details left, image
+right), with the notes section spanning full width at the bottom.
 
 **Ready to begin?** Follow these steps to get started immediately.
 
@@ -307,17 +308,19 @@ npm run type-check
 
 Follow the checklist in order, but here's the high-level flow:
 
-### Phase 1A: Display Existing Images (Day 1)
+### Phase 1A: Display Existing Images (COMPLETED ✅)
 
 1. ✅ Database schema (add imageUrl field)
 2. ✅ Run migration
-3. ✅ Populate imageUrl with migration script
+3. ✅ Populate imageUrl with migration script (217 wines updated)
 4. ✅ Image serving endpoint (GET /wines/:id/image)
-5. Update Wine type in frontend
-6. Display images in detail modal (view mode)
-7. Display images in detail modal (edit mode)
-8. Test image display
-9. Handle missing images gracefully (placeholder)
+5. ✅ Update Wine type in frontend (3 files)
+6. ✅ Display images in detail modal (view mode)
+7. ✅ Display images in detail modal (edit mode)
+8. ✅ Test image display
+9. ✅ Handle missing images gracefully (wine emoji + "Image not available" text)
+10. ✅ Side-by-side layout optimization
+11. ✅ UI refinements (removed Drink By Date, renamed to Tasting Notes)
 
 ### Phase 1B: Upload & Edit (Days 2-3)
 

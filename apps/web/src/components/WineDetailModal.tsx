@@ -18,6 +18,7 @@ interface Wine {
   drinkByDate: string | null;
   rating: number | null;
   notes: string | null;
+  imageUrl: string | null;
 }
 
 interface WineDetailModalProps {
@@ -331,7 +332,7 @@ export default function WineDetailModal({
           backgroundColor: 'white',
           padding: '32px',
           borderRadius: '8px',
-          maxWidth: '600px',
+          maxWidth: '900px',
           width: '100%',
           maxHeight: '90vh',
           overflow: 'auto',
@@ -368,223 +369,248 @@ export default function WineDetailModal({
         {/* Read-Only View - only for view mode */}
         {!isEditMode && mode === 'view' && wine && (
           <div>
-            {/* Details Grid */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '16px 24px',
-                marginBottom: '24px',
-              }}
-            >
-              {/* Region */}
-              <div>
-                <label
+            {/* Main content flex container */}
+            <div style={{ display: 'flex', gap: '24px', marginBottom: '12px' }}>
+              {/* Left side - Wine Details */}
+              <div style={{ flex: 1 }}>
+                {/* Details Grid */}
+                <div
                   style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '16px 24px',
+                    marginBottom: '24px',
                   }}
                 >
-                  Region
-                </label>
-                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
-                  {wine.region || '—'}
-                </p>
+                  {/* Region */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#7C2D3C',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Region
+                    </label>
+                    <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
+                      {wine.region || '—'}
+                    </p>
+                  </div>
+
+                  {/* Country */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#7C2D3C',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Country
+                    </label>
+                    <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>{wine.country}</p>
+                  </div>
+
+                  {/* Grape Variety */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#7C2D3C',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Grape Variety
+                    </label>
+                    <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
+                      {wine.grapeVariety || '—'}
+                    </p>
+                  </div>
+
+                  {/* Blend Details */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#7C2D3C',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Blend Details
+                    </label>
+                    <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
+                      {wine.blendDetail || '—'}
+                    </p>
+                  </div>
+
+                  {/* Wine Type */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#7C2D3C',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Wine Type
+                    </label>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '4px 8px',
+                        backgroundColor: '#F5F1E8',
+                        color: '#7C2D3C',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                      }}
+                    >
+                      {wine.color}
+                    </span>
+                  </div>
+
+                  {/* Quantity */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#7C2D3C',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Quantity
+                    </label>
+                    <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
+                      {wine.quantity} {wine.quantity === 1 ? 'bottle' : 'bottles'}
+                    </p>
+                  </div>
+
+                  {/* Purchase Price */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#7C2D3C',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Purchase Price
+                    </label>
+                    <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
+                      {formatPrice(wine.purchasePrice)}
+                    </p>
+                  </div>
+
+                  {/* Purchase Date */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#7C2D3C',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Purchase Date
+                    </label>
+                    <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
+                      {formatDate(wine.purchaseDate)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Rating */}
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '4px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      color: '#7C2D3C',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
+                    Rating
+                  </label>
+                  <StarRating rating={wine.rating} />
+                </div>
               </div>
 
-              {/* Country */}
-              <div>
-                <label
+              {/* Right side - Wine Label Image */}
+              <div style={{ flexShrink: 0, width: '300px' }}>
+                {wine.imageUrl ? (
+                  <img
+                    src={`/api/wines/${wine.id}/image`}
+                    alt={`${wine.name} label`}
+                    style={{
+                      width: '100%',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    }}
+                    loading="lazy"
+                    onError={(e) => {
+                      // If image fails to load, show placeholder
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const placeholder = target.nextElementSibling as HTMLElement;
+                      if (placeholder) {
+                        placeholder.style.display = 'flex';
+                      }
+                    }}
+                  />
+                ) : null}
+                <div
                   style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
+                    display: wine.imageUrl ? 'none' : 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '40px 20px',
                   }}
                 >
-                  Country
-                </label>
-                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>{wine.country}</p>
-              </div>
-
-              {/* Grape Variety */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Grape Variety
-                </label>
-                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
-                  {wine.grapeVariety || '—'}
-                </p>
-              </div>
-
-              {/* Blend Details */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Blend Details
-                </label>
-                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
-                  {wine.blendDetail || '—'}
-                </p>
-              </div>
-
-              {/* Wine Type */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Wine Type
-                </label>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    padding: '4px 8px',
-                    backgroundColor: '#F5F1E8',
-                    color: '#7C2D3C',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                  }}
-                >
-                  {wine.color}
-                </span>
-              </div>
-
-              {/* Quantity */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Quantity
-                </label>
-                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
-                  {wine.quantity} {wine.quantity === 1 ? 'bottle' : 'bottles'}
-                </p>
-              </div>
-
-              {/* Purchase Price */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Purchase Price
-                </label>
-                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
-                  {formatPrice(wine.purchasePrice)}
-                </p>
-              </div>
-
-              {/* Purchase Date */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Purchase Date
-                </label>
-                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
-                  {formatDate(wine.purchaseDate)}
-                </p>
-              </div>
-
-              {/* Drink By Date */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Drink By Date
-                </label>
-                <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
-                  {formatDate(wine.drinkByDate)}
-                </p>
+                  <div style={{ fontSize: '80px', color: '#D4A5A5' }}>🍷</div>
+                  <div style={{ fontSize: '14px', color: '#7C2D3C', marginTop: '12px' }}>
+                    Image not available
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Rating - Full Width */}
-            <div style={{ marginBottom: '24px' }}>
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '4px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  color: '#7C2D3C',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                }}
-              >
-                Rating
-              </label>
-              <StarRating rating={wine.rating} />
-            </div>
-
-            {/* Notes - Full Width */}
+            {/* Tasting Notes - Full Width Below */}
             {wine.notes && (
               <div style={{ marginBottom: '24px' }}>
                 <label
@@ -598,7 +624,7 @@ export default function WineDetailModal({
                     letterSpacing: '0.5px',
                   }}
                 >
-                  Notes
+                  Tasting Notes
                 </label>
                 <p
                   style={{
@@ -795,600 +821,566 @@ export default function WineDetailModal({
               </div>
             )}
 
-            {/* Edit Form Grid */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '16px 24px',
-                marginBottom: '24px',
-              }}
-            >
-              {/* Name */}
-              <div>
-                <label
+            {/* Main content flex container */}
+            <div style={{ display: 'flex', gap: '24px', marginBottom: '12px' }}>
+              {/* Left side - Edit Form */}
+              <div style={{ flex: 1 }}>
+                {/* Edit Form Grid */}
+                <div
                   style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '16px 24px',
+                    marginBottom: '24px',
                   }}
                 >
-                  Wine Name *
-                </label>
-                <input
-                  ref={nameInputRef}
-                  type="text"
-                  value={editForm.name || ''}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.name ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.name && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.name}
-                  </span>
-                )}
-              </div>
+                  {/* Name */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Wine Name *
+                    </label>
+                    <input
+                      ref={nameInputRef}
+                      type="text"
+                      value={editForm.name || ''}
+                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.name ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.name && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.name}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Vintage */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Vintage *
-                </label>
-                <input
-                  type="number"
-                  value={editForm.vintage || ''}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, vintage: parseInt(e.target.value) || 0 })
-                  }
-                  min={1900}
-                  max={new Date().getFullYear()}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.vintage ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.vintage && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.vintage}
-                  </span>
-                )}
-              </div>
+                  {/* Vintage */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Vintage *
+                    </label>
+                    <input
+                      type="number"
+                      value={editForm.vintage || ''}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, vintage: parseInt(e.target.value) || 0 })
+                      }
+                      min={1900}
+                      max={new Date().getFullYear()}
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.vintage ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.vintage && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.vintage}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Producer */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Producer *
-                </label>
-                <input
-                  type="text"
-                  value={editForm.producer || ''}
-                  onChange={(e) => setEditForm({ ...editForm, producer: e.target.value })}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.producer ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.producer && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.producer}
-                  </span>
-                )}
-              </div>
+                  {/* Producer */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Producer *
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.producer || ''}
+                      onChange={(e) => setEditForm({ ...editForm, producer: e.target.value })}
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.producer ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.producer && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.producer}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Region */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Region
-                </label>
-                <input
-                  type="text"
-                  value={editForm.region || ''}
-                  onChange={(e) => setEditForm({ ...editForm, region: e.target.value || null })}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.region ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.region && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.region}
-                  </span>
-                )}
-              </div>
+                  {/* Region */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Region
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.region || ''}
+                      onChange={(e) => setEditForm({ ...editForm, region: e.target.value || null })}
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.region ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.region && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.region}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Country */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Country *
-                </label>
-                <input
-                  type="text"
-                  value={editForm.country || ''}
-                  onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.country ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.country && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.country}
-                  </span>
-                )}
-              </div>
+                  {/* Country */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Country *
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.country || ''}
+                      onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.country ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.country && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.country}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Grape Variety */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Grape Variety
-                </label>
-                <input
-                  type="text"
-                  value={editForm.grapeVariety || ''}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, grapeVariety: e.target.value || null })
-                  }
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.grapeVariety ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.grapeVariety && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.grapeVariety}
-                  </span>
-                )}
-              </div>
+                  {/* Grape Variety */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Grape Variety
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.grapeVariety || ''}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, grapeVariety: e.target.value || null })
+                      }
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.grapeVariety ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.grapeVariety && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.grapeVariety}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Blend Details */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Blend Details
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Cabernet Sauvignon 60%, Merlot 30%, Cabernet Franc 10%"
-                  value={editForm.blendDetail || ''}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, blendDetail: e.target.value || null })
-                  }
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.blendDetail ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.blendDetail && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.blendDetail}
-                  </span>
-                )}
-              </div>
+                  {/* Blend Details */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Blend Details
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Cabernet Sauvignon 60%, Merlot 30%, Cabernet Franc 10%"
+                      value={editForm.blendDetail || ''}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, blendDetail: e.target.value || null })
+                      }
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.blendDetail ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.blendDetail && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.blendDetail}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Wine Type */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Wine Type *
-                </label>
-                <select
-                  value={editForm.color || ''}
-                  onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.color ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    cursor: 'pointer',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <option value="RED">Red</option>
-                  <option value="WHITE">White</option>
-                  <option value="ROSE">Rosé</option>
-                  <option value="SPARKLING">Sparkling</option>
-                  <option value="DESSERT">Dessert</option>
-                  <option value="FORTIFIED">Fortified</option>
-                </select>
-                {errors.color && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.color}
-                  </span>
-                )}
-              </div>
+                  {/* Wine Type */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Wine Type *
+                    </label>
+                    <select
+                      value={editForm.color || ''}
+                      onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.color ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        cursor: 'pointer',
+                        boxSizing: 'border-box',
+                      }}
+                    >
+                      <option value="RED">Red</option>
+                      <option value="WHITE">White</option>
+                      <option value="ROSE">Rosé</option>
+                      <option value="SPARKLING">Sparkling</option>
+                      <option value="DESSERT">Dessert</option>
+                      <option value="FORTIFIED">Fortified</option>
+                    </select>
+                    {errors.color && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.color}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Quantity */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Quantity *
-                </label>
-                <input
-                  type="number"
-                  value={editForm.quantity ?? ''}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, quantity: parseInt(e.target.value) || 0 })
-                  }
-                  min={0}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.quantity ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.quantity && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.quantity}
-                  </span>
-                )}
-              </div>
+                  {/* Quantity */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Quantity *
+                    </label>
+                    <input
+                      type="number"
+                      value={editForm.quantity ?? ''}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, quantity: parseInt(e.target.value) || 0 })
+                      }
+                      min={0}
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.quantity ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.quantity && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.quantity}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Purchase Price */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Purchase Price
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={editForm.purchasePrice ?? ''}
-                  onChange={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      purchasePrice: e.target.value ? parseFloat(e.target.value) : null,
-                    })
-                  }
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.purchasePrice ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.purchasePrice && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.purchasePrice}
-                  </span>
-                )}
-              </div>
-
-              {/* Rating */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Rating (1.0 - 5.0)
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="1.0"
-                  max="5.0"
-                  value={editForm.rating ?? ''}
-                  onChange={(e) =>
-                    setEditForm({
-                      ...editForm,
-                      rating: e.target.value ? parseFloat(e.target.value) : null,
-                    })
-                  }
-                  placeholder="e.g., 3.6"
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.rating ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.rating && (
-                  <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                    {errors.rating}
-                  </span>
-                )}
-              </div>
-
-              {/* Purchase Date */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Purchase Date
-                </label>
-                <input
-                  type="date"
-                  value={
-                    editForm.purchaseDate
-                      ? (() => {
-                          try {
-                            return new Date(editForm.purchaseDate).toISOString().split('T')[0];
-                          } catch {
-                            return '';
-                          }
-                        })()
-                      : ''
-                  }
-                  onChange={(e) => {
-                    // Only update if we have a valid value or user explicitly cleared it
-                    const inputValue = e.target.value;
-
-                    if (inputValue === '') {
-                      // User cleared the field - set to null
-                      setEditForm({ ...editForm, purchaseDate: null });
-                    } else {
-                      // Try to parse the date
-                      const date = new Date(inputValue);
-                      if (!isNaN(date.getTime())) {
+                  {/* Purchase Price */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Purchase Price
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editForm.purchasePrice ?? ''}
+                      onChange={(e) =>
                         setEditForm({
                           ...editForm,
-                          purchaseDate: date.toISOString(),
-                        });
+                          purchasePrice: e.target.value ? parseFloat(e.target.value) : null,
+                        })
                       }
-                      // If invalid, don't update state (keep existing value)
-                    }
-                  }}
-                  onBlur={(e) => {
-                    // When user leaves the field, validate what's in the input
-                    if (e.target.validity && !e.target.validity.valid) {
-                      // Browser detected invalid date - show error
-                      setErrors((prev) => ({ ...prev, purchaseDate: 'Please enter a valid date' }));
-                    } else {
-                      // Clear the error if it was previously set
-                      setErrors((prev) => {
-                        const { purchaseDate: _removed, ...remainingErrors } = prev;
-                        return remainingErrors;
-                      });
-                    }
-                  }}
-                  onInvalid={(e) => {
-                    // Also catch invalid events (when user tries to submit with invalid date)
-                    e.preventDefault();
-                    setErrors((prev) => ({ ...prev, purchaseDate: 'Please enter a valid date' }));
-                  }}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.purchaseDate ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.purchaseDate && (
-                  <span
-                    style={{
-                      fontSize: '12px',
-                      color: '#C73E3A',
-                      marginTop: '2px',
-                      display: 'block',
-                    }}
-                  >
-                    {errors.purchaseDate}
-                  </span>
-                )}
-              </div>
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.purchasePrice ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.purchasePrice && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.purchasePrice}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Drink By Date */}
-              <div>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
-                  }}
-                >
-                  Drink By Date
-                </label>
-                <input
-                  type="date"
-                  value={
-                    editForm.drinkByDate
-                      ? (() => {
-                          try {
-                            return new Date(editForm.drinkByDate).toISOString().split('T')[0];
-                          } catch {
-                            return '';
-                          }
-                        })()
-                      : ''
-                  }
-                  onChange={(e) => {
-                    // Only update if we have a valid value or user explicitly cleared it
-                    const inputValue = e.target.value;
-
-                    if (inputValue === '') {
-                      // User cleared the field - set to null
-                      setEditForm({ ...editForm, drinkByDate: null });
-                    } else {
-                      // Try to parse the date
-                      const date = new Date(inputValue);
-                      if (!isNaN(date.getTime())) {
+                  {/* Rating */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Rating (1.0 - 5.0)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="1.0"
+                      max="5.0"
+                      value={editForm.rating ?? ''}
+                      onChange={(e) =>
                         setEditForm({
                           ...editForm,
-                          drinkByDate: date.toISOString(),
-                        });
+                          rating: e.target.value ? parseFloat(e.target.value) : null,
+                        })
                       }
-                      // If invalid, don't update state (keep existing value)
-                    }
-                  }}
-                  onBlur={(e) => {
-                    // When user leaves the field, validate what's in the input
-                    if (e.target.validity && !e.target.validity.valid) {
-                      // Browser detected invalid date - show error
-                      setErrors((prev) => ({ ...prev, drinkByDate: 'Please enter a valid date' }));
-                    } else {
-                      // Clear the error if it was previously set
-                      setErrors((prev) => {
-                        const { drinkByDate: _removed, ...remainingErrors } = prev;
-                        return remainingErrors;
-                      });
-                    }
-                  }}
-                  onInvalid={(e) => {
-                    // Also catch invalid events (when user tries to submit with invalid date)
-                    e.preventDefault();
-                    setErrors((prev) => ({ ...prev, drinkByDate: 'Please enter a valid date' }));
-                  }}
-                  style={{
-                    padding: '10px',
-                    fontSize: '16px',
-                    border: `1px solid ${errors.drinkByDate ? '#C73E3A' : '#D4A5A5'}`,
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'white',
-                    boxSizing: 'border-box',
-                  }}
-                />
-                {errors.drinkByDate && (
-                  <span
+                      placeholder="e.g., 3.6"
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.rating ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.rating && (
+                      <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                        {errors.rating}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Purchase Date */}
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        marginBottom: '4px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        color: '#4A1C26',
+                      }}
+                    >
+                      Purchase Date
+                    </label>
+                    <input
+                      type="date"
+                      value={
+                        editForm.purchaseDate
+                          ? (() => {
+                              try {
+                                return new Date(editForm.purchaseDate).toISOString().split('T')[0];
+                              } catch {
+                                return '';
+                              }
+                            })()
+                          : ''
+                      }
+                      onChange={(e) => {
+                        // Only update if we have a valid value or user explicitly cleared it
+                        const inputValue = e.target.value;
+
+                        if (inputValue === '') {
+                          // User cleared the field - set to null
+                          setEditForm({ ...editForm, purchaseDate: null });
+                        } else {
+                          // Try to parse the date
+                          const date = new Date(inputValue);
+                          if (!isNaN(date.getTime())) {
+                            setEditForm({
+                              ...editForm,
+                              purchaseDate: date.toISOString(),
+                            });
+                          }
+                          // If invalid, don't update state (keep existing value)
+                        }
+                      }}
+                      onBlur={(e) => {
+                        // When user leaves the field, validate what's in the input
+                        if (e.target.validity && !e.target.validity.valid) {
+                          // Browser detected invalid date - show error
+                          setErrors((prev) => ({
+                            ...prev,
+                            purchaseDate: 'Please enter a valid date',
+                          }));
+                        } else {
+                          // Clear the error if it was previously set
+                          setErrors((prev) => {
+                            const { purchaseDate: _removed, ...remainingErrors } = prev;
+                            return remainingErrors;
+                          });
+                        }
+                      }}
+                      onInvalid={(e) => {
+                        // Also catch invalid events (when user tries to submit with invalid date)
+                        e.preventDefault();
+                        setErrors((prev) => ({
+                          ...prev,
+                          purchaseDate: 'Please enter a valid date',
+                        }));
+                      }}
+                      style={{
+                        padding: '10px',
+                        fontSize: '16px',
+                        border: `1px solid ${errors.purchaseDate ? '#C73E3A' : '#D4A5A5'}`,
+                        borderRadius: '4px',
+                        width: '100%',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {errors.purchaseDate && (
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          color: '#C73E3A',
+                          marginTop: '2px',
+                          display: 'block',
+                        }}
+                      >
+                        {errors.purchaseDate}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right side - Wine Label Image */}
+              {wine && (
+                <div style={{ flexShrink: 0, width: '300px' }}>
+                  {wine.imageUrl ? (
+                    <img
+                      src={`/api/wines/${wine.id}/image`}
+                      alt={`${wine.name} label`}
+                      style={{
+                        width: '100%',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                      }}
+                      loading="lazy"
+                      onError={(e) => {
+                        // If image fails to load, show placeholder
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const placeholder = target.nextElementSibling as HTMLElement;
+                        if (placeholder) {
+                          placeholder.style.display = 'flex';
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div
                     style={{
-                      fontSize: '12px',
-                      color: '#C73E3A',
-                      marginTop: '2px',
-                      display: 'block',
+                      display: wine.imageUrl ? 'none' : 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '40px 20px',
                     }}
                   >
-                    {errors.drinkByDate}
-                  </span>
-                )}
-              </div>
+                    <div style={{ fontSize: '80px', color: '#D4A5A5' }}>🍷</div>
+                    <div style={{ fontSize: '14px', color: '#7C2D3C', marginTop: '12px' }}>
+                      Image not available
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Notes - Full Width */}
+            {/* Tasting Notes - Full Width Below */}
             <div style={{ marginBottom: '24px' }}>
               <label
                 style={{
@@ -1399,7 +1391,7 @@ export default function WineDetailModal({
                   color: '#4A1C26',
                 }}
               >
-                Notes
+                Tasting Notes
               </label>
               <textarea
                 value={editForm.notes || ''}

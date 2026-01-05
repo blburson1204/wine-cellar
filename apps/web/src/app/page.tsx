@@ -21,6 +21,7 @@ interface Wine {
   drinkByDate: string | null;
   rating: number | null;
   notes: string | null;
+  imageUrl: string | null;
   createdAt?: string;
   updatedAt?: string;
 }

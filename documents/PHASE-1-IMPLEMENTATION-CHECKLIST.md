@@ -1,7 +1,7 @@
 # Phase 1 Implementation Checklist - Wine Label Images
 
-**Date**: December 31, 2025 (Updated January 4, 2026) **Status**: REVISED -
-Ready to Begin **Target Duration**: 2-4 days
+**Date**: December 31, 2025 (Updated January 5, 2026) **Status**: Phase 1A
+COMPLETED **Target Duration**: 2-4 days
 
 ---
 
@@ -81,7 +81,7 @@ Wine model
 
 **File**: `packages/database/prisma/schema.prisma`
 
-- [ ] Add imageUrl field to Wine model:
+- [x] Add imageUrl field to Wine model:
 
   ```prisma
   model Wine {
@@ -99,10 +99,10 @@ Wine model
   }
   ```
 
-- [ ] Generate Prisma client: `npm run db:generate`
-- [ ] Create migration: `npx prisma migrate dev --name add_wine_image_url`
-- [ ] Test migration in development database
-- [ ] Commit schema changes
+- [x] Generate Prisma client: `npm run db:generate`
+- [x] Create migration: `npx prisma migrate dev --name add_wine_image_url`
+- [x] Test migration in development database
+- [x] Commit schema changes
 
 **Estimated Time**: 20 minutes
 
@@ -112,16 +112,16 @@ Wine model
 
 **File**: `scripts/populate-wine-images.ts` (NEW)
 
-- [ ] Create script to read existing images from `assets/wine-labels/`
-- [ ] For each image file:
-  - [ ] Extract wine ID from filename (without extension)
-  - [ ] Find wine in database by ID
-  - [ ] Update wine.imageUrl with the filename
-  - [ ] Log results (updated vs. not found)
+- [x] Create script to read existing images from `assets/wine-labels/`
+- [x] For each image file:
+  - [x] Extract wine ID from filename (without extension)
+  - [x] Find wine in database by ID
+  - [x] Update wine.imageUrl with the filename
+  - [x] Log results (updated vs. not found)
 
-- [ ] Run script: `npx tsx scripts/populate-wine-images.ts`
-- [ ] Verify in Prisma Studio that wines have imageUrl populated
-- [ ] Commit script
+- [x] Run script: `npx tsx scripts/populate-wine-images.ts` (217 wines updated)
+- [x] Verify in Prisma Studio that wines have imageUrl populated
+- [x] Commit script
 
 **Estimated Time**: 30 minutes
 
@@ -129,9 +129,9 @@ Wine model
 
 ### 1A-3. Image Serving Endpoint
 
-**File**: `apps/api/src/routes/wines.ts` (MODIFY)
+**File**: `apps/api/src/app.ts` (MODIFIED)
 
-- [ ] Add GET endpoint to serve images:
+- [x] Add GET endpoint to serve images:
 
   ```typescript
   router.get('/wines/:id/image', async (req, res, next) => {
@@ -145,13 +145,14 @@ Wine model
   });
   ```
 
-- [ ] Add error handling:
-  - [ ] 404 if wine not found
-  - [ ] 404 if wine has no image
-  - [ ] 404 if image file doesn't exist on disk
+- [x] Add error handling:
+  - [x] 404 if wine not found
+  - [x] 404 if wine has no image
+  - [x] 404 if image file doesn't exist on disk
 
-- [ ] Test endpoint with curl or browser
-- [ ] Commit endpoint
+- [x] Test endpoint with curl or browser
+- [x] Commit endpoint
+- [x] Fixed ES module \_\_dirname issue using fileURLToPath
 
 **Estimated Time**: 1 hour
 
@@ -159,9 +160,10 @@ Wine model
 
 ### 1A-4. Frontend - Update Wine Type
 
-**File**: `apps/web/src/types/wine.ts` (NEW or MODIFY)
+**Files**: `apps/web/src/components/WineDetailModal.tsx`, `WineTable.tsx`,
+`page.tsx`
 
-- [ ] Add imageUrl field to Wine type:
+- [x] Add imageUrl field to Wine type:
 
   ```typescript
   export interface Wine {
@@ -175,7 +177,8 @@ Wine model
   }
   ```
 
-- [ ] Commit type changes
+- [x] Commit type changes
+- [x] Updated Wine interface in 3 files
 
 **Estimated Time**: 5 minutes
 
@@ -185,9 +188,9 @@ Wine model
 
 **File**: `apps/web/src/components/WineDetailModal.tsx` (MODIFY)
 
-- [ ] Add image display section in view mode:
-  - [ ] Check if `wine.imageUrl` exists
-  - [ ] If exists, display image:
+- [x] Add image display section in view mode:
+  - [x] Check if `wine.imageUrl` exists
+  - [x] If exists, display image:
     ```tsx
     <img
       src={`/api/wines/${wine.id}/image`}
@@ -196,13 +199,19 @@ Wine model
       loading="lazy"
     />
     ```
-  - [ ] If no image, show placeholder (wine emoji 🍷)
-  - [ ] Handle image load errors (broken images)
+  - [x] If no image, show placeholder (wine emoji 🍷)
+  - [x] Handle image load errors (broken images)
 
-- [ ] Style appropriately with wine-themed colors
-- [ ] Test with wines that have images
-- [ ] Test with wines that don't have images
-- [ ] Commit changes
+- [x] Style appropriately with wine-themed colors
+- [x] Test with wines that have images
+- [x] Test with wines that don't have images
+- [x] Commit changes
+- [x] Implemented side-by-side layout (details left, image right)
+- [x] Notes section spans full width at bottom
+- [x] Removed Drink By Date field
+- [x] Renamed "Notes" to "Tasting Notes"
+- [x] Added "Image not available" text to placeholder
+- [x] Increased modal width to 900px for better layout
 
 **Estimated Time**: 1 hour
 
@@ -212,14 +221,15 @@ Wine model
 
 **File**: `apps/web/src/components/WineDetailModal.tsx` (MODIFY)
 
-- [ ] Add image display section in edit mode:
-  - [ ] Same display logic as view mode
-  - [ ] Show image if exists
-  - [ ] Show placeholder if no image
-  - [ ] Note: Upload/delete functionality comes in Phase 1B
+- [x] Add image display section in edit mode:
+  - [x] Same display logic as view mode
+  - [x] Show image if exists
+  - [x] Show placeholder if no image
+  - [x] Note: Upload/delete functionality comes in Phase 1B
 
-- [ ] Test in edit mode
-- [ ] Commit changes
+- [x] Test in edit mode
+- [x] Commit changes
+- [x] Applied same side-by-side layout as view mode
 
 **Estimated Time**: 30 minutes
 
@@ -250,13 +260,15 @@ Wine model
 
 ### 1A-8. Manual Testing & Documentation
 
-- [ ] Manual testing:
-  - [ ] View wine with image in detail modal
-  - [ ] View wine without image (shows placeholder)
-  - [ ] Check browser network tab (images cached correctly)
-  - [ ] Test in both view and edit modes
+- [x] Manual testing:
+  - [x] View wine with image in detail modal
+  - [x] View wine without image (shows placeholder)
+  - [x] Check browser network tab (images cached correctly)
+  - [x] Test in both view and edit modes
+  - [x] Test responsive layout adjustments
+  - [x] Test placeholder text display
 
-- [ ] Update README or docs with new feature
+- [x] Update README or docs with new feature
 
 **Estimated Time**: 30 minutes
 
@@ -987,11 +999,17 @@ Skip if already implemented.
 
 ### Phase 1A is complete when:
 
-✅ Database has imageUrl field ✅ Existing images (~220) are linked to wines in
-database ✅ Images are displayed in Wine Detail modals (both view and edit
-modes) ✅ Images display at max 600px width ✅ Missing images show wine emoji 🍷
-placeholder ✅ Image serving endpoint works with proper caching ✅ Basic tests
-pass ✅ No console errors or warnings ✅ Linting and formatting clean
+✅ Database has imageUrl field (DONE) ✅ Existing images (217) are linked to
+wines in database (DONE) ✅ Images are displayed in Wine Detail modals (both
+view and edit modes) (DONE) ✅ Images display at 300px width in side-by-side
+layout (DONE) ✅ Missing images show wine emoji 🍷 placeholder with "Image not
+available" text (DONE) ✅ Image serving endpoint works with proper caching
+(DONE) ✅ Basic tests pass (PENDING - tests not yet written) ✅ No console
+errors or warnings (DONE) ✅ Linting and formatting clean (DONE) ✅ Modal layout
+optimized (details left, image right, notes bottom) (DONE) ✅ UI refinements
+(removed Drink By Date, renamed to Tasting Notes) (DONE)
+
+**Phase 1A Status**: FEATURE COMPLETE - Testing remains pending
 
 ### Phase 1B is complete when:
 
