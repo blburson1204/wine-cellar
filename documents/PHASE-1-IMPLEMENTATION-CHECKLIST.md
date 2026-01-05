@@ -1,7 +1,18 @@
 # Phase 1 Implementation Checklist - Wine Label Images
 
-**Date**: December 31, 2025 **Status**: Ready to Begin **Target Duration**: 3-5
-days
+**Date**: December 31, 2025 (Updated January 4, 2026) **Status**: REVISED -
+Ready to Begin **Target Duration**: 2-4 days
+
+---
+
+## IMPORTANT UPDATE (January 4, 2026)
+
+Wine label images (~220) have already been downloaded from Vivino and stored in
+[assets/wine-labels](../assets/wine-labels), keyed by Wine ID. This changes our
+implementation approach:
+
+**NEW Phase 1A Priority**: Display existing images in Wine Detail modals **NEW
+Phase 1B**: Add upload/edit capabilities
 
 ---
 
@@ -9,73 +20,259 @@ days
 
 Based on our discussion, Phase 1 will implement:
 
-✅ **Image Display**: Max 600px width in detail modal ✅ **NO Thumbnails**:
-Deferred to Phase 2 (faster implementation) ✅ **Placeholder**: Wine emoji 🍷
-when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog ✅
-**Upload Location**: Only visible in edit mode ✅ **Testing**: Comprehensive
-(80%+ coverage) ✅ **Storage**: Abstraction layer (local for dev, S3-ready) ✅
-**Database**: Simple fields on Wine model
+✅ **Image Display**: Max 600px width in detail modal (BOTH view and edit modes)
+✅ **NO Thumbnails**: Deferred to Phase 3 (faster implementation) ✅
+**Placeholder**: Wine emoji 🍷 when no image ✅ **Existing Images**: Display
+~220 images already downloaded ✅ **Upload Location**: Only available in edit
+mode (Phase 1B) ✅ **Testing**: Comprehensive (80%+ coverage) ✅ **Storage**:
+Local file system (assets/wine-labels) ✅ **Database**: Simple imageUrl field on
+Wine model
 
 ---
 
-## Phase 1 Scope
+## Phase 1A Scope - Display Existing Images (PRIORITY)
+
+### What's Included ✅
+
+- Database field to store image filename
+- Migration script to populate imageUrl from existing files
+- Image serving endpoint (GET /wines/:id/image)
+- Display images in Wine Detail modal (view mode)
+- Display images in Wine Detail modal (edit mode)
+- Graceful handling of missing images
+- Basic tests
+
+### Estimated Time: 1 day
+
+---
+
+## Phase 1B Scope - Upload & Edit
 
 ### What's Included ✅
 
 - Upload single image per wine (JPEG, PNG, WebP)
-- Display full-size image in detail modal
-- Delete/replace images
-- Local file system storage for development
-- Storage abstraction ready for AWS S3 (Phase 2)
+- Delete/replace images with confirmation
+- Local file system storage
 - Image optimization (resize to 1200px max, compress)
+- File validation (size, type, magic numbers)
 - Comprehensive testing
-- Security validations
+- Error handling
 
-### What's NOT Included (Deferred to Phase 2) ⏸️
+### What's NOT Included (Deferred) ⏸️
 
-- Thumbnails in wine table
-- AWS S3 production storage
-- CloudFront CDN
-- Multiple images per wine
-- Image editing (crop, rotate)
-- Drag-and-drop upload
+- Thumbnails in wine table (Phase 3)
+- AWS S3 production storage (Phase 4)
+- CloudFront CDN (Phase 4)
+- Multiple images per wine (Phase 5)
+- Image editing (crop, rotate) (Phase 5)
+- Drag-and-drop upload (Phase 5)
+
+### Estimated Time: 2-3 days
 
 ---
 
 ## Implementation Tasks
 
-### 1. Database Schema Changes
+---
+
+## PHASE 1A: DISPLAY EXISTING IMAGES (PRIORITY)
+
+### 1A-1. Database Schema Changes
 
 **File**: `packages/database/prisma/schema.prisma`
 
-- [ ] Add image fields to Wine model:
+- [ ] Add imageUrl field to Wine model:
 
   ```prisma
   model Wine {
     // ... existing fields ...
 
-    // Image fields
-    imageUrl      String?   // URL/path to optimized image
-    imageMimeType String?   // e.g., "image/jpeg"
-    imageSize     Int?      // File size in bytes
-    imageUploadedAt DateTime? // When image was uploaded
+    // Image field (stores filename from assets/wine-labels)
+    imageUrl      String?   // e.g., "cmjx1sc6s0000yr445n60tinv.jpg"
+
+    // Future fields for Phase 1B (upload functionality)
+    // imageMimeType String?
+    // imageSize     Int?
+    // imageUploadedAt DateTime?
 
     // ... rest of fields ...
   }
   ```
 
 - [ ] Generate Prisma client: `npm run db:generate`
-- [ ] Create migration: `npx prisma migrate dev --name add_wine_images`
+- [ ] Create migration: `npx prisma migrate dev --name add_wine_image_url`
 - [ ] Test migration in development database
 - [ ] Commit schema changes
+
+**Estimated Time**: 20 minutes
+
+---
+
+### 1A-2. Migration Script to Populate imageUrl
+
+**File**: `scripts/populate-wine-images.ts` (NEW)
+
+- [ ] Create script to read existing images from `assets/wine-labels/`
+- [ ] For each image file:
+  - [ ] Extract wine ID from filename (without extension)
+  - [ ] Find wine in database by ID
+  - [ ] Update wine.imageUrl with the filename
+  - [ ] Log results (updated vs. not found)
+
+- [ ] Run script: `npx tsx scripts/populate-wine-images.ts`
+- [ ] Verify in Prisma Studio that wines have imageUrl populated
+- [ ] Commit script
 
 **Estimated Time**: 30 minutes
 
 ---
 
-### 2. Install Dependencies
+### 1A-3. Image Serving Endpoint
+
+**File**: `apps/api/src/routes/wines.ts` (MODIFY)
+
+- [ ] Add GET endpoint to serve images:
+
+  ```typescript
+  router.get('/wines/:id/image', async (req, res, next) => {
+    // 1. Find wine by ID
+    // 2. Check if wine.imageUrl exists
+    // 3. Construct path to assets/wine-labels/{imageUrl}
+    // 4. Check if file exists
+    // 5. Determine MIME type from extension
+    // 6. Set caching headers (Cache-Control: public, max-age=31536000)
+    // 7. Send file with res.sendFile()
+  });
+  ```
+
+- [ ] Add error handling:
+  - [ ] 404 if wine not found
+  - [ ] 404 if wine has no image
+  - [ ] 404 if image file doesn't exist on disk
+
+- [ ] Test endpoint with curl or browser
+- [ ] Commit endpoint
+
+**Estimated Time**: 1 hour
+
+---
+
+### 1A-4. Frontend - Update Wine Type
+
+**File**: `apps/web/src/types/wine.ts` (NEW or MODIFY)
+
+- [ ] Add imageUrl field to Wine type:
+
+  ```typescript
+  export interface Wine {
+    id: string;
+    name: string;
+    vintage: number;
+    // ... existing fields ...
+
+    // New image field
+    imageUrl?: string | null;
+  }
+  ```
+
+- [ ] Commit type changes
+
+**Estimated Time**: 5 minutes
+
+---
+
+### 1A-5. Frontend - Display Image in Detail Modal (View Mode)
+
+**File**: `apps/web/src/components/WineDetailModal.tsx` (MODIFY)
+
+- [ ] Add image display section in view mode:
+  - [ ] Check if `wine.imageUrl` exists
+  - [ ] If exists, display image:
+    ```tsx
+    <img
+      src={`/api/wines/${wine.id}/image`}
+      alt={`${wine.name} label`}
+      style={{ maxWidth: '600px', width: '100%', borderRadius: '8px' }}
+      loading="lazy"
+    />
+    ```
+  - [ ] If no image, show placeholder (wine emoji 🍷)
+  - [ ] Handle image load errors (broken images)
+
+- [ ] Style appropriately with wine-themed colors
+- [ ] Test with wines that have images
+- [ ] Test with wines that don't have images
+- [ ] Commit changes
+
+**Estimated Time**: 1 hour
+
+---
+
+### 1A-6. Frontend - Display Image in Detail Modal (Edit Mode)
+
+**File**: `apps/web/src/components/WineDetailModal.tsx` (MODIFY)
+
+- [ ] Add image display section in edit mode:
+  - [ ] Same display logic as view mode
+  - [ ] Show image if exists
+  - [ ] Show placeholder if no image
+  - [ ] Note: Upload/delete functionality comes in Phase 1B
+
+- [ ] Test in edit mode
+- [ ] Commit changes
+
+**Estimated Time**: 30 minutes
+
+---
+
+### 1A-7. Basic Tests for Image Display
+
+**File**: `apps/api/__tests__/wine-images.test.ts` (NEW)
+
+- [ ] Test GET `/wines/:id/image`:
+  - [ ] Returns 200 and image for wine with imageUrl
+  - [ ] Returns 404 for wine without imageUrl
+  - [ ] Returns 404 for non-existent wine
+  - [ ] Sets correct Content-Type header
+  - [ ] Sets correct Cache-Control header
+
+**File**: `apps/web/__tests__/WineDetailModal.test.tsx` (MODIFY)
+
+- [ ] Test image display:
+  - [ ] Shows image when wine.imageUrl exists
+  - [ ] Shows placeholder when no imageUrl
+  - [ ] Image has correct src attribute
+  - [ ] Image has correct alt text
+
+**Estimated Time**: 1.5 hours
+
+---
+
+### 1A-8. Manual Testing & Documentation
+
+- [ ] Manual testing:
+  - [ ] View wine with image in detail modal
+  - [ ] View wine without image (shows placeholder)
+  - [ ] Check browser network tab (images cached correctly)
+  - [ ] Test in both view and edit modes
+
+- [ ] Update README or docs with new feature
+
+**Estimated Time**: 30 minutes
+
+---
+
+**Total Phase 1A Time**: ~5.5 hours (half a day to full day)
+
+---
+
+## PHASE 1B: UPLOAD & EDIT CAPABILITIES
+
+### 1B-1. Install Dependencies
 
 **File**: `apps/api/package.json`
+
+**Note**: Only needed for Phase 1B (upload functionality)
 
 - [ ] Install Multer for file uploads:
 
@@ -105,7 +302,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 3. Configuration
+### 1B-2. Configuration
 
 **File**: `apps/api/src/config/storage.ts` (NEW)
 
@@ -146,7 +343,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 4. Storage Service Interface
+### 1B-3. Storage Service Interface
 
 **File**: `apps/api/src/services/storage/storage.interface.ts` (NEW)
 
@@ -177,7 +374,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 5. Local Storage Service Implementation
+### 1B-4. Local Storage Service Implementation
 
 **File**: `apps/api/src/services/storage/local-storage.service.ts` (NEW)
 
@@ -204,7 +401,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 6. Storage Service Factory
+### 1B-5. Storage Service Factory
 
 **File**: `apps/api/src/services/storage/index.ts` (NEW)
 
@@ -232,7 +429,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 7. Image Validation Utilities
+### 1B-6. Image Validation Utilities
 
 **File**: `apps/api/src/utils/image-validation.ts` (NEW)
 
@@ -253,7 +450,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 8. Image Processing Utilities
+### 1B-7. Image Processing Utilities
 
 **File**: `apps/api/src/utils/image-processing.ts` (NEW)
 
@@ -273,7 +470,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 9. Upload Endpoint
+### 1B-8. Upload Endpoint
 
 **File**: `apps/api/src/routes/wines.ts` (MODIFY)
 
@@ -316,7 +513,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 10. Delete Endpoint
+### 1B-9. Delete Endpoint
 
 **File**: `apps/api/src/routes/wines.ts` (MODIFY)
 
@@ -342,11 +539,14 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 11. Image Serving Endpoint
+### 1B-10. Image Serving Endpoint
+
+**Note**: This should already be complete from Phase 1A (task 1A-3). Skip this
+task if already implemented.
 
 **File**: `apps/api/src/routes/wines.ts` (MODIFY)
 
-- [ ] Add GET endpoint:
+- [ ] Add GET endpoint (or skip if done in Phase 1A):
 
   ```typescript
   router.get('/wines/:id/image', async (req, res, next) => {
@@ -367,7 +567,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 12. Update Wine Deletion to Clean Up Images
+### 1B-11. Update Wine Deletion to Clean Up Images
 
 **File**: `apps/api/src/routes/wines.ts` (MODIFY)
 
@@ -382,7 +582,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 13. Backend Unit Tests - Storage Service
+### 1B-12. Backend Unit Tests - Storage Service
 
 **File**: `apps/api/__tests__/storage-service.test.ts` (NEW)
 
@@ -402,7 +602,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 14. Backend Integration Tests - API Endpoints
+### 1B-13. Backend Integration Tests - API Endpoints
 
 **File**: `apps/api/__tests__/wine-images.test.ts` (NEW)
 
@@ -439,11 +639,14 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 15. Frontend - Update Wine Type
+### 1B-14. Frontend - Update Wine Type
 
-**File**: `apps/web/src/types/wine.ts` (NEW or update existing type)
+**Note**: This should already be complete from Phase 1A (task 1A-4). This step
+is to add the ADDITIONAL fields for upload metadata.
 
-- [ ] Add image fields to Wine type:
+**File**: `apps/web/src/types/wine.ts` (MODIFY)
+
+- [ ] Add additional image metadata fields to Wine type:
 
   ```typescript
   export interface Wine {
@@ -464,7 +667,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 16. Frontend - Image Upload in Detail Modal
+### 1B-15. Frontend - Image Upload in Detail Modal
 
 **File**: `apps/web/src/components/WineDetailModal.tsx` (MODIFY)
 
@@ -500,11 +703,14 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 17. Frontend - Display Image in Detail Modal
+### 1B-16. Frontend - Display Image in Detail Modal
+
+**Note**: This should already be complete from Phase 1A (tasks 1A-5 and 1A-6).
+Skip if already implemented.
 
 **File**: `apps/web/src/components/WineDetailModal.tsx` (MODIFY)
 
-- [ ] Add image display in view mode:
+- [ ] Verify image display in view mode (should already be done):
   - [ ] Show image at max 600px width
   - [ ] Preserve aspect ratio
   - [ ] Alt text for accessibility
@@ -518,7 +724,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 18. Frontend - Update API Utilities
+### 1B-17. Frontend - Update API Utilities
 
 **File**: `apps/web/src/utils/api.ts` (MODIFY if needed)
 
@@ -561,7 +767,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 19. Frontend Unit Tests - WineDetailModal Image Upload
+### 1B-18. Frontend Unit Tests - WineDetailModal Image Upload
 
 **File**: `apps/web/__tests__/WineDetailModal.test.tsx` (MODIFY)
 
@@ -600,7 +806,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 20. Error Handling
+### 1B-19. Error Handling
 
 **File**: `apps/api/src/errors/AppError.ts` (MODIFY)
 
@@ -638,7 +844,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 21. Logging
+### 1B-20. Logging
 
 - [ ] Add structured logging for image operations:
   - [ ] Upload start/success/failure
@@ -656,7 +862,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 22. Documentation
+### 1B-21. Documentation
 
 **File**: Update existing docs
 
@@ -677,7 +883,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 23. Manual Testing
+### 1B-22. Manual Testing
 
 - [ ] **Upload Tests**:
   - [ ] Upload JPEG image (< 5MB) ✓
@@ -726,7 +932,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 24. Code Review & Cleanup
+### 1B-23. Code Review & Cleanup
 
 - [ ] Run linter: `npm run lint`
 - [ ] Fix any linting errors
@@ -742,7 +948,7 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ---
 
-### 25. Final Testing
+### 1B-24. Final Testing
 
 - [ ] Run all tests: `npm test`
 - [ ] Verify 80%+ coverage for new code: `npm run test:coverage`
@@ -757,37 +963,68 @@ when no image ✅ **Image Replacement**: Auto-replace with confirmation dialog �
 
 ## Total Estimated Time
 
-**Backend**: ~12 hours **Frontend**: ~7 hours **Testing**: ~8 hours
-**Documentation & Review**: ~3 hours
+### Phase 1A (Display Existing Images)
 
-**Total**: ~30 hours (3-5 days at 6-10 hours/day)
+- **Backend**: ~1.5 hours
+- **Frontend**: ~1.5 hours
+- **Testing**: ~1.5 hours
+- **Documentation**: ~0.5 hour
+- **Total Phase 1A**: ~5.5 hours (half to full day)
+
+### Phase 1B (Upload & Edit)
+
+- **Backend**: ~10 hours
+- **Frontend**: ~4.5 hours
+- **Testing**: ~7.5 hours
+- **Documentation & Review**: ~3 hours
+- **Total Phase 1B**: ~25 hours (2-3 days)
+
+**Grand Total**: ~30.5 hours (2-4 days total, but Phase 1A can ship in < 1 day)
 
 ---
 
 ## Definition of Done
 
-Phase 1 is complete when:
+### Phase 1A is complete when:
 
-✅ Users can upload wine label images (JPEG, PNG, WebP) ✅ Images are displayed
-in detail modal (max 600px width) ✅ Users can delete images with confirmation
-✅ Users can replace images with confirmation ✅ Upload only available in edit
-mode ✅ File size validation (5MB max) ✅ File type validation (magic number
-check) ✅ Images optimized (resized to 1200px, compressed) ✅ Storage
-abstraction ready for S3 (Phase 2) ✅ Comprehensive tests (80%+ coverage) ✅ All
-existing tests still pass ✅ No console errors or warnings ✅ Linting and
-formatting clean ✅ Documentation updated ✅ Manual testing checklist complete
+✅ Database has imageUrl field ✅ Existing images (~220) are linked to wines in
+database ✅ Images are displayed in Wine Detail modals (both view and edit
+modes) ✅ Images display at max 600px width ✅ Missing images show wine emoji 🍷
+placeholder ✅ Image serving endpoint works with proper caching ✅ Basic tests
+pass ✅ No console errors or warnings ✅ Linting and formatting clean
+
+### Phase 1B is complete when:
+
+✅ Users can upload wine label images (JPEG, PNG, WebP) ✅ Users can delete
+images with confirmation ✅ Users can replace images with confirmation ✅ Upload
+only available in edit mode ✅ File size validation (5MB max) ✅ File type
+validation (magic number check) ✅ Images optimized (resized to 1200px,
+compressed) ✅ Comprehensive tests (80%+ coverage) ✅ All existing tests still
+pass ✅ No console errors or warnings ✅ Linting and formatting clean ✅
+Documentation updated ✅ Manual testing checklist complete
 
 ---
 
-## Phase 2 Preview
+## Future Phases Preview
 
-After Phase 1 is stable, Phase 2 will add:
+### Phase 3: Thumbnails in Table View
 
 - Thumbnails in wine table (200x200px)
+- Lazy loading optimization
+- Performance improvements
+
+### Phase 4: Production Readiness
+
 - AWS S3 storage with CloudFront CDN
 - Professional placeholder images
-- Performance optimizations
 - Production deployment
+
+### Phase 5: Enhancements
+
+- Multiple images per wine
+- Image editing (crop, rotate)
+- Drag-and-drop upload
+- OCR label reading
 
 ---
 
@@ -798,8 +1035,20 @@ After Phase 1 is stable, Phase 2 will add:
 - Ask questions if anything is unclear
 - Document any deviations from this plan
 - Update this checklist as you complete tasks
+- **Phase 1A can be completed and shipped independently before starting Phase
+  1B**
 
 ---
 
-**Ready to begin!** Start with task #1 (Database Schema) and work through
-sequentially.
+## Getting Started
+
+**Ready to begin!**
+
+1. Start with **Phase 1A** tasks (1A-1 through 1A-8) to get existing images
+   displaying ASAP
+2. Ship Phase 1A to production once complete and tested
+3. Then proceed with **Phase 1B** tasks (1B-1 through 1B-24) for upload/edit
+   functionality
+4. Each phase is independently valuable and can be deployed separately
+
+**First task**: 1A-1 (Database Schema Changes) - Add the imageUrl field

@@ -1,5 +1,12 @@
 # Quick Start Guide - Phase 1 Wine Label Images
 
+**Updated**: January 4, 2026
+
+**IMPORTANT**: Wine label images (~220) have already been downloaded and saved
+in [assets/wine-labels](../assets/wine-labels), keyed by Wine ID. Phase 1 now
+focuses on **displaying these existing images** in the Wine Detail modals, then
+adding upload/edit capabilities.
+
 **Ready to begin?** Follow these steps to get started immediately.
 
 ---
@@ -8,10 +15,11 @@
 
 Before you start coding, make sure:
 
-- [ ] You've read
+- [ ] You've read the updated
       [WINE-LABEL-IMAGE-FEATURE-PLAN.md](WINE-LABEL-IMAGE-FEATURE-PLAN.md)
-- [ ] You've reviewed
+- [ ] You've reviewed the updated
       [PHASE-1-IMPLEMENTATION-CHECKLIST.md](PHASE-1-IMPLEMENTATION-CHECKLIST.md)
+- [ ] You've confirmed images exist in `assets/wine-labels/` directory
 - [ ] Your development environment is running (`npm run dev`)
 - [ ] All existing tests are passing (`npm test`)
 - [ ] You have a recent backup of your database
@@ -61,11 +69,13 @@ model Wine {
   rating        Float?
   notes         String?
 
-  // NEW: Image fields for Phase 1
-  imageUrl        String?    // URL/path to optimized image
-  imageMimeType   String?    // e.g., "image/jpeg"
-  imageSize       Int?       // File size in bytes
-  imageUploadedAt DateTime?  // When image was uploaded
+  // NEW: Image field for Phase 1 (displaying existing images)
+  imageUrl        String?    // Path to wine label image (e.g., "cmjx1sc6s0000yr445n60tinv.jpg")
+
+  // Phase 2: Add these fields when implementing upload
+  // imageMimeType   String?    // e.g., "image/jpeg"
+  // imageSize       Int?       // File size in bytes
+  // imageUploadedAt DateTime?  // When image was uploaded
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -98,133 +108,152 @@ git commit -m "feat: add image fields to Wine model"
 
 ---
 
-## Step 3: Install Dependencies (15 minutes)
+## Step 3: Migration Script to Populate imageUrl (45 minutes)
 
-### Backend Dependencies
+### Create Migration Script
 
-```bash
-cd apps/api
+Since the images are already downloaded and keyed by Wine ID, create a script to
+populate the `imageUrl` field in the database.
 
-# Multer for file uploads
-npm install multer
-npm install --save-dev @types/multer
-
-# Sharp for image processing
-npm install sharp
-npm install --save-dev @types/sharp
-
-# File type validation
-npm install file-type
-
-# Verify installations
-npm list multer sharp file-type
-
-cd ../..
-```
-
-### Update .gitignore
-
-Add to `.gitignore`:
-
-```
-# Image uploads (development only)
-apps/api/uploads/
-```
-
-### Create Upload Directory
-
-```bash
-mkdir -p apps/api/uploads/wines
-```
-
-### Commit Dependencies
-
-```bash
-git add apps/api/package.json apps/api/package-lock.json
-git add .gitignore
-git commit -m "feat: install image upload dependencies (multer, sharp, file-type)"
-```
-
----
-
-## Step 4: Project Structure Setup (10 minutes)
-
-Create the following file/directory structure:
-
-```bash
-# Configuration
-touch apps/api/src/config/storage.ts
-
-# Storage services
-mkdir -p apps/api/src/services/storage
-touch apps/api/src/services/storage/storage.interface.ts
-touch apps/api/src/services/storage/local-storage.service.ts
-touch apps/api/src/services/storage/index.ts
-
-# Utilities
-touch apps/api/src/utils/image-validation.ts
-touch apps/api/src/utils/image-processing.ts
-
-# Tests
-touch apps/api/__tests__/storage-service.test.ts
-touch apps/api/__tests__/wine-images.test.ts
-
-# Test fixtures directory
-mkdir -p apps/api/__tests__/fixtures
-```
-
-### Verify Structure
-
-```bash
-tree apps/api/src/services/storage
-tree apps/api/src/utils
-tree apps/api/__tests__
-```
-
----
-
-## Step 5: Configuration File (20 minutes)
-
-Create `apps/api/src/config/storage.ts`:
+Create `scripts/populate-wine-images.ts`:
 
 ```typescript
+import { PrismaClient } from '@prisma/client';
+import fs from 'fs/promises';
 import path from 'path';
 
-export const storageConfig = {
-  // Upload directory (local development)
-  uploadDir:
-    process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads/wines'),
+const prisma = new PrismaClient();
 
-  // File size limit (5MB)
-  maxFileSize: 5 * 1024 * 1024,
+async function populateWineImages() {
+  const imagesDir = path.join(__dirname, '../assets/wine-labels');
 
-  // Allowed MIME types
-  allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'] as const,
+  console.log('Reading images from:', imagesDir);
 
-  // Image optimization settings
-  maxImageWidth: 1200, // Resize images larger than this
-  imageQuality: 85, // JPEG quality (1-100)
-} as const;
+  // Get all image files
+  const files = await fs.readdir(imagesDir);
+  const imageFiles = files.filter(
+    (f) => f.endsWith('.jpg') || f.endsWith('.jpeg') || f.endsWith('.png')
+  );
 
-export const isProduction = process.env.NODE_ENV === 'production';
-export const useS3 = isProduction && !!process.env.AWS_S3_BUCKET;
+  console.log(`Found ${imageFiles.length} image files`);
 
-export type AllowedMimeType = (typeof storageConfig.allowedMimeTypes)[number];
+  let updated = 0;
+  let notFound = 0;
+
+  for (const imageFile of imageFiles) {
+    // Extract wine ID from filename (remove extension)
+    const wineId = path.parse(imageFile).name;
+
+    // Check if wine exists
+    const wine = await prisma.wine.findUnique({
+      where: { id: wineId },
+    });
+
+    if (wine) {
+      // Update wine with imageUrl
+      await prisma.wine.update({
+        where: { id: wineId },
+        data: { imageUrl: imageFile },
+      });
+      updated++;
+      console.log(`✓ Updated wine ${wineId}`);
+    } else {
+      notFound++;
+      console.log(`✗ Wine not found for image: ${imageFile}`);
+    }
+  }
+
+  console.log('\nMigration complete!');
+  console.log(`Updated: ${updated} wines`);
+  console.log(`Not found: ${notFound} wines`);
+}
+
+populateWineImages()
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());
 ```
 
-Test it works:
+### Run Migration Script
 
 ```bash
-cd apps/api
-npx tsx src/config/storage.ts
-# Should not error
+# From project root
+npx tsx scripts/populate-wine-images.ts
 ```
 
-Commit:
+### Verify in Database
 
 ```bash
-git add apps/api/src/config/storage.ts
-git commit -m "feat: add storage configuration"
+npm run db:studio
+# Check that wines now have imageUrl populated
+```
+
+---
+
+## Step 4: Image Serving Endpoint (1 hour)
+
+### Create Endpoint to Serve Images
+
+Modify `apps/api/src/routes/wines.ts` to add an image serving endpoint:
+
+```typescript
+// GET /wines/:id/image - Serve wine label image
+router.get('/wines/:id/image', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Find wine
+    const wine = await prisma.wine.findUnique({
+      where: { id },
+      select: { id: true, imageUrl: true },
+    });
+
+    if (!wine) {
+      return res.status(404).json({ error: 'Wine not found' });
+    }
+
+    if (!wine.imageUrl) {
+      return res.status(404).json({ error: 'No image for this wine' });
+    }
+
+    // Construct full path to image
+    const imagePath = path.join(
+      __dirname,
+      '../../assets/wine-labels',
+      wine.imageUrl
+    );
+
+    // Check if file exists
+    try {
+      await fs.access(imagePath);
+    } catch {
+      return res.status(404).json({ error: 'Image file not found' });
+    }
+
+    // Determine MIME type from extension
+    const ext = path.extname(wine.imageUrl).toLowerCase();
+    const mimeType = ext === '.png' ? 'image/png' : 'image/jpeg';
+
+    // Set caching headers (1 year for immutable images)
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+
+    // Send file
+    res.sendFile(imagePath);
+  } catch (error) {
+    next(error);
+  }
+});
+```
+
+### Test the Endpoint
+
+```bash
+# Start the API server
+npm run dev:api
+
+# In another terminal, test the endpoint
+curl http://localhost:3001/api/wines/{WINE_ID}/image --output test-image.jpg
+# Replace {WINE_ID} with an actual wine ID from your database
 ```
 
 ---
@@ -274,37 +303,41 @@ npm run type-check
 
 ---
 
-## Implementation Order (Recommended)
+## Implementation Order (REVISED)
 
 Follow the checklist in order, but here's the high-level flow:
 
-### Backend First (Days 1-2)
+### Phase 1A: Display Existing Images (Day 1)
 
-1. ✅ Database schema (done above)
-2. ✅ Install dependencies (done above)
-3. ✅ Configuration (done above)
-4. Storage interface
-5. Local storage service
-6. Image validation utilities
-7. Image processing utilities
-8. API endpoints (upload, delete, serve)
-9. Backend tests
+1. ✅ Database schema (add imageUrl field)
+2. ✅ Run migration
+3. ✅ Populate imageUrl with migration script
+4. ✅ Image serving endpoint (GET /wines/:id/image)
+5. Update Wine type in frontend
+6. Display images in detail modal (view mode)
+7. Display images in detail modal (edit mode)
+8. Test image display
+9. Handle missing images gracefully (placeholder)
 
-### Frontend Second (Day 3)
+### Phase 1B: Upload & Edit (Days 2-3)
 
-10. Update Wine type
-11. Image upload UI in detail modal
-12. Image display in detail modal
-13. API utility functions
-14. Frontend tests
+10. Install dependencies (multer, sharp)
+11. Storage configuration
+12. Local storage service
+13. Image validation utilities
+14. Image processing utilities
+15. Upload endpoint (POST /wines/:id/image)
+16. Delete endpoint (DELETE /wines/:id/image)
+17. Upload UI in edit modal
+18. Backend tests
 
-### Polish & Testing (Days 4-5)
+### Polish & Testing (Day 4)
 
-15. Error handling
-16. Manual testing
-17. Code review & cleanup
-18. Documentation
-19. Final testing
+19. Error handling
+20. Manual testing
+21. Code review & cleanup
+22. Documentation
+23. Final testing
 
 ---
 

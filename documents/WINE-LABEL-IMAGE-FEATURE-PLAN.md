@@ -1,16 +1,21 @@
 # Wine Label Image Feature - Implementation Plan
 
-**Date**: December 31, 2025 **Status**: Planning Phase **Author**: Brian (with
-Claude)
+**Date**: December 31, 2025 (Updated January 4, 2026) **Status**: Planning
+Phase - UPDATED **Author**: Brian (with Claude)
 
 ---
 
 ## Executive Summary
 
-This document outlines a comprehensive plan to add wine label image upload,
-storage, and display capabilities to the Wine Cellar application. The feature
-will allow users to upload, view, and manage wine label photos for each wine in
-their collection.
+**IMPORTANT UPDATE (January 4, 2026):** Wine label images have already been
+downloaded from Vivino and stored in [assets/wine-labels](../assets/wine-labels)
+(~220 images, keyed by Wine ID). This significantly changes our implementation
+priorities.
+
+This document outlines the plan to display existing wine label images and add
+upload/edit capabilities to the Wine Cellar application. The feature will allow
+users to view wine label photos for each wine in their collection, and later
+upload or edit those images.
 
 ---
 
@@ -1150,52 +1155,90 @@ try {
 
 ## Implementation Phases
 
-### Phase 1: MVP (Core Functionality)
+### Phase 1: Display Existing Images (REVISED - PRIORITY)
 
-**Goal**: Basic image upload and display working in development
+**Goal**: Display the ~220 existing wine label images in the Wine Details modals
 
 **Tasks**:
 
-1. ✅ Database schema changes (add image fields to Wine model)
-2. ✅ Backend: Local file storage service
-3. ✅ Backend: Image upload endpoint (POST /wines/:id/image)
-4. ✅ Backend: Image deletion endpoint (DELETE /wines/:id/image)
-5. ✅ Backend: Image serving endpoint (GET /wines/:id/image)
-6. ✅ Backend: Image processing (thumbnail generation with sharp)
-7. ✅ Frontend: Upload UI in detail modal
-8. ✅ Frontend: Display thumbnail in table
-9. ✅ Frontend: Display full image in detail modal
-10. ✅ Testing: Unit tests for storage service
-11. ✅ Testing: Integration tests for API endpoints
-12. ✅ Testing: Frontend component tests
+1. Database schema changes (add imageUrl field to Wine model)
+2. Migration script to populate imageUrl field from existing files
+3. Backend: Image serving endpoint (GET /wines/:id/image)
+4. Frontend: Display full image in detail modal (view mode)
+5. Frontend: Display full image in editable detail modal
+6. Testing: Integration tests for serving endpoint
+7. Testing: Frontend component tests
 
 **Success Criteria**:
 
-- Can upload JPEG/PNG images up to 5MB
-- Thumbnails auto-generated and displayed in table
-- Full images displayed in detail modal
+- Existing images (~220) are displayed in Wine Detail modals (both view and edit
+  modes)
+- Images load quickly with proper caching
+- Graceful handling of missing images (placeholder)
 - All tests passing
-- Error handling for invalid files
-
-**Timeline**: ~3-5 days
 
 ---
 
-### Phase 2: Production Readiness
+### Phase 2: Image Upload & Edit
 
-**Goal**: AWS S3 storage, optimization, production deployment
+**Goal**: Allow users to upload new images and replace existing ones
 
 **Tasks**:
 
-1. ✅ AWS S3 service implementation
-2. ✅ Storage service abstraction (dev vs. prod)
-3. ✅ CloudFront CDN setup
-4. ✅ Environment variable configuration
-5. ✅ Image optimization (resize, compress)
-6. ✅ Security hardening (file validation, rate limiting)
-7. ✅ Migration script for existing data
-8. ✅ Production deployment
-9. ✅ Monitoring and logging
+1. Backend: Local file storage service
+2. Backend: Image upload endpoint (POST /wines/:id/image)
+3. Backend: Image deletion endpoint (DELETE /wines/:id/image)
+4. Backend: Image processing (resize, optimization with sharp)
+5. Frontend: Upload UI in edit modal
+6. Frontend: Delete/replace functionality
+7. Testing: Unit tests for storage service
+8. Testing: Integration tests for upload/delete endpoints
+9. Testing: Frontend upload component tests
+
+**Success Criteria**:
+
+- Can upload JPEG/PNG/WebP images up to 5MB
+- Images auto-optimized (resize to 1200px max)
+- Full images displayed in detail modal
+- Can replace existing images
+- All tests passing
+- Error handling for invalid files
+
+---
+
+### Phase 3: Thumbnails in Table View
+
+**Goal**: Add thumbnail images to the wine list/table view
+
+**Tasks**:
+
+1. Backend: Thumbnail generation with sharp (200x200px)
+2. Update database to store thumbnailUrl
+3. Frontend: Display thumbnails in wine table
+4. Optimize loading performance (lazy loading, caching)
+
+**Success Criteria**:
+
+- Thumbnails appear in wine table
+- Fast loading with lazy loading
+- Consistent sizing and quality
+
+---
+
+### Phase 4: Production Readiness (Future)
+
+**Goal**: AWS S3 storage, CDN, production deployment
+
+**Tasks**:
+
+1. AWS S3 service implementation
+2. Storage service abstraction (dev vs. prod)
+3. CloudFront CDN setup
+4. Environment variable configuration
+5. Security hardening (file validation, rate limiting)
+6. Migration script to move images to S3
+7. Production deployment
+8. Monitoring and logging
 
 **Success Criteria**:
 
@@ -1205,11 +1248,9 @@ try {
 - Security measures in place
 - All tests passing in production
 
-**Timeline**: ~2-3 days
-
 ---
 
-### Phase 3: Enhancements (Future)
+### Phase 5: Enhancements (Future)
 
 **Tasks**:
 
