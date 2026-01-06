@@ -286,4 +286,38 @@ describe('Wine API', () => {
       expect(response.body.quantity).toBe(1000);
     });
   });
+
+  describe('GET /api/wines/:id/image', () => {
+    it('returns 404 when wine does not exist', async () => {
+      const response = await request(app).get('/api/wines/nonexistent-id/image');
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBeDefined();
+      expect(response.body.errorCode).toBe('NOT_FOUND');
+    });
+
+    it('returns 404 when wine has no imageUrl', async () => {
+      const wine = await prisma.wine.create({
+        data: createWineData({ imageUrl: null }),
+      });
+
+      const response = await request(app).get(`/api/wines/${wine.id}/image`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe('No image found for this wine');
+      expect(response.body.errorCode).toBe('IMAGE_NOT_FOUND');
+    });
+
+    it('returns 404 when image file does not exist on disk', async () => {
+      const wine = await prisma.wine.create({
+        data: createWineData({ imageUrl: 'nonexistent-image.jpg' }),
+      });
+
+      const response = await request(app).get(`/api/wines/${wine.id}/image`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBe('Image file not found');
+      expect(response.body.errorCode).toBe('IMAGE_FILE_NOT_FOUND');
+    });
+  });
 });
