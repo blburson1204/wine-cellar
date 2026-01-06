@@ -24,6 +24,7 @@ describe('WineTable', () => {
       drinkByDate: '2030-12-31T00:00:00.000Z',
       rating: 4.5,
       notes: 'Excellent wine',
+      imageUrl: null,
     },
     {
       id: '2',
@@ -41,6 +42,7 @@ describe('WineTable', () => {
       drinkByDate: '2025-12-31T00:00:00.000Z',
       rating: 4.0,
       notes: 'Fresh and crisp',
+      imageUrl: null,
     },
     {
       id: '3',
@@ -58,6 +60,7 @@ describe('WineTable', () => {
       drinkByDate: null,
       rating: null,
       notes: null,
+      imageUrl: null,
     },
   ];
 

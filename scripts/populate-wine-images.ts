@@ -7,6 +7,8 @@
  * 3. Updates the corresponding wine records with the filename
  */
 
+/* eslint-disable no-console, @typescript-eslint/explicit-function-return-type */
+
 import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';

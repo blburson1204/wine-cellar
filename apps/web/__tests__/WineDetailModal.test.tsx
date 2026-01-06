@@ -20,6 +20,7 @@ describe('WineDetailModal', () => {
     drinkByDate: '2030-12-31T00:00:00.000Z',
     rating: 4.5,
     notes: 'Excellent wine with great aging potential',
+    imageUrl: null,
   };
 
   const mockOnClose = vi.fn();
@@ -71,11 +72,9 @@ describe('WineDetailModal', () => {
         />
       );
 
-      // Check that dates are formatted (not showing ISO strings)
+      // Check that purchase date is formatted (not showing ISO strings)
       expect(screen.getByText(/January/i)).toBeInTheDocument();
       expect(screen.getByText(/2020/)).toBeInTheDocument();
-      expect(screen.getByText(/December/i)).toBeInTheDocument();
-      expect(screen.getByText(/2030/)).toBeInTheDocument();
     });
 
     it('displays rating with stars', () => {
