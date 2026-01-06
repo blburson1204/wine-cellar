@@ -197,7 +197,10 @@ describe('Home Page - Wine Cellar', () => {
 
       // Detail modal should open
       await waitFor(() => {
-        expect(screen.getByText('2020 · Test Producer')).toBeInTheDocument();
+        expect(screen.getByText(/2020 · Test Producer ·/)).toBeInTheDocument();
+        // Check that RED appears in the header (there may be multiple REDs on page from filters)
+        const redBadges = screen.getAllByText('RED');
+        expect(redBadges.length).toBeGreaterThan(0);
       });
     });
 

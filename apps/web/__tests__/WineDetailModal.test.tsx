@@ -52,7 +52,7 @@ describe('WineDetailModal', () => {
       expect(screen.getByText('Bordeaux')).toBeInTheDocument();
       expect(screen.getByText('France')).toBeInTheDocument();
       expect(screen.getByText('Cabernet Sauvignon')).toBeInTheDocument();
-      expect(screen.getByText('2 bottles')).toBeInTheDocument();
+      expect(screen.getByText('Yes - 2 bottles')).toBeInTheDocument();
       expect(screen.getByText('$150.00')).toBeInTheDocument();
       expect(screen.getByText('Excellent wine with great aging potential')).toBeInTheDocument();
 
@@ -101,7 +101,22 @@ describe('WineDetailModal', () => {
         />
       );
 
-      expect(screen.getByText('1 bottle')).toBeInTheDocument();
+      expect(screen.getByText('Yes - 1 bottle')).toBeInTheDocument();
+    });
+
+    it('shows No when quantity is 0', () => {
+      const noCellarWine = { ...mockWine, quantity: 0 };
+      render(
+        <WineDetailModal
+          wine={noCellarWine}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      expect(screen.getByText('Currently in Cellar?')).toBeInTheDocument();
+      expect(screen.getByText('No')).toBeInTheDocument();
     });
 
     it('displays em dash for null values', () => {

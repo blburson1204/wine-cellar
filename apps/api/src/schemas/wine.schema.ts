@@ -64,6 +64,8 @@ export const createWineSchema = z.object({
   notes: z.string().max(2000, 'Notes must be less than 2000 characters').optional().nullable(),
 
   wineLink: z.string().url('Wine link must be a valid URL').optional().nullable(),
+
+  imageUrl: z.string().optional().nullable(),
 });
 
 /**
@@ -140,6 +142,8 @@ export const updateWineSchema = z
     notes: z.string().max(2000, 'Notes must be less than 2000 characters').optional().nullable(),
 
     wineLink: z.string().url('Wine link must be a valid URL').optional().nullable(),
+
+    imageUrl: z.string().optional().nullable(),
   })
   .strict(); // Reject unknown fields
 

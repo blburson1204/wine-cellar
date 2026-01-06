@@ -30,15 +30,6 @@ interface WineDetailModalProps {
   onDelete?: (id: string) => void;
 }
 
-const WINE_COLORS: Record<string, string> = {
-  RED: '#7C2D3C',
-  WHITE: '#F5F1E8',
-  ROSE: '#D4A5A5',
-  SPARKLING: '#FFD700',
-  DESSERT: '#8B4513',
-  FORTIFIED: '#4A1C26',
-};
-
 const formatDate = (dateString: string | null): string => {
   if (!dateString) return '—';
   try {
@@ -137,6 +128,7 @@ export default function WineDetailModal({
         drinkByDate: null,
         rating: null,
         notes: null,
+        imageUrl: null,
       });
     } else if (wine) {
       setEditForm(wine);
@@ -343,26 +335,29 @@ export default function WineDetailModal({
         {/* Header - only show for view mode (not edit/add mode) */}
         {mode === 'view' && wine && !isEditMode && (
           <div style={{ marginBottom: '24px' }}>
-            <div
-              style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}
+            <h2
+              style={{ margin: '0 0 8px 0', fontSize: '24px', fontWeight: '600', color: '#4A1C26' }}
             >
-              <div
+              {wine.name}
+            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '16px', color: '#7C2D3C' }}>
+                {wine.vintage} · {wine.producer} ·
+              </span>
+              <span
                 style={{
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: '50%',
-                  backgroundColor: WINE_COLORS[wine.color] || '#7C2D3C',
-                  border: wine.color === 'WHITE' ? '1px solid #D4A5A5' : 'none',
-                  flexShrink: 0,
+                  display: 'inline-block',
+                  padding: '4px 8px',
+                  backgroundColor: '#F5F1E8',
+                  color: '#7C2D3C',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontWeight: '500',
                 }}
-              />
-              <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600', color: '#4A1C26' }}>
-                {wine.name}
-              </h2>
+              >
+                {wine.color}
+              </span>
             </div>
-            <p style={{ margin: 0, fontSize: '16px', color: '#7C2D3C' }}>
-              {wine.vintage} · {wine.producer}
-            </p>
           </div>
         )}
 
@@ -460,7 +455,7 @@ export default function WineDetailModal({
                     </p>
                   </div>
 
-                  {/* Wine Type */}
+                  {/* Rating */}
                   <div>
                     <label
                       style={{
@@ -473,24 +468,12 @@ export default function WineDetailModal({
                         letterSpacing: '0.5px',
                       }}
                     >
-                      Wine Type
+                      Rating
                     </label>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        padding: '4px 8px',
-                        backgroundColor: '#F5F1E8',
-                        color: '#7C2D3C',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                      }}
-                    >
-                      {wine.color}
-                    </span>
+                    <StarRating rating={wine.rating} />
                   </div>
 
-                  {/* Quantity */}
+                  {/* Currently in Cellar */}
                   <div>
                     <label
                       style={{
@@ -503,10 +486,12 @@ export default function WineDetailModal({
                         letterSpacing: '0.5px',
                       }}
                     >
-                      Quantity
+                      Currently in Cellar?
                     </label>
                     <p style={{ margin: 0, fontSize: '16px', color: '#4A1C26' }}>
-                      {wine.quantity} {wine.quantity === 1 ? 'bottle' : 'bottles'}
+                      {wine.quantity === 0
+                        ? 'No'
+                        : `Yes - ${wine.quantity} ${wine.quantity === 1 ? 'bottle' : 'bottles'}`}
                     </p>
                   </div>
 
@@ -549,24 +534,36 @@ export default function WineDetailModal({
                       {formatDate(wine.purchaseDate)}
                     </p>
                   </div>
-                </div>
 
-                {/* Rating */}
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      marginBottom: '4px',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: '#7C2D3C',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    Rating
-                  </label>
-                  <StarRating rating={wine.rating} />
+                  {/* Tasting Notes - Full Width spanning both columns */}
+                  {wine.notes && (
+                    <div style={{ gridColumn: '1 / -1' }}>
+                      <label
+                        style={{
+                          display: 'block',
+                          marginBottom: '4px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: '#7C2D3C',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                        }}
+                      >
+                        Tasting Notes
+                      </label>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: '16px',
+                          color: '#4A1C26',
+                          whiteSpace: 'pre-wrap',
+                          lineHeight: '1.5',
+                        }}
+                      >
+                        {wine.notes}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -609,36 +606,6 @@ export default function WineDetailModal({
                 </div>
               </div>
             </div>
-
-            {/* Tasting Notes - Full Width Below */}
-            {wine.notes && (
-              <div style={{ marginBottom: '24px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#7C2D3C',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  Tasting Notes
-                </label>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: '16px',
-                    color: '#4A1C26',
-                    lineHeight: '1.5',
-                    whiteSpace: 'pre-wrap',
-                  }}
-                >
-                  {wine.notes}
-                </p>
-              </div>
-            )}
 
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
