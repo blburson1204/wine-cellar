@@ -9,10 +9,8 @@ interface WineFiltersProps {
   selectedCountry: string | null;
   onCountryChange: (country: string | null) => void;
   countries: string[];
-  vintageRange: [number, number] | null;
-  onVintageRangeChange: (range: [number, number] | null) => void;
-  vintageMin: number;
-  vintageMax: number;
+  showOnlyInCellar: boolean;
+  onShowOnlyInCellarChange: (value: boolean) => void;
   priceRange: [number, number] | null;
   onPriceRangeChange: (range: [number, number] | null) => void;
   priceMin: number;
@@ -40,10 +38,8 @@ export default function WineFilters({
   selectedCountry,
   onCountryChange,
   countries,
-  vintageRange,
-  onVintageRangeChange,
-  vintageMin,
-  vintageMax,
+  showOnlyInCellar,
+  onShowOnlyInCellarChange,
   priceRange,
   onPriceRangeChange,
   priceMin,
@@ -55,7 +51,7 @@ export default function WineFilters({
     selectedColors.length > 0 ||
     selectedGrapeVariety !== null ||
     selectedCountry !== null ||
-    vintageRange !== null ||
+    showOnlyInCellar ||
     priceRange !== null;
 
   const handleColorToggle = (colorValue: string): void => {
@@ -66,16 +62,6 @@ export default function WineFilters({
       // Add color to selection
       onColorsChange([...selectedColors, colorValue]);
     }
-  };
-
-  const handleVintageMinChange = (value: number): void => {
-    const max = vintageRange?.[1] ?? vintageMax;
-    onVintageRangeChange([value, max]);
-  };
-
-  const handleVintageMaxChange = (value: number): void => {
-    const min = vintageRange?.[0] ?? vintageMin;
-    onVintageRangeChange([min, value]);
   };
 
   const handlePriceMinChange = (value: number): void => {
@@ -295,173 +281,135 @@ export default function WineFilters({
           </select>
         </div>
 
-        {/* Vintage and Price Range - Side by Side */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          {/* Vintage Range */}
-          <div>
+        {/* In Cellar Filter */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '4px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#4A1C26',
+            }}
+          >
+            In Cellar
+          </label>
+          <div
+            style={{
+              padding: '8px',
+              backgroundColor: 'rgba(245, 241, 232, 0.8)',
+              border: '1px solid #D4A5A5',
+              borderRadius: '6px',
+            }}
+          >
             <label
               style={{
-                display: 'block',
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#4A1C26',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
               }}
             >
-              Vintage
+              <input
+                type="checkbox"
+                checked={showOnlyInCellar}
+                onChange={(e) => onShowOnlyInCellarChange(e.target.checked)}
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  cursor: 'pointer',
+                  accentColor: '#7C2D3C',
+                  flexShrink: 0,
+                }}
+              />
+              <span style={{ fontSize: '13px', color: '#4A1C26', fontWeight: '500' }}>
+                Show what's currently in cellar
+              </span>
             </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div>
-                <label
-                  htmlFor="vintage-from"
-                  style={{
-                    display: 'block',
-                    marginBottom: '2px',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    color: '#7C2D3C',
-                  }}
-                >
-                  From
-                </label>
-                <input
-                  id="vintage-from"
-                  type="number"
-                  min={vintageMin}
-                  max={vintageMax}
-                  value={vintageRange?.[0] ?? vintageMin}
-                  onChange={(e) => handleVintageMinChange(parseInt(e.target.value) || vintageMin)}
-                  disabled={vintageMin === vintageMax}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    fontSize: '13px',
-                    border: '1px solid #D4A5A5',
-                    borderRadius: '4px',
-                    backgroundColor: 'rgba(245, 241, 232, 0.8)',
-                    boxSizing: 'border-box',
-                    cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
-                  }}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="vintage-to"
-                  style={{
-                    display: 'block',
-                    marginBottom: '2px',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    color: '#7C2D3C',
-                  }}
-                >
-                  To
-                </label>
-                <input
-                  id="vintage-to"
-                  type="number"
-                  min={vintageMin}
-                  max={vintageMax}
-                  value={vintageRange?.[1] ?? vintageMax}
-                  onChange={(e) => handleVintageMaxChange(parseInt(e.target.value) || vintageMax)}
-                  disabled={vintageMin === vintageMax}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    fontSize: '13px',
-                    border: '1px solid #D4A5A5',
-                    borderRadius: '4px',
-                    backgroundColor: 'rgba(245, 241, 232, 0.8)',
-                    boxSizing: 'border-box',
-                    cursor: vintageMin === vintageMax ? 'not-allowed' : 'text',
-                  }}
-                />
-              </div>
-            </div>
           </div>
+        </div>
 
-          {/* Price Range */}
-          <div>
-            <label
-              style={{
-                display: 'block',
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#4A1C26',
-              }}
-            >
-              Price ($)
-            </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div>
-                <label
-                  htmlFor="price-from"
-                  style={{
-                    display: 'block',
-                    marginBottom: '2px',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    color: '#7C2D3C',
-                  }}
-                >
-                  From
-                </label>
-                <input
-                  id="price-from"
-                  type="number"
-                  min={priceMin}
-                  max={priceMax}
-                  step="0.01"
-                  value={priceRange?.[0] ?? priceMin}
-                  onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
-                  disabled={priceMin === priceMax}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    fontSize: '13px',
-                    border: '1px solid #D4A5A5',
-                    borderRadius: '4px',
-                    backgroundColor: 'rgba(245, 241, 232, 0.8)',
-                    boxSizing: 'border-box',
-                    cursor: priceMin === priceMax ? 'not-allowed' : 'text',
-                  }}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="price-to"
-                  style={{
-                    display: 'block',
-                    marginBottom: '2px',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    color: '#7C2D3C',
-                  }}
-                >
-                  To
-                </label>
-                <input
-                  id="price-to"
-                  type="number"
-                  min={priceMin}
-                  max={priceMax}
-                  step="0.01"
-                  value={priceRange?.[1] ?? priceMax}
-                  onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
-                  disabled={priceMin === priceMax}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    fontSize: '13px',
-                    border: '1px solid #D4A5A5',
-                    borderRadius: '4px',
-                    backgroundColor: 'rgba(245, 241, 232, 0.8)',
-                    boxSizing: 'border-box',
-                    cursor: priceMin === priceMax ? 'not-allowed' : 'text',
-                  }}
-                />
-              </div>
+        {/* Price Range */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '4px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#4A1C26',
+            }}
+          >
+            Price ($)
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div>
+              <label
+                htmlFor="price-from"
+                style={{
+                  display: 'block',
+                  marginBottom: '2px',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  color: '#7C2D3C',
+                }}
+              >
+                From
+              </label>
+              <input
+                id="price-from"
+                type="number"
+                min={priceMin}
+                max={priceMax}
+                step="0.01"
+                value={priceRange?.[0] ?? priceMin}
+                onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
+                disabled={priceMin === priceMax}
+                style={{
+                  width: '100%',
+                  padding: '6px',
+                  fontSize: '13px',
+                  border: '1px solid #D4A5A5',
+                  borderRadius: '4px',
+                  backgroundColor: 'rgba(245, 241, 232, 0.8)',
+                  boxSizing: 'border-box',
+                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                }}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="price-to"
+                style={{
+                  display: 'block',
+                  marginBottom: '2px',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  color: '#7C2D3C',
+                }}
+              >
+                To
+              </label>
+              <input
+                id="price-to"
+                type="number"
+                min={priceMin}
+                max={priceMax}
+                step="0.01"
+                value={priceRange?.[1] ?? priceMax}
+                onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
+                disabled={priceMin === priceMax}
+                style={{
+                  width: '100%',
+                  padding: '6px',
+                  fontSize: '13px',
+                  border: '1px solid #D4A5A5',
+                  borderRadius: '4px',
+                  backgroundColor: 'rgba(245, 241, 232, 0.8)',
+                  boxSizing: 'border-box',
+                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                }}
+              />
             </div>
           </div>
         </div>

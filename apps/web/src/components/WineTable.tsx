@@ -118,15 +118,38 @@ export default function WineTable({
         <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#7C2D3C' }}>
           <tr style={{ backgroundColor: '#7C2D3C', color: 'white' }}>
             <th
-              onClick={() => onSort('name')}
+              onClick={() => onSort('vintage')}
               style={{
-                padding: '10px 12px',
+                padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
+                width: '56px',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5f2330';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Vintage</span>
+              {getSortIndicator('vintage')}
+            </th>
+            <th
+              onClick={() => onSort('name')}
+              style={{
+                padding: '10px 8px',
+                textAlign: 'left',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
+                width: '230px',
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.backgroundColor = '#5f2330';
@@ -140,10 +163,11 @@ export default function WineTable({
             </th>
             <th
               style={{
-                padding: '10px 12px',
+                padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '600',
+                width: '80px',
               }}
             >
               Type
@@ -151,13 +175,14 @@ export default function WineTable({
             <th
               onClick={() => onSort('producer')}
               style={{
-                padding: '10px 12px',
+                padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
+                width: '180px',
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.backgroundColor = '#5f2330';
@@ -171,50 +196,30 @@ export default function WineTable({
             </th>
             <th
               style={{
-                padding: '10px 12px',
+                padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '600',
+                width: '120px',
               }}
             >
               Country
             </th>
             <th
-              onClick={() => onSort('vintage')}
               style={{
-                padding: '10px 12px',
-                textAlign: 'left',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                userSelect: 'none',
-                transition: 'background-color 0.2s',
-                minWidth: '90px',
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#5f2330';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Vintage</span>
-              {getSortIndicator('vintage')}
-            </th>
-            <th
-              style={{
-                padding: '10px 12px',
+                padding: '10px 8px',
                 textAlign: 'center',
                 fontSize: '14px',
                 fontWeight: '600',
+                width: '80px',
               }}
             >
-              Qty
+              In Cellar
             </th>
             <th
               onClick={() => onSort('price')}
               style={{
-                padding: '10px 12px',
+                padding: '10px 8px',
                 textAlign: 'right',
                 fontSize: '14px',
                 fontWeight: '600',
@@ -262,10 +267,11 @@ export default function WineTable({
                   onRowClick(wine);
                 }}
               >
-                <td style={{ padding: '12px', fontWeight: '500', color: '#4A1C26' }}>
+                <td style={{ padding: '6px 8px', color: '#4A1C26' }}>{wine.vintage}</td>
+                <td style={{ padding: '6px 8px', fontWeight: '500', color: '#4A1C26' }}>
                   {wine.name}
                 </td>
-                <td style={{ padding: '12px' }}>
+                <td style={{ padding: '6px 8px' }}>
                   <span
                     style={{
                       padding: '4px 8px',
@@ -279,15 +285,14 @@ export default function WineTable({
                     {wine.color}
                   </span>
                 </td>
-                <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.producer}</td>
-                <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.country}</td>
-                <td style={{ padding: '12px', color: '#4A1C26' }}>{wine.vintage}</td>
-                <td style={{ padding: '12px', textAlign: 'center', color: '#4A1C26' }}>
-                  {wine.quantity}
+                <td style={{ padding: '6px 8px', color: '#4A1C26' }}>{wine.producer}</td>
+                <td style={{ padding: '6px 8px', color: '#4A1C26' }}>{wine.country}</td>
+                <td style={{ padding: '6px 8px', textAlign: 'center', color: '#4A1C26' }}>
+                  {wine.quantity > 0 ? 'Yes' : 'No'}
                 </td>
                 <td
                   style={{
-                    padding: '12px',
+                    padding: '6px 8px',
                     textAlign: 'right',
                     color: '#4A1C26',
                     fontWeight: '500',

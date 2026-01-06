@@ -38,6 +38,7 @@ export default function Home(): React.JSX.Element {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedGrapeVariety, setSelectedGrapeVariety] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [showOnlyInCellar, setShowOnlyInCellar] = useState(false);
   const [vintageRange, setVintageRange] = useState<[number, number] | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
   const [sortBy, setSortBy] = useState<'name' | 'vintage' | 'producer' | 'price'>('name');
@@ -54,16 +55,6 @@ export default function Home(): React.JSX.Element {
   const countries = useMemo(() => {
     const uniqueCountries = [...new Set(wines.map((w) => w.country))];
     return uniqueCountries.sort();
-  }, [wines]);
-
-  const vintageMin = useMemo(() => {
-    if (wines.length === 0) return new Date().getFullYear();
-    return Math.min(...wines.map((w) => w.vintage));
-  }, [wines]);
-
-  const vintageMax = useMemo(() => {
-    if (wines.length === 0) return new Date().getFullYear();
-    return Math.max(...wines.map((w) => w.vintage));
   }, [wines]);
 
   const priceMin = useMemo(() => {
@@ -112,14 +103,19 @@ export default function Home(): React.JSX.Element {
       result = result.filter((wine) => wine.country === selectedCountry);
     }
 
-    // Stage 5: Vintage range filter
+    // Stage 5: In Cellar filter
+    if (showOnlyInCellar) {
+      result = result.filter((wine) => wine.quantity > 0);
+    }
+
+    // Stage 6: Vintage range filter
     if (vintageRange) {
       result = result.filter(
         (wine) => wine.vintage >= vintageRange[0] && wine.vintage <= vintageRange[1]
       );
     }
 
-    // Stage 6: Price range filter
+    // Stage 7: Price range filter
     if (priceRange) {
       result = result.filter((wine) => {
         if (wine.purchasePrice === null || wine.purchasePrice === undefined) return false;
@@ -127,7 +123,7 @@ export default function Home(): React.JSX.Element {
       });
     }
 
-    // Stage 7: Sorting
+    // Stage 8: Sorting
     result.sort((a, b) => {
       let comparison = 0;
       switch (sortBy) {
@@ -154,6 +150,7 @@ export default function Home(): React.JSX.Element {
     selectedColors,
     selectedGrapeVariety,
     selectedCountry,
+    showOnlyInCellar,
     vintageRange,
     priceRange,
     sortBy,
@@ -165,6 +162,7 @@ export default function Home(): React.JSX.Element {
     setSelectedColors([]);
     setSelectedGrapeVariety(null);
     setSelectedCountry(null);
+    setShowOnlyInCellar(false);
     setVintageRange(null);
     setPriceRange(null);
     setSortBy('name');
@@ -342,68 +340,35 @@ export default function Home(): React.JSX.Element {
         </div>
       )}
 
-      {/* Action Bar */}
-      <div
-        style={{
-          marginBottom: '24px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '20px',
-        }}
-      >
-        <div
-          style={{
-            flex: wines.length > 0 ? '0 0 calc(25% - 32px)' : '0 0 auto',
-            padding: '10px 16px',
-            backgroundColor: '#7C2D3C',
-            color: 'white',
-            borderRadius: '6px',
-            boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
-          }}
-        >
-          <h2
-            style={{
-              margin: 0,
-              fontSize: '18px',
-              fontWeight: '500',
-            }}
-          >
-            {filteredAndSortedWines.length !== wines.length
-              ? `Showing ${filteredAndSortedWines.length} of ${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'}`
-              : `${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection`}
-          </h2>
-        </div>
-        <button
-          onClick={() => setModalMode('add')}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#7C2D3C',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            fontWeight: '500',
-            transition: 'all 0.2s',
-            boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = '#5f2330';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = '#7C2D3C';
-          }}
-        >
-          + Add Wine
-        </button>
-      </div>
-
       {/* Main Content: Sidebar + Table Layout */}
       <div style={{ display: 'flex', gap: '40px' }}>
-        {/* Left Sidebar - Filters (25%) */}
+        {/* Left Sidebar - Filters and Bottle Count (25%) */}
         {wines.length > 0 && (
-          <div style={{ flex: '0 0 25%' }}>
+          <div style={{ flex: '0 0 25%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Bottle count */}
+            <div
+              style={{
+                padding: '10px 16px',
+                backgroundColor: '#7C2D3C',
+                color: 'white',
+                borderRadius: '6px',
+                boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: '18px',
+                  fontWeight: '500',
+                }}
+              >
+                {filteredAndSortedWines.length !== wines.length
+                  ? `Showing ${filteredAndSortedWines.length} of ${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'}`
+                  : `${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection`}
+              </h2>
+            </div>
+
+            {/* Filters */}
             <WineFilters
               searchText={searchText}
               onSearchChange={setSearchText}
@@ -415,10 +380,8 @@ export default function Home(): React.JSX.Element {
               selectedCountry={selectedCountry}
               onCountryChange={setSelectedCountry}
               countries={countries}
-              vintageRange={vintageRange}
-              onVintageRangeChange={setVintageRange}
-              vintageMin={vintageMin}
-              vintageMax={vintageMax}
+              showOnlyInCellar={showOnlyInCellar}
+              onShowOnlyInCellarChange={setShowOnlyInCellar}
               priceRange={priceRange}
               onPriceRangeChange={setPriceRange}
               priceMin={priceMin}
@@ -428,12 +391,43 @@ export default function Home(): React.JSX.Element {
           </div>
         )}
 
-        {/* Right Content - Table (67%) */}
+        {/* Right Content - Add Wine Button + Table */}
         <div
           style={{
             flex: wines.length > 0 ? '1' : '1 1 100%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
           }}
         >
+          {/* Add Wine button */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              onClick={() => setModalMode('add')}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#7C2D3C',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '16px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                transition: 'all 0.2s',
+                boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5f2330';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = '#7C2D3C';
+              }}
+            >
+              + Add Wine
+            </button>
+          </div>
+
+          {/* Wine Table */}
           <WineTable
             wines={filteredAndSortedWines}
             onRowClick={(wine) => {
