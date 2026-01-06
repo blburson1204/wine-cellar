@@ -8,7 +8,7 @@ describe('WineFilters', () => {
   const mockOnColorsChange = vi.fn();
   const mockOnGrapeVarietyChange = vi.fn();
   const mockOnCountryChange = vi.fn();
-  const mockOnVintageRangeChange = vi.fn();
+  const mockOnShowOnlyInCellarChange = vi.fn();
   const mockOnPriceRangeChange = vi.fn();
   const mockOnClearAll = vi.fn();
 
@@ -23,10 +23,8 @@ describe('WineFilters', () => {
     selectedCountry: null,
     onCountryChange: mockOnCountryChange,
     countries: ['France', 'Italy', 'Spain', 'USA'],
-    vintageRange: null,
-    onVintageRangeChange: mockOnVintageRangeChange,
-    vintageMin: 2000,
-    vintageMax: 2024,
+    showOnlyInCellar: false,
+    onShowOnlyInCellarChange: mockOnShowOnlyInCellarChange,
     priceRange: null,
     onPriceRangeChange: mockOnPriceRangeChange,
     priceMin: 0,
@@ -45,7 +43,7 @@ describe('WineFilters', () => {
       expect(screen.getByText('Filter Criteria')).toBeInTheDocument();
       expect(screen.getByText('Wine Type')).toBeInTheDocument();
       expect(screen.getByLabelText('Country')).toBeInTheDocument();
-      expect(screen.getByText('Vintage')).toBeInTheDocument();
+      expect(screen.getByText('In Cellar')).toBeInTheDocument();
       expect(screen.getByText('Price ($)')).toBeInTheDocument();
     });
 
@@ -94,8 +92,8 @@ describe('WineFilters', () => {
       expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
     });
 
-    it('shows clear button when vintage range is set', () => {
-      render(<WineFilters {...defaultProps} vintageRange={[2010, 2020]} />);
+    it('shows clear button when in cellar filter is active', () => {
+      render(<WineFilters {...defaultProps} showOnlyInCellar={true} />);
 
       expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
     });
@@ -195,75 +193,23 @@ describe('WineFilters', () => {
     });
   });
 
-  describe('Vintage Range Filter', () => {
-    it('displays vintage range values', () => {
-      render(<WineFilters {...defaultProps} vintageRange={[2010, 2020]} />);
-
-      // Use IDs directly since there are multiple "From" and "To" labels
-      const vintageFrom = document.getElementById('vintage-from') as HTMLInputElement;
-      const vintageTo = document.getElementById('vintage-to') as HTMLInputElement;
-      expect(vintageFrom).toHaveValue(2010);
-      expect(vintageTo).toHaveValue(2020);
-    });
-
-    it('displays default min/max when no range set', () => {
-      render(<WineFilters {...defaultProps} />);
-
-      const inputs = screen.getAllByRole('spinbutton');
-      // First two spinbuttons are vintage range
-      expect(inputs[0]).toHaveValue(2000);
-      expect(inputs[1]).toHaveValue(2024);
-    });
-
-    it('calls onVintageRangeChange when changing min vintage', async () => {
-      const user = userEvent.setup();
-      render(<WineFilters {...defaultProps} />);
-
-      const vintageFromInput = document.getElementById('vintage-from') as HTMLInputElement;
-      await user.type(vintageFromInput, '{Backspace}{Backspace}{Backspace}{Backspace}2010');
-
-      // Should be called when value changes
-      expect(mockOnVintageRangeChange).toHaveBeenCalled();
-      expect(mockOnVintageRangeChange.mock.calls.length).toBeGreaterThan(0);
-    });
-
-    it('calls onVintageRangeChange when changing max vintage', async () => {
-      const user = userEvent.setup();
-      render(<WineFilters {...defaultProps} vintageRange={[2010, 2024]} />);
-
-      const vintageToInput = document.getElementById('vintage-to') as HTMLInputElement;
-      await user.type(vintageToInput, '{Backspace}{Backspace}{Backspace}{Backspace}2020');
-
-      expect(mockOnVintageRangeChange).toHaveBeenCalled();
-      expect(mockOnVintageRangeChange.mock.calls.length).toBeGreaterThan(0);
-    });
-
-    it('disables vintage inputs when min equals max', () => {
-      render(<WineFilters {...defaultProps} vintageMin={2020} vintageMax={2020} />);
-
-      const inputs = screen.getAllByRole('spinbutton');
-      expect(inputs[0]).toBeDisabled();
-      expect(inputs[1]).toBeDisabled();
-    });
-  });
-
   describe('Price Range Filter', () => {
     it('displays price range values', () => {
       render(<WineFilters {...defaultProps} priceRange={[50, 200]} />);
 
       const inputs = screen.getAllByRole('spinbutton');
-      // Last two spinbuttons are price range
-      expect(inputs[2]).toHaveValue(50);
-      expect(inputs[3]).toHaveValue(200);
+      // Only price range inputs exist now
+      expect(inputs[0]).toHaveValue(50);
+      expect(inputs[1]).toHaveValue(200);
     });
 
     it('displays default min/max when no range set', () => {
       render(<WineFilters {...defaultProps} />);
 
       const inputs = screen.getAllByRole('spinbutton');
-      // Last two spinbuttons are price range
-      expect(inputs[2]).toHaveValue(0);
-      expect(inputs[3]).toHaveValue(500);
+      // Only price range inputs exist now
+      expect(inputs[0]).toHaveValue(0);
+      expect(inputs[1]).toHaveValue(500);
     });
 
     it('calls onPriceRangeChange when changing min price', async () => {
@@ -292,8 +238,8 @@ describe('WineFilters', () => {
       render(<WineFilters {...defaultProps} priceMin={100} priceMax={100} />);
 
       const inputs = screen.getAllByRole('spinbutton');
-      expect(inputs[2]).toBeDisabled();
-      expect(inputs[3]).toBeDisabled();
+      expect(inputs[0]).toBeDisabled();
+      expect(inputs[1]).toBeDisabled();
     });
   });
 

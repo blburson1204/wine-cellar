@@ -98,12 +98,12 @@ describe('WineTable', () => {
     it('renders table with correct headers', () => {
       render(<WineTable {...defaultProps} />);
 
+      expect(screen.getByText('Vintage')).toBeInTheDocument();
       expect(screen.getByText('Wine')).toBeInTheDocument();
       expect(screen.getByText('Type')).toBeInTheDocument();
       expect(screen.getByText('Producer')).toBeInTheDocument();
       expect(screen.getByText('Country')).toBeInTheDocument();
-      expect(screen.getByText('Vintage')).toBeInTheDocument();
-      expect(screen.getByText('Qty')).toBeInTheDocument();
+      expect(screen.getByText('In Cellar')).toBeInTheDocument();
       expect(screen.getByText('Price')).toBeInTheDocument();
     });
 
@@ -122,7 +122,7 @@ describe('WineTable', () => {
       expect(screen.getByText('Margaux Estate')).toBeInTheDocument();
       expect(screen.getAllByText('France')[0]).toBeInTheDocument();
       expect(screen.getByText('2015')).toBeInTheDocument();
-      expect(screen.getByText('2')).toBeInTheDocument();
+      expect(screen.getAllByText('Yes')[0]).toBeInTheDocument(); // quantity > 0 shows "Yes"
       expect(screen.getByText('$150.00')).toBeInTheDocument();
     });
 
@@ -267,12 +267,12 @@ describe('WineTable', () => {
       expect(mockOnSort).not.toHaveBeenCalled();
     });
 
-    it('does not call onSort when Qty header clicked', async () => {
+    it('does not call onSort when In Cellar header clicked', async () => {
       const user = userEvent.setup();
       render(<WineTable {...defaultProps} />);
 
-      const qtyHeader = screen.getByText('Qty').parentElement;
-      await user.click(qtyHeader!);
+      const inCellarHeader = screen.getByText('In Cellar').parentElement;
+      await user.click(inCellarHeader!);
 
       expect(mockOnSort).not.toHaveBeenCalled();
     });

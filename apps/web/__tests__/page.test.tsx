@@ -35,10 +35,11 @@ describe('Home Page - Wine Cellar', () => {
       render(<Home />);
 
       await waitFor(() => {
-        expect(screen.getByText('0 Bottles in Collection')).toBeInTheDocument();
+        expect(screen.getByText(/No wines found/i)).toBeInTheDocument();
       });
 
-      expect(screen.getByText(/No wines found/i)).toBeInTheDocument();
+      // Bottle count and filters are not shown when there are no wines
+      expect(screen.queryByText('0 Bottles in Collection')).not.toBeInTheDocument();
     });
   });
 
@@ -260,7 +261,7 @@ describe('Home Page - Wine Cellar', () => {
       render(<Home />);
 
       await waitFor(() => {
-        expect(screen.getByText('0 Bottles in Collection')).toBeInTheDocument();
+        expect(screen.getByText(/No wines found/i)).toBeInTheDocument();
       });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith('Error fetching wines:', expect.any(Error));
