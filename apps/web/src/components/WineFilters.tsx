@@ -77,20 +77,20 @@ export default function WineFilters({
   return (
     <div
       style={{
-        backgroundColor: 'rgba(245, 241, 232, 0.6)',
+        backgroundColor: '#f5f1e8',
         borderRadius: '8px',
-        border: '1px solid #D4A5A5',
+        border: '1px solid #C4B5A0',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        backdropFilter: 'blur(4px)',
         overflow: 'hidden',
+        marginTop: '-1px',
       }}
     >
       {/* Header */}
       <div
         style={{
-          backgroundColor: '#7C2D3C',
+          backgroundColor: '#4A1C26',
           color: 'white',
-          padding: '10px 16px',
+          padding: '10px 8px',
           fontSize: '14px',
           fontWeight: '600',
         }}
@@ -130,10 +130,10 @@ export default function WineFilters({
             style={{
               padding: '8px',
               fontSize: '14px',
-              border: '1px solid #D4A5A5',
+              border: '1px solid #C4B5A0',
               borderRadius: '4px',
               width: '100%',
-              backgroundColor: 'rgba(245, 241, 232, 0.8)',
+              backgroundColor: '#FFFFFF',
               boxSizing: 'border-box',
             }}
           />
@@ -155,8 +155,8 @@ export default function WineFilters({
           <div
             style={{
               padding: '8px',
-              backgroundColor: 'rgba(245, 241, 232, 0.8)',
-              border: '1px solid #D4A5A5',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #C4B5A0',
               borderRadius: '6px',
               display: 'grid',
               gridTemplateColumns: 'repeat(2, 1fr)',
@@ -226,10 +226,10 @@ export default function WineFilters({
             style={{
               padding: '8px',
               fontSize: '14px',
-              border: '1px solid #D4A5A5',
+              border: '1px solid #C4B5A0',
               borderRadius: '4px',
               width: '100%',
-              backgroundColor: 'rgba(245, 241, 232, 0.8)',
+              backgroundColor: '#FFFFFF',
               cursor: 'pointer',
               boxSizing: 'border-box',
             }}
@@ -264,10 +264,10 @@ export default function WineFilters({
             style={{
               padding: '8px',
               fontSize: '14px',
-              border: '1px solid #D4A5A5',
+              border: '1px solid #C4B5A0',
               borderRadius: '4px',
               width: '100%',
-              backgroundColor: 'rgba(245, 241, 232, 0.8)',
+              backgroundColor: '#FFFFFF',
               cursor: 'pointer',
               boxSizing: 'border-box',
             }}
@@ -297,8 +297,8 @@ export default function WineFilters({
           <div
             style={{
               padding: '8px',
-              backgroundColor: 'rgba(245, 241, 232, 0.8)',
-              border: '1px solid #D4A5A5',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #C4B5A0',
               borderRadius: '6px',
             }}
           >
@@ -351,7 +351,7 @@ export default function WineFilters({
                   marginBottom: '2px',
                   fontSize: '11px',
                   fontWeight: '500',
-                  color: '#7C2D3C',
+                  color: '#4A1C26',
                 }}
               >
                 From
@@ -369,9 +369,9 @@ export default function WineFilters({
                   width: '100%',
                   padding: '6px',
                   fontSize: '13px',
-                  border: '1px solid #D4A5A5',
+                  border: '1px solid #C4B5A0',
                   borderRadius: '4px',
-                  backgroundColor: 'rgba(245, 241, 232, 0.8)',
+                  backgroundColor: '#FFFFFF',
                   boxSizing: 'border-box',
                   cursor: priceMin === priceMax ? 'not-allowed' : 'text',
                 }}
@@ -385,7 +385,7 @@ export default function WineFilters({
                   marginBottom: '2px',
                   fontSize: '11px',
                   fontWeight: '500',
-                  color: '#7C2D3C',
+                  color: '#4A1C26',
                 }}
               >
                 To
@@ -403,9 +403,9 @@ export default function WineFilters({
                   width: '100%',
                   padding: '6px',
                   fontSize: '13px',
-                  border: '1px solid #D4A5A5',
+                  border: '1px solid #C4B5A0',
                   borderRadius: '4px',
-                  backgroundColor: 'rgba(245, 241, 232, 0.8)',
+                  backgroundColor: '#FFFFFF',
                   boxSizing: 'border-box',
                   cursor: priceMin === priceMax ? 'not-allowed' : 'text',
                 }}

@@ -78,11 +78,10 @@ export default function WineTable({
         style={{
           textAlign: 'center',
           padding: '64px 24px',
-          backgroundColor: 'rgba(245, 241, 232, 0.6)',
+          backgroundColor: '#f5f1e8',
           borderRadius: '8px',
-          border: '1px solid #D4A5A5',
+          border: '1px solid #C4B5A0',
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          backdropFilter: 'blur(4px)',
         }}
       >
         <div style={{ fontSize: '64px', marginBottom: '16px' }}>🍷</div>
@@ -99,10 +98,9 @@ export default function WineTable({
       ref={tableRef}
       style={{
         borderRadius: '8px',
-        border: '1px solid #D4A5A5',
+        border: '1px solid #C4B5A0',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        backgroundColor: 'rgba(255, 255, 255, 0.6)',
-        backdropFilter: 'blur(4px)',
+        backgroundColor: '#f5f1e8',
         overflow: 'auto',
         maxHeight: maxHeight,
       }}
@@ -249,17 +247,17 @@ export default function WineTable({
                   borderBottom: index < wines.length - 1 ? '1px solid #E5DFD0' : 'none',
                   transition: 'background-color 0.2s, box-shadow 0.2s',
                   cursor: 'pointer',
-                  backgroundColor: isFocused ? 'rgba(245, 241, 232, 0.8)' : 'transparent',
-                  boxShadow: isFocused ? 'inset 0 0 0 2px #7C2D3C' : 'none',
+                  backgroundColor: isFocused ? '#E8DCC8' : 'transparent',
+                  boxShadow: isFocused ? 'inset 0 0 0 1px #C4B5A0' : 'none',
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(245, 241, 232, 0.8)';
+                  e.currentTarget.style.backgroundColor = '#E8DCC8';
                 }}
                 onMouseOut={(e) => {
                   if (!isFocused) {
                     e.currentTarget.style.backgroundColor = 'transparent';
                   } else {
-                    e.currentTarget.style.backgroundColor = 'rgba(245, 241, 232, 0.8)';
+                    e.currentTarget.style.backgroundColor = '#E8DCC8';
                   }
                 }}
                 onClick={() => {
@@ -267,32 +265,54 @@ export default function WineTable({
                   onRowClick(wine);
                 }}
               >
-                <td style={{ padding: '6px 8px', color: '#4A1C26' }}>{wine.vintage}</td>
-                <td style={{ padding: '6px 8px', fontWeight: '500', color: '#4A1C26' }}>
+                <td style={{ padding: '6px 8px', fontSize: '14px', color: '#4A1C26' }}>
+                  {wine.vintage}
+                </td>
+                <td
+                  style={{
+                    padding: '6px 8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#4A1C26',
+                  }}
+                >
                   {wine.name}
                 </td>
-                <td style={{ padding: '6px 8px' }}>
+                <td style={{ padding: '6px 8px', fontSize: '14px' }}>
                   <span
                     style={{
                       padding: '4px 8px',
-                      backgroundColor: '#F5F1E8',
+                      backgroundColor: '#FFFFFF',
                       color: '#7C2D3C',
                       borderRadius: '4px',
                       fontSize: '12px',
                       fontWeight: '500',
+                      border: '1px solid #E5DFD0',
                     }}
                   >
                     {wine.color}
                   </span>
                 </td>
-                <td style={{ padding: '6px 8px', color: '#4A1C26' }}>{wine.producer}</td>
-                <td style={{ padding: '6px 8px', color: '#4A1C26' }}>{wine.country}</td>
-                <td style={{ padding: '6px 8px', textAlign: 'center', color: '#4A1C26' }}>
+                <td style={{ padding: '6px 8px', fontSize: '14px', color: '#4A1C26' }}>
+                  {wine.producer}
+                </td>
+                <td style={{ padding: '6px 8px', fontSize: '14px', color: '#4A1C26' }}>
+                  {wine.country}
+                </td>
+                <td
+                  style={{
+                    padding: '6px 8px',
+                    fontSize: '14px',
+                    textAlign: 'center',
+                    color: '#4A1C26',
+                  }}
+                >
                   {wine.quantity > 0 ? 'Yes' : 'No'}
                 </td>
                 <td
                   style={{
                     padding: '6px 8px',
+                    fontSize: '14px',
                     textAlign: 'right',
                     color: '#4A1C26',
                     fontWeight: '500',

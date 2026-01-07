@@ -348,18 +348,18 @@ export default function Home(): React.JSX.Element {
             {/* Bottle count */}
             <div
               style={{
-                padding: '10px 16px',
-                backgroundColor: '#7C2D3C',
+                padding: '10px 20px',
+                backgroundColor: '#4A1C26',
                 color: 'white',
                 borderRadius: '6px',
-                boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
+                boxShadow: '0 2px 4px rgba(74, 28, 38, 0.2)',
               }}
             >
               <h2
                 style={{
                   margin: 0,
-                  fontSize: '18px',
-                  fontWeight: '500',
+                  fontSize: '16px',
+                  fontWeight: '600',
                 }}
               >
                 {filteredAndSortedWines.length !== wines.length
@@ -401,7 +401,7 @@ export default function Home(): React.JSX.Element {
           }}
         >
           {/* Add Wine button */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', minHeight: '36px' }}>
             <button
               onClick={() => setModalMode('add')}
               style={{
