@@ -74,3 +74,44 @@ export class DatabaseError extends AppError {
     super(500, message, true, 'DATABASE_ERROR');
   }
 }
+
+/**
+ * Base image upload error (400)
+ */
+export class ImageUploadError extends AppError {
+  constructor(message: string, errorCode: string = 'IMAGE_UPLOAD_ERROR') {
+    super(400, message, true, errorCode);
+  }
+}
+
+/**
+ * File too large error (400)
+ */
+export class FileTooLargeError extends ImageUploadError {
+  constructor(size: number, maxSize: number) {
+    const sizeMB = Math.round(size / 1024 / 1024);
+    const maxSizeMB = Math.round(maxSize / 1024 / 1024);
+    super(`File size ${sizeMB}MB exceeds maximum ${maxSizeMB}MB`, 'FILE_TOO_LARGE');
+  }
+}
+
+/**
+ * Invalid file type error (400)
+ */
+export class InvalidFileTypeError extends ImageUploadError {
+  constructor(mimeType: string) {
+    super(
+      `File type ${mimeType} is not supported. Please upload JPEG, PNG, or WebP images.`,
+      'INVALID_FILE_TYPE'
+    );
+  }
+}
+
+/**
+ * Invalid image error (400)
+ */
+export class InvalidImageError extends ImageUploadError {
+  constructor(reason: string) {
+    super(`Invalid image: ${reason}`, 'INVALID_IMAGE');
+  }
+}
