@@ -37,19 +37,70 @@ Wine Cellar application.
 
 ### Backend (API)
 
-- **Framework**: Jest
-- **Supertest**: HTTP assertions
-- **@prisma/client**: Database mocking
+- **Framework**: Vitest 4.0.16
+- **Supertest**: HTTP assertions for API endpoints
+- **@prisma/client**: Real test database (not mocked)
+- **Spies/Mocks**: vi.spyOn() for unit testing utilities
 
 ### Frontend (Web)
 
-- **Framework**: Vitest (faster than Jest for Vite/Next.js)
+- **Framework**: Vitest 4.0.16 (faster than Jest for Vite/Next.js)
 - **React Testing Library**: Component testing
-- **MSW**: API mocking
+- **@testing-library/user-event**: User interaction simulation
+- **Global fetch mock**: vi.fn() for API mocking
 
-## Unit Testing Patterns
+## Test Types
 
-### API Endpoint Tests
+### When to Write Each Type of Test
+
+**Unit Tests** - Test individual functions in isolation
+
+- ✅ Utility functions (image validation, image processing, logger)
+- ✅ Pure functions with complex logic
+- ✅ Functions with many edge cases
+- ✅ Use vi.spyOn() to mock dependencies
+- ❌ Don't unit test simple CRUD operations (use integration tests instead)
+
+**Integration Tests** - Test full API endpoints with real database
+
+- ✅ All API endpoints (CRUD operations)
+- ✅ Full request/response cycle
+- ✅ Database interactions
+- ✅ Error handling and validation
+- ✅ Use supertest + real test database
+
+**Component Tests** - Test React components as users interact with them
+
+- ✅ All UI components
+- ✅ User interactions (clicks, form inputs)
+- ✅ Conditional rendering
+- ✅ Use @testing-library/react + userEvent
+- ❌ Don't test implementation details (CSS, internal state)
+
+## Testing Patterns
+
+### Unit Tests for Utilities
+
+**Structure:**
+
+```typescript
+// Test a utility function in isolation
+describe('validateImage', () => {
+  it('should pass for valid JPEG', async () => {
+    const buffer = createValidJpegBuffer();
+    await expect(validateImage(buffer, 'image/jpeg')).resolves.toBeUndefined();
+  });
+
+  it('should reject oversized files', async () => {
+    const largeBuffer = Buffer.alloc(6 * 1024 * 1024);
+    await expect(validateImage(largeBuffer, 'image/jpeg')).rejects.toThrow(
+      FileTooLargeError
+    );
+  });
+});
+```
+
+### Integration Tests for API Endpoints
 
 **Structure:**
 
