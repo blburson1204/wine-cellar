@@ -4,17 +4,36 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 import { prisma } from '@wine-cellar/database';
 import { requestIdMiddleware } from './middleware/requestId';
 import { httpLogger } from './middleware/httpLogger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { validate } from './middleware/validate';
 import { createWineSchema, updateWineSchema, wineIdSchema } from './schemas/wine.schema';
-import { NotFoundError } from './errors/AppError';
+import { NotFoundError, ImageUploadError } from './errors/AppError';
 import { createLogger } from './utils/logger';
+import { storageService } from './services/storage';
+import { storageConfig } from './config/storage';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Configure Multer for handling file uploads
+const upload = multer({
+  storage: multer.memoryStorage(), // Store in memory for processing
+  limits: {
+    fileSize: storageConfig.maxFileSize, // 5MB max
+  },
+  fileFilter: (_req, file, cb) => {
+    // Basic MIME type check (will be validated more thoroughly in the handler)
+    if (storageConfig.allowedMimeTypes.includes(file.mimetype as any)) {
+      cb(null, true);
+    } else {
+      cb(new ImageUploadError(`File type ${file.mimetype} not supported`));
+    }
+  },
+});
 
 export const createApp = (): Express => {
   const app = express();
@@ -124,8 +143,11 @@ export const createApp = (): Express => {
         });
       }
 
-      // Construct path to image file
-      const imagePath = path.join(
+      // Try uploaded images first (from uploads directory)
+      const uploadedImagePath = path.join(__dirname, '..', 'uploads', 'wines', wine.imageUrl);
+
+      // Then try existing images (from assets directory)
+      const assetImagePath = path.join(
         __dirname,
         '..',
         '..',
@@ -135,12 +157,17 @@ export const createApp = (): Express => {
         wine.imageUrl
       );
 
-      // Check if file exists
-      if (!fs.existsSync(imagePath)) {
+      let imagePath: string;
+      if (fs.existsSync(uploadedImagePath)) {
+        imagePath = uploadedImagePath;
+      } else if (fs.existsSync(assetImagePath)) {
+        imagePath = assetImagePath;
+      } else {
         log.error('Image file not found on disk', new Error('Image file not found'), {
           wineId: id,
           imageUrl: wine.imageUrl,
-          imagePath,
+          uploadedImagePath,
+          assetImagePath,
         });
         return res.status(404).json({
           error: 'Image file not found',
@@ -167,6 +194,111 @@ export const createApp = (): Express => {
       return res.sendFile(imagePath);
     } catch (error) {
       log.error('Error serving wine image', error as Error);
+      next(error);
+    }
+  });
+
+  // Upload wine label image
+  app.post(
+    '/api/wines/:id/image',
+    validate(wineIdSchema, 'params'),
+    upload.single('image'),
+    async (req, res, next) => {
+      const log = createLogger(req);
+
+      try {
+        const { id } = req.params;
+        log.info('Uploading wine image', { wineId: id });
+
+        // Check if wine exists
+        const wine = await prisma.wine.findUnique({
+          where: { id },
+        });
+
+        if (!wine) {
+          log.warn('Wine not found', { wineId: id });
+          throw new NotFoundError('Wine', id);
+        }
+
+        // Check if file was uploaded
+        if (!req.file) {
+          log.warn('No file uploaded', { wineId: id });
+          throw new ImageUploadError('No image file provided');
+        }
+
+        // Upload image using storage service
+        const uploadResult = await storageService.uploadImage(
+          id,
+          req.file.buffer,
+          req.file.mimetype
+        );
+
+        log.info('Image uploaded successfully', {
+          wineId: id,
+          imageUrl: uploadResult.imageUrl,
+          fileSize: uploadResult.fileSize,
+        });
+
+        // Update wine in database
+        const updatedWine = await prisma.wine.update({
+          where: { id },
+          data: {
+            imageUrl: uploadResult.imageUrl,
+          },
+        });
+
+        res.json(updatedWine);
+      } catch (error) {
+        log.error('Error uploading wine image', error as Error, { wineId: req.params.id });
+        next(error);
+      }
+    }
+  );
+
+  // Delete wine label image
+  app.delete('/api/wines/:id/image', validate(wineIdSchema, 'params'), async (req, res, next) => {
+    const log = createLogger(req);
+
+    try {
+      const { id } = req.params;
+      log.info('Deleting wine image', { wineId: id });
+
+      // Check if wine exists
+      const wine = await prisma.wine.findUnique({
+        where: { id },
+      });
+
+      if (!wine) {
+        log.warn('Wine not found', { wineId: id });
+        throw new NotFoundError('Wine', id);
+      }
+
+      // Check if wine has an image
+      if (!wine.imageUrl) {
+        log.warn('Wine has no image to delete', { wineId: id });
+        return res.status(404).json({
+          error: 'No image found for this wine',
+          errorCode: 'IMAGE_NOT_FOUND',
+        });
+      }
+
+      // Delete image from storage
+      await storageService.deleteImage(id);
+
+      log.info('Image deleted from storage', { wineId: id });
+
+      // Update wine in database
+      await prisma.wine.update({
+        where: { id },
+        data: {
+          imageUrl: null,
+        },
+      });
+
+      log.info('Wine image deleted successfully', { wineId: id });
+      return res.status(204).send();
+    } catch (error) {
+      log.error('Error deleting wine image', error as Error, { wineId: req.params.id });
       next(error);
     }
   });
@@ -224,12 +356,36 @@ export const createApp = (): Express => {
       const { id } = req.params;
       log.info('Deleting wine', { wineId: id });
 
+      // Get wine first to check if it has an image
+      const wine = await prisma.wine.findUnique({
+        where: { id },
+      });
+
+      if (!wine) {
+        throw new NotFoundError('Wine', id);
+      }
+
+      // Delete associated image if it exists
+      if (wine.imageUrl) {
+        try {
+          await storageService.deleteImage(id);
+          log.info('Wine image deleted', { wineId: id });
+        } catch (error) {
+          // Log error but continue with wine deletion
+          log.warn('Failed to delete wine image, continuing with wine deletion', {
+            wineId: id,
+            error: error as Error,
+          });
+        }
+      }
+
+      // Delete the wine from database
       await prisma.wine.delete({
         where: { id },
       });
 
       log.info('Wine deleted successfully', { wineId: id });
-      res.status(204).send();
+      return res.status(204).send();
     } catch (error) {
       log.error('Error deleting wine', error as Error, { wineId: req.params.id });
       next(error);

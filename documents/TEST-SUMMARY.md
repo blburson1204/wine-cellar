@@ -1,29 +1,34 @@
 # Wine Cellar - Test Summary
 
-## ✅ All Tests Passing (175/175)
+## ✅ All Tests Passing (270/270)
 
 ### Test Suite Results
 
 **API Tests:**
 
 ```
-✓ apps/api/__tests__/wines.test.ts (18 tests) 222ms
-✓ apps/api/__tests__/errorHandling.test.ts (31 tests) 166ms
+✓ apps/api/__tests__/wines.test.ts (18 tests) - Integration
+✓ apps/api/__tests__/errorHandling.test.ts (31 tests) - Integration
+✓ apps/api/__tests__/utils/image-validation.test.ts (26 tests) - Unit
+✓ apps/api/__tests__/utils/image-processing.test.ts (14 tests) - Unit
+✓ apps/api/__tests__/utils/logger.test.ts (22 tests) - Unit
+✓ apps/api/__tests__/services/storage/local-storage.service.test.ts (14 tests) - Unit
+✓ apps/api/__tests__/routes/wine-image.integration.test.ts (19 tests) - Integration
 
-Test Files  2 passed (2)
-Tests       49 passed (49)
-Duration    ~892ms
+Test Files  7 passed (7)
+Tests       144 passed (144)
+Duration    ~2.3s
 ```
 
 **Web Tests:**
 
 ```
-✓ apps/web/__tests__/api.test.ts (23 tests) 7ms
-✓ apps/web/__tests__/ErrorBoundary.test.tsx (14 tests) 126ms
-✓ apps/web/__tests__/WineTable.test.tsx (27 tests) 279ms
-✓ apps/web/__tests__/WineFilters.test.tsx (29 tests) 555ms
-✓ apps/web/__tests__/page.test.tsx (11 tests) 581ms
-✓ apps/web/__tests__/WineDetailModal.test.tsx (22 tests) 955ms
+✓ apps/web/__tests__/api.test.ts (23 tests) - Unit
+✓ apps/web/__tests__/ErrorBoundary.test.tsx (14 tests) - Component
+✓ apps/web/__tests__/WineTable.test.tsx (27 tests) - Component
+✓ apps/web/__tests__/WineFilters.test.tsx (29 tests) - Component
+✓ apps/web/__tests__/page.test.tsx (11 tests) - Component
+✓ apps/web/__tests__/WineDetailModal.test.tsx (22 tests) - Component
 
 Test Files  6 passed (6)
 Tests       126 passed (126)
@@ -33,16 +38,84 @@ Duration    ~1.99s
 ### Quick Stats
 
 - **Test Runner**: Vitest 4.0.16
-- **Total Tests**: 175 (49 API + 126 web)
+- **Total Tests**: 270 (144 API + 126 web)
 - **Pass Rate**: 100%
-- **Execution Time**: ~3s
-- **Test Files**: 8 (2 API + 6 web)
+- **Execution Time**: ~4.3s
+- **Test Files**: 13 (7 API + 6 web)
+- **Test Types**: Unit (76), Integration (68), Component (126)
 
 ---
 
 ## Test Breakdown
 
-### API Tests (49 tests)
+### API Tests (144 tests)
+
+#### NEW: Phase 1B Image Upload Tests (95 tests)
+
+**logger.test.ts (22 tests) - Unit**
+
+- ✓ Create logger without/with request context
+- ✓ Log messages at all levels (info, warn, error, debug)
+- ✓ Include request metadata (requestId, method, path, userId)
+- ✓ Merge extra metadata with request context
+- ✓ Handle Error objects with stack traces
+- ✓ HTTP log stream integration
+
+**image-validation.test.ts (26 tests) - Unit**
+
+- ✓ File size validation (within limit, at limit, exceeding limit)
+- ✓ MIME type validation (JPEG, PNG, WebP supported; GIF, BMP rejected)
+- ✓ Image buffer validation using file-type magic numbers
+- ✓ File type spoofing detection (executables pretending to be images)
+- ✓ Empty file and null buffer handling
+- ✓ Comprehensive error messages
+
+**image-processing.test.ts (14 tests) - Unit**
+
+- ✓ Extract image metadata (width, height, format)
+- ✓ Optimize images (resize if > max width, preserve aspect ratio)
+- ✓ Convert all formats to JPEG
+- ✓ Compress with configurable quality
+- ✓ Preserve orientation metadata
+- ✓ Generate thumbnails with cover fit
+
+**local-storage.service.test.ts (14 tests) - Unit**
+
+- ✓ Initialize upload directory
+- ✓ Upload and optimize images
+- ✓ Delete images (handle non-existent gracefully)
+- ✓ Get image URLs
+- ✓ Check image existence
+- ✓ Error propagation from validation/optimization
+
+**wine-image.integration.test.ts (19 tests) - Integration**
+
+POST /api/wines/:id/image:
+
+- ✓ Upload JPEG, PNG, WebP (all convert to JPEG)
+- ✓ Replace existing images
+- ✓ Return 404 for non-existent wines
+- ✓ Return 400 for missing files, unsupported types
+- ✓ Reject oversized files (> 5MB)
+- ✓ Reject invalid image data
+- ✓ Detect file type spoofing
+- ✓ Handle concurrent uploads
+
+DELETE /api/wines/:id/image:
+
+- ✓ Delete existing images
+- ✓ Return 404 for non-existent wines
+- ✓ Return 404 when wine has no image
+- ✓ Handle already-deleted images gracefully
+- ✓ Handle concurrent deletes
+
+Full lifecycle:
+
+- ✓ Upload → Replace → Delete → Re-upload workflow
+
+---
+
+### CRUD & Error Handling Tests (49 tests)
 
 #### wines.test.ts (18 tests)
 
@@ -558,6 +631,23 @@ export default defineConfig({
 
 ### Recent Changes
 
+- **January 7, 2026**: Phase 1B Image Upload Feature - Complete Test Suite
+  - Added 95 new tests for image upload/delete functionality
+  - **Unit tests** (76 tests total):
+    - image-validation.ts (26 tests) - File validation, MIME types, spoofing
+      detection
+    - image-processing.ts (14 tests) - Optimization, resizing, thumbnail
+      generation
+    - local-storage.service.ts (14 tests) - Upload, delete, existence checks
+    - logger.ts (22 tests) - Contextual logging, request metadata
+  - **Integration tests** (19 tests):
+    - POST /DELETE /api/wines/:id/image endpoints
+    - Full upload → replace → delete → re-upload lifecycle
+    - Error handling, concurrent operations, security
+  - Total tests increased from 175 to 270 (+54% increase)
+  - Introduced **explicit test type classification**: Unit, Integration,
+    Component
+  - All 270 tests passing ✅
 - **December 30, 2025**: Comprehensive Test Coverage Improvement
   - Added 64 new web tests across 3 components (WineTable, ErrorBoundary,
     api.ts)
@@ -604,4 +694,4 @@ export default defineConfig({
 
 ---
 
-**Last Updated**: December 30, 2025
+**Last Updated**: January 7, 2026 (Phase 1B Image Upload Tests)

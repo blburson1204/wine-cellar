@@ -107,8 +107,20 @@ export default function WineDetailModal({
   const [editForm, setEditForm] = useState<Partial<Wine>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isDeletingImage, setIsDeletingImage] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(wine?.imageUrl || null);
+  const [imageTimestamp, setImageTimestamp] = useState(Date.now());
   const nameInputRef = useRef<HTMLInputElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Update currentImageUrl when wine prop changes
+  useEffect(() => {
+    setCurrentImageUrl(wine?.imageUrl || null);
+  }, [wine?.imageUrl]);
 
   // Initialize form with default values for add mode
   useEffect(() => {
@@ -299,6 +311,93 @@ export default function WineDetailModal({
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = event.target.files?.[0];
+    if (!file || !wine) return;
+
+    // Reset error state
+    setUploadError(null);
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setUploadError(`File size ${Math.round(file.size / 1024 / 1024)}MB exceeds maximum 5MB`);
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadError('Please upload a JPEG, PNG, or WebP image');
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`/api/wines/${wine.id}/image`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to upload image');
+      }
+
+      const updatedWine = await response.json();
+
+      // Update the wine in the parent component (this will refresh the wine list)
+      await onUpdate(wine.id, { imageUrl: updatedWine.imageUrl });
+
+      // Update local state to show the new image immediately
+      setCurrentImageUrl(updatedWine.imageUrl);
+      setImageTimestamp(Date.now()); // Force image refresh
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setUploadError(error instanceof Error ? error.message : 'Failed to upload image');
+    } finally {
+      setIsUploadingImage(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleImageDelete = async (): Promise<void> => {
+    if (!wine || !currentImageUrl) return;
+
+    setIsDeletingImage(true);
+    setUploadError(null);
+
+    try {
+      const response = await fetch(`/api/wines/${wine.id}/image`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete image');
+      }
+
+      // Update the wine in the parent component (this will refresh the wine list)
+      await onUpdate(wine.id, { imageUrl: null });
+
+      // Update local state to show placeholder immediately
+      setCurrentImageUrl(null);
+      setShowDeleteConfirm(false);
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      setUploadError(error instanceof Error ? error.message : 'Failed to delete image');
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeletingImage(false);
     }
   };
 
@@ -569,9 +668,9 @@ export default function WineDetailModal({
 
               {/* Right side - Wine Label Image */}
               <div style={{ flexShrink: 0, width: '300px' }}>
-                {wine.imageUrl ? (
+                {currentImageUrl ? (
                   <img
-                    src={`/api/wines/${wine.id}/image`}
+                    src={`/api/wines/${wine.id}/image?t=${imageTimestamp}`}
                     alt={`${wine.name} label`}
                     style={{
                       width: '100%',
@@ -592,7 +691,7 @@ export default function WineDetailModal({
                 ) : null}
                 <div
                   style={{
-                    display: wine.imageUrl ? 'none' : 'flex',
+                    display: currentImageUrl ? 'none' : 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1305,42 +1404,237 @@ export default function WineDetailModal({
                 </div>
               </div>
 
-              {/* Right side - Wine Label Image */}
+              {/* Right side - Wine Label Image with Upload/Delete */}
               {wine && (
                 <div style={{ flexShrink: 0, width: '300px' }}>
-                  {wine.imageUrl ? (
-                    <img
-                      src={`/api/wines/${wine.id}/image`}
-                      alt={`${wine.name} label`}
+                  {/* Image Display */}
+                  {currentImageUrl ? (
+                    <div style={{ position: 'relative' }}>
+                      <img
+                        src={`/api/wines/${wine.id}/image?t=${imageTimestamp}`}
+                        alt={`${wine.name} label`}
+                        style={{
+                          width: '100%',
+                          borderRadius: '8px',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        }}
+                        loading="lazy"
+                        onError={(e) => {
+                          // If image fails to load, show placeholder
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const placeholder = target.nextElementSibling as HTMLElement;
+                          if (placeholder) {
+                            placeholder.style.display = 'flex';
+                          }
+                        }}
+                      />
+                      <div
+                        style={{
+                          display: 'none',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '40px 20px',
+                        }}
+                      >
+                        <div style={{ fontSize: '80px', color: '#D4A5A5' }}>🍷</div>
+                        <div style={{ fontSize: '14px', color: '#7C2D3C', marginTop: '12px' }}>
+                          Image not available
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
                       style={{
-                        width: '100%',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '40px 20px',
                       }}
-                      loading="lazy"
-                      onError={(e) => {
-                        // If image fails to load, show placeholder
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const placeholder = target.nextElementSibling as HTMLElement;
-                        if (placeholder) {
-                          placeholder.style.display = 'flex';
-                        }
-                      }}
-                    />
-                  ) : null}
+                    >
+                      <div style={{ fontSize: '80px', color: '#D4A5A5' }}>🍷</div>
+                      <div style={{ fontSize: '14px', color: '#7C2D3C', marginTop: '12px' }}>
+                        No image
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Upload/Delete Controls */}
                   <div
                     style={{
-                      display: wine.imageUrl ? 'none' : 'flex',
+                      marginTop: '16px',
+                      display: 'flex',
                       flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '40px 20px',
+                      gap: '12px',
                     }}
                   >
-                    <div style={{ fontSize: '80px', color: '#D4A5A5' }}>🍷</div>
-                    <div style={{ fontSize: '14px', color: '#7C2D3C', marginTop: '12px' }}>
-                      Image not available
+                    {/* Upload Error Message */}
+                    {uploadError && (
+                      <div
+                        style={{
+                          padding: '10px',
+                          backgroundColor: '#FEE',
+                          border: '1px solid #C73E3A',
+                          borderRadius: '4px',
+                          fontSize: '14px',
+                          color: '#C73E3A',
+                        }}
+                      >
+                        {uploadError}
+                      </div>
+                    )}
+
+                    {/* Hidden File Input */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleImageUpload}
+                      style={{ display: 'none' }}
+                    />
+
+                    {/* Upload Button */}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploadingImage || isDeletingImage}
+                      style={{
+                        padding: '10px 16px',
+                        backgroundColor: currentImageUrl ? '#F5F1E8' : '#7C2D3C',
+                        color: currentImageUrl ? '#7C2D3C' : '#F5F1E8',
+                        border: `1px solid ${currentImageUrl ? '#D4A5A5' : '#7C2D3C'}`,
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: isUploadingImage || isDeletingImage ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.2s',
+                        opacity: isUploadingImage || isDeletingImage ? 0.6 : 1,
+                      }}
+                      onMouseOver={(e) => {
+                        if (!isUploadingImage && !isDeletingImage) {
+                          e.currentTarget.style.opacity = '0.8';
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        if (!isUploadingImage && !isDeletingImage) {
+                          e.currentTarget.style.opacity = '1';
+                        }
+                      }}
+                    >
+                      {isUploadingImage
+                        ? 'Uploading...'
+                        : currentImageUrl
+                          ? 'Replace Image'
+                          : 'Upload Image'}
+                    </button>
+
+                    {/* Delete Button (only if image exists) */}
+                    {currentImageUrl && !showDeleteConfirm && (
+                      <button
+                        type="button"
+                        onClick={() => setShowDeleteConfirm(true)}
+                        disabled={isUploadingImage || isDeletingImage}
+                        style={{
+                          padding: '10px 16px',
+                          backgroundColor: 'transparent',
+                          color: '#C73E3A',
+                          border: '1px solid #C73E3A',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          cursor: isUploadingImage || isDeletingImage ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s',
+                          opacity: isUploadingImage || isDeletingImage ? 0.6 : 1,
+                        }}
+                        onMouseOver={(e) => {
+                          if (!isUploadingImage && !isDeletingImage) {
+                            e.currentTarget.style.backgroundColor = '#FEE';
+                          }
+                        }}
+                        onMouseOut={(e) => {
+                          if (!isUploadingImage && !isDeletingImage) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
+                        Delete Image
+                      </button>
+                    )}
+
+                    {/* Delete Confirmation */}
+                    {showDeleteConfirm && (
+                      <div
+                        style={{
+                          padding: '12px',
+                          backgroundColor: '#FFF8F8',
+                          border: '1px solid #C73E3A',
+                          borderRadius: '6px',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: '14px',
+                            color: '#4A1C26',
+                            marginBottom: '12px',
+                            fontWeight: '500',
+                          }}
+                        >
+                          Delete this image?
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            type="button"
+                            onClick={handleImageDelete}
+                            disabled={isDeletingImage}
+                            style={{
+                              flex: 1,
+                              padding: '8px 12px',
+                              backgroundColor: '#C73E3A',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                              cursor: isDeletingImage ? 'not-allowed' : 'pointer',
+                              opacity: isDeletingImage ? 0.6 : 1,
+                            }}
+                          >
+                            {isDeletingImage ? 'Deleting...' : 'Yes, Delete'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowDeleteConfirm(false)}
+                            disabled={isDeletingImage}
+                            style={{
+                              flex: 1,
+                              padding: '8px 12px',
+                              backgroundColor: '#F5F1E8',
+                              color: '#7C2D3C',
+                              border: '1px solid #D4A5A5',
+                              borderRadius: '4px',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                              cursor: isDeletingImage ? 'not-allowed' : 'pointer',
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Helper Text */}
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: '#7C2D3C',
+                        textAlign: 'center',
+                        lineHeight: '1.4',
+                      }}
+                    >
+                      JPEG, PNG, or WebP • Max 5MB
                     </div>
                   </div>
                 </div>

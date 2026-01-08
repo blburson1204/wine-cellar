@@ -16,3 +16,6 @@ scripts/import-vivino.ts
 # Wine label images (can be re-downloaded via script)
 assets/wine-labels/*.jpg
 assets/wine-labels/*.png
+
+# Image uploads (development and production)
+apps/api/uploads/
