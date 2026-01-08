@@ -452,9 +452,9 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         expect(screen.getByText(/delete this image/i)).toBeInTheDocument();
       });
 
-      // Click cancel button
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
-      await user.click(cancelButton);
+      // Click cancel (find all cancel buttons and click the last one which is in the confirmation dialog)
+      const cancelButtons = screen.getAllByRole('button', { name: /cancel/i });
+      await user.click(cancelButtons[cancelButtons.length - 1]);
 
       // Should close dialog
       await waitFor(() => {
@@ -578,10 +578,13 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         />
       );
 
-      // Should show image
+      // Should show image using API endpoint
       const image = screen.getByRole('img');
       expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute('src', expect.stringContaining('test-wine-123.jpg'));
+      expect(image).toHaveAttribute(
+        'src',
+        expect.stringContaining('/api/wines/test-wine-123/image')
+      );
     });
 
     it('should show placeholder when no image exists', () => {
@@ -595,8 +598,8 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         />
       );
 
-      // Should show placeholder text or icon
-      expect(screen.getByText(/no.*image/i)).toBeInTheDocument();
+      // Should show placeholder text
+      expect(screen.getByText(/image not available/i)).toBeInTheDocument();
     });
 
     it('should update displayed image after successful upload', async () => {
@@ -626,10 +629,13 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       await user.upload(fileInput, mockFile);
 
-      // Wait for upload to complete and image to update
+      // Wait for upload to complete and image to display (uses API endpoint, timestamp changes)
       await waitFor(() => {
         const image = screen.getByRole('img');
-        expect(image).toHaveAttribute('src', expect.stringContaining('new-image.jpg'));
+        expect(image).toHaveAttribute(
+          'src',
+          expect.stringContaining('/api/wines/test-wine-123/image')
+        );
       });
     });
   });
