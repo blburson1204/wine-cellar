@@ -26,7 +26,7 @@ interface WineDetailModalProps {
   mode?: 'view' | 'add'; // 'view' for viewing existing wine, 'add' for creating new wine
   onClose: () => void;
   onUpdate: (id: string, data: Partial<Wine>) => Promise<void>;
-  onCreate?: (data: Omit<Wine, 'id'>) => Promise<void>;
+  onCreate?: (data: Omit<Wine, 'id'>) => Promise<Wine>;
   onDelete?: (id: string) => void;
 }
 
@@ -113,6 +113,8 @@ export default function WineDetailModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(wine?.imageUrl || null);
   const [imageTimestamp, setImageTimestamp] = useState(Date.now());
+  const [stagedImageFile, setStagedImageFile] = useState<File | null>(null);
+  const [stagedImagePreview, setStagedImagePreview] = useState<string | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -291,7 +293,48 @@ export default function WineDetailModal({
         if (!onCreate) {
           throw new Error('onCreate handler is required for add mode');
         }
-        await onCreate(editForm as Omit<Wine, 'id'>);
+        const createdWine = await onCreate(editForm as Omit<Wine, 'id'>);
+
+        // If there's a staged image, upload it to the newly created wine
+        if (stagedImageFile) {
+          setIsUploadingImage(true);
+          try {
+            const formData = new FormData();
+            formData.append('image', stagedImageFile);
+
+            const response = await fetch(`/api/wines/${createdWine.id}/image`, {
+              method: 'POST',
+              body: formData,
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || 'Failed to upload image');
+            }
+
+            // Image uploaded successfully - notify parent to refresh the wine list
+            const updatedWine = await response.json();
+            await onUpdate(createdWine.id, { imageUrl: updatedWine.imageUrl });
+          } catch (imageError) {
+            console.error('Error uploading image:', imageError);
+            // Don't fail the whole operation if image upload fails
+            // The wine was created successfully
+            setErrors({
+              _general: 'Wine created, but image upload failed. You can add the image later.',
+            });
+            // Give user time to see the error
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          } finally {
+            setIsUploadingImage(false);
+            // Clean up the staged image
+            if (stagedImagePreview) {
+              URL.revokeObjectURL(stagedImagePreview);
+            }
+            setStagedImageFile(null);
+            setStagedImagePreview(null);
+          }
+        }
+
         onClose(); // Close modal after successful creation
       } else {
         // Update existing wine
@@ -316,7 +359,7 @@ export default function WineDetailModal({
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = event.target.files?.[0];
-    if (!file || !wine) return;
+    if (!file) return;
 
     // Reset error state
     setUploadError(null);
@@ -334,6 +377,18 @@ export default function WineDetailModal({
       setUploadError('Please upload a JPEG, PNG, or WebP image');
       return;
     }
+
+    // If in add mode, stage the image for later upload
+    if (mode === 'add') {
+      setStagedImageFile(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setStagedImagePreview(previewUrl);
+      return;
+    }
+
+    // If in edit mode with existing wine, upload immediately
+    if (!wine) return;
 
     setIsUploadingImage(true);
     try {
@@ -371,6 +426,21 @@ export default function WineDetailModal({
   };
 
   const handleImageDelete = async (): Promise<void> => {
+    // If in add mode, just clear the staged image
+    if (mode === 'add') {
+      if (stagedImagePreview) {
+        URL.revokeObjectURL(stagedImagePreview);
+      }
+      setStagedImageFile(null);
+      setStagedImagePreview(null);
+      setShowDeleteConfirm(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    // If in edit mode, delete from server
     if (!wine || !currentImageUrl) return;
 
     setIsDeletingImage(true);
@@ -1405,10 +1475,25 @@ export default function WineDetailModal({
               </div>
 
               {/* Right side - Wine Label Image with Upload/Delete */}
-              {wine && (
+              {(wine || mode === 'add') && (
                 <div style={{ flexShrink: 0, width: '300px' }}>
                   {/* Image Display */}
-                  {currentImageUrl ? (
+                  {mode === 'add' && stagedImagePreview ? (
+                    // Show staged image preview in add mode
+                    <div style={{ position: 'relative' }}>
+                      <img
+                        src={stagedImagePreview}
+                        alt="Wine label preview"
+                        style={{
+                          width: '100%',
+                          borderRadius: '8px',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        }}
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : wine && currentImageUrl ? (
+                    // Show existing image in edit mode
                     <div style={{ position: 'relative' }}>
                       <img
                         src={`/api/wines/${wine.id}/image?t=${imageTimestamp}`}
@@ -1445,6 +1530,7 @@ export default function WineDetailModal({
                       </div>
                     </div>
                   ) : (
+                    // Show placeholder when no image
                     <div
                       style={{
                         display: 'flex',
@@ -1502,9 +1588,10 @@ export default function WineDetailModal({
                       disabled={isUploadingImage || isDeletingImage}
                       style={{
                         padding: '10px 16px',
-                        backgroundColor: currentImageUrl ? '#F5F1E8' : '#7C2D3C',
-                        color: currentImageUrl ? '#7C2D3C' : '#F5F1E8',
-                        border: `1px solid ${currentImageUrl ? '#D4A5A5' : '#7C2D3C'}`,
+                        backgroundColor:
+                          currentImageUrl || stagedImagePreview ? '#F5F1E8' : '#7C2D3C',
+                        color: currentImageUrl || stagedImagePreview ? '#7C2D3C' : '#F5F1E8',
+                        border: `1px solid ${currentImageUrl || stagedImagePreview ? '#D4A5A5' : '#7C2D3C'}`,
                         borderRadius: '6px',
                         fontSize: '14px',
                         fontWeight: '500',
@@ -1525,13 +1612,13 @@ export default function WineDetailModal({
                     >
                       {isUploadingImage
                         ? 'Uploading...'
-                        : currentImageUrl
+                        : currentImageUrl || stagedImagePreview
                           ? 'Replace Image'
                           : 'Upload Image'}
                     </button>
 
                     {/* Delete Button (only if image exists) */}
-                    {currentImageUrl && !showDeleteConfirm && (
+                    {(currentImageUrl || stagedImagePreview) && !showDeleteConfirm && (
                       <button
                         type="button"
                         onClick={() => setShowDeleteConfirm(true)}

@@ -185,7 +185,7 @@ export default function Home(): React.JSX.Element {
     }
   };
 
-  const handleCreateWine = async (data: Omit<Wine, 'id'>): Promise<void> => {
+  const handleCreateWine = async (data: Omit<Wine, 'id'>): Promise<Wine> => {
     try {
       const response = await fetch('/api/wines', {
         method: 'POST',
@@ -199,12 +199,16 @@ export default function Home(): React.JSX.Element {
         throw new Error(`Failed to create wine: ${response.status} ${errorText}`);
       }
 
+      const createdWine = await response.json();
+
       // Fetch fresh list
       const res = await fetch('/api/wines');
       const updatedWines = await res.json();
       setWines(updatedWines);
       setModalMode(null);
       setSelectedWine(null);
+
+      return createdWine;
     } catch (error) {
       console.error('❌ Error creating wine:', error);
       throw error;
