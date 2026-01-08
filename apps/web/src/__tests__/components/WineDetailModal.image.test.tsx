@@ -403,7 +403,8 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Find and click the confirm button within the dialog
       const confirmButtons = screen.getAllByRole('button');
       const confirmButton = confirmButtons.find(
-        (btn) => btn.textContent?.toLowerCase().includes('delete') && !btn.disabled
+        (btn) =>
+          btn.textContent?.toLowerCase().includes('delete') && !(btn as HTMLButtonElement).disabled
       );
       expect(confirmButton).toBeInTheDocument();
       await user.click(confirmButton!);
@@ -498,7 +499,8 @@ describe('WineDetailModal - Image Upload/Delete', () => {
 
       const confirmButtons = screen.getAllByRole('button');
       const confirmButton = confirmButtons.find(
-        (btn) => btn.textContent?.toLowerCase().includes('delete') && !btn.disabled
+        (btn) =>
+          btn.textContent?.toLowerCase().includes('delete') && !(btn as HTMLButtonElement).disabled
       );
       await user.click(confirmButton!);
 
@@ -547,7 +549,8 @@ describe('WineDetailModal - Image Upload/Delete', () => {
 
       const confirmButtons = screen.getAllByRole('button');
       const confirmButton = confirmButtons.find(
-        (btn) => btn.textContent?.toLowerCase().includes('delete') && !btn.disabled
+        (btn) =>
+          btn.textContent?.toLowerCase().includes('delete') && !(btn as HTMLButtonElement).disabled
       );
       await user.click(confirmButton!);
 

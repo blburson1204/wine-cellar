@@ -299,7 +299,7 @@ export const createApp = (): Express => {
       return res.status(204).send();
     } catch (error) {
       log.error('Error deleting wine image', error as Error, { wineId: req.params.id });
-      next(error);
+      return next(error);
     }
   });
 
@@ -388,7 +388,7 @@ export const createApp = (): Express => {
       return res.status(204).send();
     } catch (error) {
       log.error('Error deleting wine', error as Error, { wineId: req.params.id });
-      next(error);
+      return next(error);
     }
   });
 
