@@ -78,15 +78,22 @@ export default function WineTable({
         style={{
           textAlign: 'center',
           padding: '64px 24px',
-          backgroundColor: '#f5f1e8',
+          backgroundColor: '#221a13',
           borderRadius: '8px',
-          border: '1px solid #C4B5A0',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         }}
       >
         <div style={{ fontSize: '64px', marginBottom: '16px' }}>🍷</div>
-        <h3 style={{ color: '#4A1C26', fontSize: '20px', marginBottom: '8px' }}>No wines found</h3>
-        <p style={{ color: '#7C2D3C', fontSize: '16px' }}>
+        <h3
+          style={{
+            color: 'rgba(255, 255, 255, 0.7)',
+            fontSize: '20px',
+            marginBottom: '8px',
+            fontWeight: '700',
+          }}
+        >
+          No wines found
+        </h3>
+        <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '16px', fontWeight: '700' }}>
           Try adjusting your filters or add your first wine
         </p>
       </div>
@@ -98,9 +105,7 @@ export default function WineTable({
       ref={tableRef}
       style={{
         borderRadius: '8px',
-        border: '1px solid #C4B5A0',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        backgroundColor: '#f5f1e8',
+        backgroundColor: '#221a13',
         overflow: 'auto',
         maxHeight: maxHeight,
       }}
@@ -113,28 +118,29 @@ export default function WineTable({
           backgroundColor: 'transparent',
         }}
       >
-        <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#7C2D3C' }}>
-          <tr style={{ backgroundColor: '#7C2D3C', color: 'white' }}>
+        <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#3d010b' }}>
+          <tr style={{ backgroundColor: '#3d010b' }}>
             <th
               onClick={() => onSort('vintage')}
               style={{
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
                 width: '56px',
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#5f2330';
+                e.currentTarget.style.backgroundColor = '#5a0210';
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Vintage</span>
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Vintage</span>
               {getSortIndicator('vintage')}
             </th>
             <th
@@ -143,20 +149,21 @@ export default function WineTable({
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
                 width: '230px',
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#5f2330';
+                e.currentTarget.style.backgroundColor = '#5a0210';
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Wine</span>
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Wine</span>
               {getSortIndicator('name')}
             </th>
             <th
@@ -164,7 +171,8 @@ export default function WineTable({
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
                 width: '80px',
               }}
             >
@@ -176,20 +184,21 @@ export default function WineTable({
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
                 width: '180px',
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#5f2330';
+                e.currentTarget.style.backgroundColor = '#5a0210';
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Producer</span>
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Producer</span>
               {getSortIndicator('producer')}
             </th>
             <th
@@ -197,7 +206,8 @@ export default function WineTable({
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
                 width: '120px',
               }}
             >
@@ -208,7 +218,8 @@ export default function WineTable({
                 padding: '10px 8px',
                 textAlign: 'center',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
                 width: '80px',
               }}
             >
@@ -220,19 +231,20 @@ export default function WineTable({
                 padding: '10px 8px',
                 textAlign: 'right',
                 fontSize: '14px',
-                fontWeight: '600',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#5f2330';
+                e.currentTarget.style.backgroundColor = '#5a0210';
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.6)' }}>Price</span>
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Price</span>
               {getSortIndicator('price')}
             </th>
           </tr>
@@ -244,20 +256,26 @@ export default function WineTable({
               <tr
                 key={wine.id}
                 style={{
-                  borderBottom: index < wines.length - 1 ? '1px solid #E5DFD0' : 'none',
-                  transition: 'background-color 0.2s, box-shadow 0.2s',
+                  transition: 'background-color 0.2s',
                   cursor: 'pointer',
-                  backgroundColor: isFocused ? '#E8DCC8' : 'transparent',
-                  boxShadow: isFocused ? 'inset 0 0 0 1px #C4B5A0' : 'none',
+                  backgroundColor: isFocused ? '#7a0215' : '#221a13',
+                  color: isFocused ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.7)',
+                  fontWeight: isFocused ? '700' : '400',
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#E8DCC8';
+                  e.currentTarget.style.backgroundColor = '#7a0215';
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
+                  e.currentTarget.style.fontWeight = '700';
                 }}
                 onMouseOut={(e) => {
                   if (!isFocused) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.backgroundColor = '#221a13';
+                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                    e.currentTarget.style.fontWeight = '400';
                   } else {
-                    e.currentTarget.style.backgroundColor = '#E8DCC8';
+                    e.currentTarget.style.backgroundColor = '#7a0215';
+                    e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
+                    e.currentTarget.style.fontWeight = '700';
                   }
                 }}
                 onClick={() => {
@@ -265,15 +283,11 @@ export default function WineTable({
                   onRowClick(wine);
                 }}
               >
-                <td style={{ padding: '6px 8px', fontSize: '14px', color: '#4A1C26' }}>
-                  {wine.vintage}
-                </td>
+                <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.vintage}</td>
                 <td
                   style={{
                     padding: '6px 8px',
                     fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A1C26',
                   }}
                 >
                   {wine.name}
@@ -282,29 +296,22 @@ export default function WineTable({
                   <span
                     style={{
                       padding: '4px 8px',
-                      backgroundColor: '#FFFFFF',
-                      color: '#7C2D3C',
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      color: 'inherit',
                       borderRadius: '4px',
                       fontSize: '12px',
-                      fontWeight: '500',
-                      border: '1px solid #E5DFD0',
                     }}
                   >
                     {wine.color}
                   </span>
                 </td>
-                <td style={{ padding: '6px 8px', fontSize: '14px', color: '#4A1C26' }}>
-                  {wine.producer}
-                </td>
-                <td style={{ padding: '6px 8px', fontSize: '14px', color: '#4A1C26' }}>
-                  {wine.country}
-                </td>
+                <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.producer}</td>
+                <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.country}</td>
                 <td
                   style={{
                     padding: '6px 8px',
                     fontSize: '14px',
                     textAlign: 'center',
-                    color: '#4A1C26',
                   }}
                 >
                   {wine.quantity > 0 ? 'Yes' : 'No'}
@@ -314,8 +321,6 @@ export default function WineTable({
                     padding: '6px 8px',
                     fontSize: '14px',
                     textAlign: 'right',
-                    color: '#4A1C26',
-                    fontWeight: '500',
                   }}
                 >
                   {wine.purchasePrice !== null && wine.purchasePrice !== undefined

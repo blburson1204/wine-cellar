@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
             "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
           margin: 0,
           padding: 0,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#282f20',
           color: '#4A1C26',
           position: 'relative',
           minHeight: '100vh',
@@ -31,10 +31,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
       >
         <header
           style={{
-            backgroundColor: '#4A1C26',
-            color: 'white',
+            backgroundColor: '#09040a',
             padding: '16px 24px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             position: 'sticky',
             top: 0,
             zIndex: 100,
@@ -52,7 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
               style={{
                 margin: 0,
                 fontSize: '24px',
-                fontWeight: '600',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
               }}
             >
               Wine Cellar

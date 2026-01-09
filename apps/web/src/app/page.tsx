@@ -328,7 +328,7 @@ export default function Home(): React.JSX.Element {
                 onClick={confirmDelete}
                 style={{
                   padding: '10px 20px',
-                  backgroundColor: '#C73E3A',
+                  backgroundColor: '#8B3A3A',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -344,34 +344,63 @@ export default function Home(): React.JSX.Element {
         </div>
       )}
 
-      {/* Main Content: Sidebar + Table Layout */}
-      <div style={{ display: 'flex', gap: '40px' }}>
-        {/* Left Sidebar - Filters and Bottle Count (25%) */}
-        {wines.length > 0 && (
-          <div style={{ flex: '0 0 25%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* Bottle count */}
-            <div
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#4A1C26',
-                color: 'white',
-                borderRadius: '6px',
-                boxShadow: '0 2px 4px rgba(74, 28, 38, 0.2)',
-              }}
-            >
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: '16px',
-                  fontWeight: '600',
-                }}
-              >
-                {filteredAndSortedWines.length !== wines.length
-                  ? `Showing ${filteredAndSortedWines.length} of ${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'}`
-                  : `${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection`}
-              </h2>
-            </div>
+      {/* Top bar: Bottle count + Add Wine button */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '10px 0',
+          marginBottom: '16px',
+          backgroundColor: '#282f20',
+        }}
+      >
+        {wines.length > 0 ? (
+          <h2
+            style={{
+              margin: 0,
+              fontSize: '24px',
+              fontWeight: '700',
+              color: 'rgba(255, 255, 255, 0.7)',
+              textAlign: 'left',
+            }}
+          >
+            {filteredAndSortedWines.length !== wines.length
+              ? `Showing ${filteredAndSortedWines.length} of ${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'}`
+              : `${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection`}
+          </h2>
+        ) : (
+          <div />
+        )}
+        <button
+          onClick={() => setModalMode('add')}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#3d010b',
+            color: 'rgba(255, 255, 255, 0.7)',
+            border: 'none',
+            borderRadius: '6px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            fontWeight: '700',
+            transition: 'all 0.2s',
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = '#5a0210';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = '#3d010b';
+          }}
+        >
+          + Add Wine
+        </button>
+      </div>
 
+      {/* Main Content: Sidebar + Table Layout */}
+      <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
+        {/* Left Sidebar - Filters (25%) */}
+        {wines.length > 0 && (
+          <div style={{ flex: '0 0 25%' }}>
             {/* Filters */}
             <WineFilters
               searchText={searchText}
@@ -395,42 +424,12 @@ export default function Home(): React.JSX.Element {
           </div>
         )}
 
-        {/* Right Content - Add Wine Button + Table */}
+        {/* Right Content - Table */}
         <div
           style={{
             flex: wines.length > 0 ? '1' : '1 1 100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
           }}
         >
-          {/* Add Wine button */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', minHeight: '36px' }}>
-            <button
-              onClick={() => setModalMode('add')}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#7C2D3C',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '16px',
-                cursor: 'pointer',
-                fontWeight: '500',
-                transition: 'all 0.2s',
-                boxShadow: '0 2px 4px rgba(124, 45, 60, 0.2)',
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#5f2330';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = '#7C2D3C';
-              }}
-            >
-              + Add Wine
-            </button>
-          </div>
-
           {/* Wine Table */}
           <WineTable
             wines={filteredAndSortedWines}
