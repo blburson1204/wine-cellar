@@ -41,7 +41,10 @@ export default function Home(): React.JSX.Element {
   const [showOnlyInCellar, setShowOnlyInCellar] = useState(false);
   const [vintageRange, setVintageRange] = useState<[number, number] | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
-  const [sortBy, setSortBy] = useState<'name' | 'vintage' | 'producer' | 'price'>('name');
+  const [minRating, setMinRating] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'vintage' | 'producer' | 'price' | 'rating'>(
+    'name'
+  );
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Derived state for filters
@@ -123,7 +126,15 @@ export default function Home(): React.JSX.Element {
       });
     }
 
-    // Stage 8: Sorting
+    // Stage 8: Rating filter
+    if (minRating !== null) {
+      result = result.filter((wine) => {
+        if (wine.rating === null || wine.rating === undefined) return false;
+        return wine.rating >= minRating;
+      });
+    }
+
+    // Stage 9: Sorting
     result.sort((a, b) => {
       let comparison = 0;
       switch (sortBy) {
@@ -139,6 +150,9 @@ export default function Home(): React.JSX.Element {
         case 'price':
           comparison = (a.purchasePrice ?? 0) - (b.purchasePrice ?? 0);
           break;
+        case 'rating':
+          comparison = (a.rating ?? 0) - (b.rating ?? 0);
+          break;
       }
       return sortDirection === 'asc' ? comparison : -comparison;
     });
@@ -153,6 +167,7 @@ export default function Home(): React.JSX.Element {
     showOnlyInCellar,
     vintageRange,
     priceRange,
+    minRating,
     sortBy,
     sortDirection,
   ]);
@@ -165,6 +180,7 @@ export default function Home(): React.JSX.Element {
     setShowOnlyInCellar(false);
     setVintageRange(null);
     setPriceRange(null);
+    setMinRating(null);
     setSortBy('name');
     setSortDirection('asc');
   };
@@ -397,7 +413,7 @@ export default function Home(): React.JSX.Element {
       </div>
 
       {/* Main Content: Sidebar + Table Layout */}
-      <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: '26px', alignItems: 'flex-start' }}>
         {/* Left Sidebar - Filters (25%) */}
         {wines.length > 0 && (
           <div style={{ flex: '0 0 25%' }}>
@@ -415,6 +431,8 @@ export default function Home(): React.JSX.Element {
               countries={countries}
               showOnlyInCellar={showOnlyInCellar}
               onShowOnlyInCellarChange={setShowOnlyInCellar}
+              minRating={minRating}
+              onMinRatingChange={setMinRating}
               priceRange={priceRange}
               onPriceRangeChange={setPriceRange}
               priceMin={priceMin}

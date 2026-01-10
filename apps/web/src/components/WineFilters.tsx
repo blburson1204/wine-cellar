@@ -11,6 +11,8 @@ interface WineFiltersProps {
   countries: string[];
   showOnlyInCellar: boolean;
   onShowOnlyInCellarChange: (value: boolean) => void;
+  minRating: number | null;
+  onMinRatingChange: (rating: number | null) => void;
   priceRange: [number, number] | null;
   onPriceRangeChange: (range: [number, number] | null) => void;
   priceMin: number;
@@ -20,10 +22,10 @@ interface WineFiltersProps {
 
 const WINE_COLORS = [
   { value: 'RED', label: 'Red', color: '#7C2D3C' },
-  { value: 'SPARKLING', label: 'Sparkling', color: '#FFD700' },
   { value: 'WHITE', label: 'White', color: '#F5F1E8' },
-  { value: 'DESSERT', label: 'Dessert', color: '#8B4513' },
   { value: 'ROSE', label: 'Rosé', color: '#D4A5A5' },
+  { value: 'SPARKLING', label: 'Sparkling', color: '#FFD700' },
+  { value: 'DESSERT', label: 'Dessert', color: '#8B4513' },
   { value: 'FORTIFIED', label: 'Fortified', color: '#4A1C26' },
 ];
 
@@ -40,20 +42,14 @@ export default function WineFilters({
   countries,
   showOnlyInCellar,
   onShowOnlyInCellarChange,
+  minRating,
+  onMinRatingChange,
   priceRange,
   onPriceRangeChange,
   priceMin,
   priceMax,
   onClearAll,
 }: WineFiltersProps): React.JSX.Element {
-  const hasActiveFilters =
-    searchText !== '' ||
-    selectedColors.length > 0 ||
-    selectedGrapeVariety !== null ||
-    selectedCountry !== null ||
-    showOnlyInCellar ||
-    priceRange !== null;
-
   const handleColorToggle = (colorValue: string): void => {
     if (selectedColors.includes(colorValue)) {
       // Remove color from selection
@@ -87,7 +83,7 @@ export default function WineFilters({
         style={{
           backgroundColor: '#3d010b',
           color: 'rgba(255, 255, 255, 0.7)',
-          padding: '10px 8px',
+          padding: '10px 16px',
           fontSize: '14px',
           fontWeight: '700',
         }}
@@ -158,7 +154,7 @@ export default function WineFilters({
               backgroundColor: 'rgba(255, 255, 255, 0.4)',
               borderRadius: '6px',
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
+              gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '4px',
             }}
           >
@@ -171,10 +167,12 @@ export default function WineFilters({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    padding: '4px 6px',
+                    padding: '0 6px',
+                    height: '34px',
                     cursor: 'pointer',
                     transition: 'background-color 0.2s',
                     borderRadius: '4px',
+                    boxSizing: 'border-box',
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
@@ -204,131 +202,130 @@ export default function WineFilters({
           </div>
         </div>
 
-        {/* Grape Variety */}
-        <div>
-          <label
-            htmlFor="grape-variety"
-            style={{
-              display: 'block',
-              marginBottom: '4px',
-              fontSize: '14px',
-              fontWeight: '700',
-              color: 'rgba(255, 255, 255, 0.7)',
-              backgroundColor: '#221a13',
-            }}
-          >
-            Grape Variety
-          </label>
-          <select
-            id="grape-variety"
-            value={selectedGrapeVariety ?? ''}
-            onChange={(e) => onGrapeVarietyChange(e.target.value || null)}
-            style={{
-              padding: '8px',
-              fontSize: '14px',
-              border: 'none',
-              borderRadius: '4px',
-              width: '100%',
-              backgroundColor: 'rgba(255, 255, 255, 0.4)',
-              color: 'rgba(255, 255, 255, 0.7)',
-              cursor: 'pointer',
-              boxSizing: 'border-box',
-            }}
-          >
-            <option
-              value=""
-              style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+        {/* Grape Variety & Country - Side by Side */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <div>
+            <label
+              htmlFor="grape-variety"
+              style={{
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: '#221a13',
+              }}
             >
-              All Varieties
-            </option>
-            {grapeVarieties.map((variety) => (
+              Grape
+            </label>
+            <select
+              id="grape-variety"
+              value={selectedGrapeVariety ?? ''}
+              onChange={(e) => onGrapeVarietyChange(e.target.value || null)}
+              style={{
+                padding: '8px',
+                fontSize: '13px',
+                border: 'none',
+                borderRadius: '4px',
+                width: '100%',
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+              }}
+            >
               <option
-                key={variety}
-                value={variety}
+                value=""
                 style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
               >
-                {variety}
+                All
               </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Country */}
-        <div>
-          <label
-            htmlFor="country"
-            style={{
-              display: 'block',
-              marginBottom: '4px',
-              fontSize: '14px',
-              fontWeight: '700',
-              color: 'rgba(255, 255, 255, 0.7)',
-              backgroundColor: '#221a13',
-            }}
-          >
-            Country
-          </label>
-          <select
-            id="country"
-            value={selectedCountry ?? ''}
-            onChange={(e) => onCountryChange(e.target.value || null)}
-            style={{
-              padding: '8px',
-              fontSize: '14px',
-              border: 'none',
-              borderRadius: '4px',
-              width: '100%',
-              backgroundColor: 'rgba(255, 255, 255, 0.4)',
-              color: 'rgba(255, 255, 255, 0.7)',
-              cursor: 'pointer',
-              boxSizing: 'border-box',
-            }}
-          >
-            <option
-              value=""
-              style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+              {grapeVarieties.map((variety) => (
+                <option
+                  key={variety}
+                  value={variety}
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  {variety}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="country"
+              style={{
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: '#221a13',
+              }}
             >
-              All Countries
-            </option>
-            {countries.map((country) => (
+              Country
+            </label>
+            <select
+              id="country"
+              value={selectedCountry ?? ''}
+              onChange={(e) => onCountryChange(e.target.value || null)}
+              style={{
+                padding: '8px',
+                fontSize: '13px',
+                border: 'none',
+                borderRadius: '4px',
+                width: '100%',
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+              }}
+            >
               <option
-                key={country}
-                value={country}
+                value=""
                 style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
               >
-                {country}
+                All
               </option>
-            ))}
-          </select>
+              {countries.map((country) => (
+                <option
+                  key={country}
+                  value={country}
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  {country}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* In Cellar Filter */}
-        <div>
-          <label
-            style={{
-              display: 'block',
-              marginBottom: '4px',
-              fontSize: '14px',
-              fontWeight: '700',
-              color: 'rgba(255, 255, 255, 0.7)',
-              backgroundColor: '#221a13',
-            }}
-          >
-            In Cellar
-          </label>
-          <div
-            style={{
-              padding: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.4)',
-              borderRadius: '6px',
-            }}
-          >
+        {/* In Cellar & Rating - Side by Side */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <div>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: '#221a13',
+              }}
+            >
+              In Cellar
+            </label>
             <label
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
+                padding: '0 8px',
+                height: '34px',
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                borderRadius: '4px',
                 cursor: 'pointer',
+                boxSizing: 'border-box',
               }}
             >
               <input
@@ -344,9 +341,73 @@ export default function WineFilters({
                 }}
               />
               <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)' }}>
-                Show what's currently in cellar
+                Currently in cellar
               </span>
             </label>
+          </div>
+          <div>
+            <label
+              htmlFor="min-rating"
+              style={{
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: '#221a13',
+              }}
+            >
+              Rating
+            </label>
+            <select
+              id="min-rating"
+              value={minRating ?? ''}
+              onChange={(e) =>
+                onMinRatingChange(e.target.value ? parseInt(e.target.value, 10) : null)
+              }
+              style={{
+                padding: '8px',
+                fontSize: '13px',
+                border: 'none',
+                borderRadius: '4px',
+                width: '100%',
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+              }}
+            >
+              <option
+                value=""
+                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+              >
+                Any
+              </option>
+              <option
+                value="95"
+                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+              >
+                95+
+              </option>
+              <option
+                value="90"
+                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+              >
+                90+
+              </option>
+              <option
+                value="85"
+                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+              >
+                85+
+              </option>
+              <option
+                value="80"
+                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+              >
+                80+
+              </option>
+            </select>
           </div>
         </div>
 
@@ -441,39 +502,37 @@ export default function WineFilters({
         </div>
 
         {/* Clear Button at Bottom */}
-        {hasActiveFilters && (
-          <div
+        <div
+          style={{
+            paddingTop: '12px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+          }}
+        >
+          <button
+            type="button"
+            onClick={onClearAll}
             style={{
-              paddingTop: '12px',
-              borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+              padding: '8px 16px',
+              backgroundColor: '#3d010b',
+              color: 'rgba(255, 255, 255, 0.7)',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '14px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              transition: 'all 0.2s',
+              width: '100%',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#5a0210';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = '#3d010b';
             }}
           >
-            <button
-              type="button"
-              onClick={onClearAll}
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#3d010b',
-                color: 'rgba(255, 255, 255, 0.7)',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '14px',
-                cursor: 'pointer',
-                fontWeight: '700',
-                transition: 'all 0.2s',
-                width: '100%',
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = '#5a0210';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = '#3d010b';
-              }}
-            >
-              Clear All Filters
-            </button>
-          </div>
-        )}
+            Clear All Filters
+          </button>
+        </div>
       </div>
     </div>
   );

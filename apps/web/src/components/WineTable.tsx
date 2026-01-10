@@ -24,11 +24,20 @@ interface Wine {
 interface WineTableProps {
   wines: Wine[];
   onRowClick: (wine: Wine) => void;
-  sortBy: 'name' | 'vintage' | 'producer' | 'price';
+  sortBy: 'name' | 'vintage' | 'producer' | 'price' | 'rating';
   sortDirection: 'asc' | 'desc';
-  onSort: (column: 'name' | 'vintage' | 'producer' | 'price') => void;
+  onSort: (column: 'name' | 'vintage' | 'producer' | 'price' | 'rating') => void;
   maxHeight?: string;
 }
+
+const COLOR_LABELS: Record<string, string> = {
+  RED: 'Red',
+  WHITE: 'White',
+  ROSE: 'Rosé',
+  SPARKLING: 'Sparkling',
+  DESSERT: 'Dessert',
+  FORTIFIED: 'Fortified',
+};
 
 export default function WineTable({
   wines,
@@ -68,7 +77,9 @@ export default function WineTable({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [wines, focusedIndex, onRowClick]);
-  const getSortIndicator = (column: 'name' | 'vintage' | 'producer' | 'price'): string => {
+  const getSortIndicator = (
+    column: 'name' | 'vintage' | 'producer' | 'price' | 'rating'
+  ): string => {
     if (sortBy !== column) return '';
     return sortDirection === 'asc' ? ' ↑' : ' ↓';
   };
@@ -123,7 +134,7 @@ export default function WineTable({
             <th
               onClick={() => onSort('vintage')}
               style={{
-                padding: '10px 8px',
+                padding: '10px 8px 10px 20px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '700',
@@ -154,7 +165,7 @@ export default function WineTable({
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
-                width: '230px',
+                width: '320px',
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.backgroundColor = '#5a0210';
@@ -177,6 +188,30 @@ export default function WineTable({
               }}
             >
               Type
+            </th>
+            <th
+              style={{
+                padding: '10px 8px',
+                textAlign: 'left',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                width: '120px',
+              }}
+            >
+              Region
+            </th>
+            <th
+              style={{
+                padding: '10px 8px',
+                textAlign: 'left',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                width: '120px',
+              }}
+            >
+              Grape
             </th>
             <th
               onClick={() => onSort('producer')}
@@ -214,6 +249,29 @@ export default function WineTable({
               Country
             </th>
             <th
+              onClick={() => onSort('rating')}
+              style={{
+                padding: '10px 8px',
+                textAlign: 'center',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
+                width: '90px',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5a0210';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Rating</span>
+              {getSortIndicator('rating')}
+            </th>
+            <th
               style={{
                 padding: '10px 8px',
                 textAlign: 'center',
@@ -228,7 +286,7 @@ export default function WineTable({
             <th
               onClick={() => onSort('price')}
               style={{
-                padding: '10px 8px',
+                padding: '10px 20px 10px 8px',
                 textAlign: 'right',
                 fontSize: '14px',
                 fontWeight: '700',
@@ -283,7 +341,7 @@ export default function WineTable({
                   onRowClick(wine);
                 }}
               >
-                <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.vintage}</td>
+                <td style={{ padding: '6px 8px 6px 20px', fontSize: '14px' }}>{wine.vintage}</td>
                 <td
                   style={{
                     padding: '6px 8px',
@@ -293,20 +351,21 @@ export default function WineTable({
                   {wine.name}
                 </td>
                 <td style={{ padding: '6px 8px', fontSize: '14px' }}>
-                  <span
-                    style={{
-                      padding: '4px 8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      color: 'inherit',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                    }}
-                  >
-                    {wine.color}
-                  </span>
+                  {COLOR_LABELS[wine.color] || wine.color}
                 </td>
+                <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.region || '—'}</td>
+                <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.grapeVariety || '—'}</td>
                 <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.producer}</td>
                 <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.country}</td>
+                <td
+                  style={{
+                    padding: '6px 8px',
+                    fontSize: '14px',
+                    textAlign: 'center',
+                  }}
+                >
+                  {wine.rating !== null && wine.rating !== undefined ? wine.rating : '—'}
+                </td>
                 <td
                   style={{
                     padding: '6px 8px',
@@ -318,7 +377,7 @@ export default function WineTable({
                 </td>
                 <td
                   style={{
-                    padding: '6px 8px',
+                    padding: '6px 20px 6px 8px',
                     fontSize: '14px',
                     textAlign: 'right',
                   }}

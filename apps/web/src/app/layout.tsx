@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
         <ErrorBoundary>
           <main
             style={{
-              maxWidth: '1200px',
+              maxWidth: '1600px',
               margin: '0 auto',
               padding: '32px 24px',
             }}
