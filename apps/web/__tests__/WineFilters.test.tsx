@@ -9,6 +9,7 @@ describe('WineFilters', () => {
   const mockOnGrapeVarietyChange = vi.fn();
   const mockOnCountryChange = vi.fn();
   const mockOnShowOnlyInCellarChange = vi.fn();
+  const mockOnMinRatingChange = vi.fn();
   const mockOnPriceRangeChange = vi.fn();
   const mockOnClearAll = vi.fn();
 
@@ -25,6 +26,8 @@ describe('WineFilters', () => {
     countries: ['France', 'Italy', 'Spain', 'USA'],
     showOnlyInCellar: false,
     onShowOnlyInCellarChange: mockOnShowOnlyInCellarChange,
+    minRating: null,
+    onMinRatingChange: mockOnMinRatingChange,
     priceRange: null,
     onPriceRangeChange: mockOnPriceRangeChange,
     priceMin: 0,
@@ -61,47 +64,31 @@ describe('WineFilters', () => {
     it('renders country options', () => {
       render(<WineFilters {...defaultProps} />);
 
-      expect(screen.getByRole('option', { name: 'All Countries' })).toBeInTheDocument();
+      // Country dropdown uses "All" as the default option
+      const countrySelect = screen.getByLabelText('Country');
+      const allOption = countrySelect.querySelector('option[value=""]');
+      expect(allOption).toHaveTextContent('All');
       expect(screen.getByRole('option', { name: 'France' })).toBeInTheDocument();
       expect(screen.getByRole('option', { name: 'Italy' })).toBeInTheDocument();
       expect(screen.getByRole('option', { name: 'Spain' })).toBeInTheDocument();
       expect(screen.getByRole('option', { name: 'USA' })).toBeInTheDocument();
     });
 
-    it('does not show clear button when no filters active', () => {
+    it('always shows clear button', () => {
       render(<WineFilters {...defaultProps} />);
 
-      expect(screen.queryByRole('button', { name: 'Clear All Filters' })).not.toBeInTheDocument();
-    });
-
-    it('shows clear button when search text is active', () => {
-      render(<WineFilters {...defaultProps} searchText="test" />);
-
       expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
     });
 
-    it('shows clear button when colors are selected', () => {
-      render(<WineFilters {...defaultProps} selectedColors={['RED']} />);
+    it('renders rating filter dropdown', () => {
+      render(<WineFilters {...defaultProps} />);
 
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
-    });
-
-    it('shows clear button when country is selected', () => {
-      render(<WineFilters {...defaultProps} selectedCountry="France" />);
-
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
-    });
-
-    it('shows clear button when in cellar filter is active', () => {
-      render(<WineFilters {...defaultProps} showOnlyInCellar={true} />);
-
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
-    });
-
-    it('shows clear button when price range is set', () => {
-      render(<WineFilters {...defaultProps} priceRange={[10, 100]} />);
-
-      expect(screen.getByRole('button', { name: 'Clear All Filters' })).toBeInTheDocument();
+      expect(screen.getByLabelText('Rating')).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Any' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '95+' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '90+' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '85+' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '80+' })).toBeInTheDocument();
     });
   });
 
@@ -182,7 +169,7 @@ describe('WineFilters', () => {
       expect(mockOnCountryChange).toHaveBeenCalledWith('Italy');
     });
 
-    it('calls onCountryChange with null when selecting All Countries', async () => {
+    it('calls onCountryChange with null when selecting All', async () => {
       const user = userEvent.setup();
       render(<WineFilters {...defaultProps} selectedCountry="France" />);
 
@@ -190,6 +177,35 @@ describe('WineFilters', () => {
       await user.selectOptions(countrySelect, '');
 
       expect(mockOnCountryChange).toHaveBeenCalledWith(null);
+    });
+  });
+
+  describe('Rating Filter', () => {
+    it('displays selected rating', () => {
+      render(<WineFilters {...defaultProps} minRating={90} />);
+
+      const ratingSelect = screen.getByLabelText('Rating');
+      expect(ratingSelect).toHaveValue('90');
+    });
+
+    it('calls onMinRatingChange when selecting a rating', async () => {
+      const user = userEvent.setup();
+      render(<WineFilters {...defaultProps} />);
+
+      const ratingSelect = screen.getByLabelText('Rating');
+      await user.selectOptions(ratingSelect, '95');
+
+      expect(mockOnMinRatingChange).toHaveBeenCalledWith(95);
+    });
+
+    it('calls onMinRatingChange with null when selecting Any', async () => {
+      const user = userEvent.setup();
+      render(<WineFilters {...defaultProps} minRating={90} />);
+
+      const ratingSelect = screen.getByLabelText('Rating');
+      await user.selectOptions(ratingSelect, '');
+
+      expect(mockOnMinRatingChange).toHaveBeenCalledWith(null);
     });
   });
 

@@ -101,8 +101,11 @@ describe('WineTable', () => {
       expect(screen.getByText('Vintage')).toBeInTheDocument();
       expect(screen.getByText('Wine')).toBeInTheDocument();
       expect(screen.getByText('Type')).toBeInTheDocument();
+      expect(screen.getByText('Region')).toBeInTheDocument();
+      expect(screen.getByText('Grape')).toBeInTheDocument();
       expect(screen.getByText('Producer')).toBeInTheDocument();
       expect(screen.getByText('Country')).toBeInTheDocument();
+      expect(screen.getByText('Rating')).toBeInTheDocument();
       expect(screen.getByText('In Cellar')).toBeInTheDocument();
       expect(screen.getByText('Price')).toBeInTheDocument();
     });
@@ -129,9 +132,9 @@ describe('WineTable', () => {
     it('displays wine types correctly', () => {
       render(<WineTable {...defaultProps} />);
 
-      expect(screen.getByText('RED')).toBeInTheDocument();
-      expect(screen.getByText('WHITE')).toBeInTheDocument();
-      expect(screen.getByText('SPARKLING')).toBeInTheDocument();
+      expect(screen.getByText('Red')).toBeInTheDocument();
+      expect(screen.getByText('White')).toBeInTheDocument();
+      expect(screen.getByText('Sparkling')).toBeInTheDocument();
     });
 
     it('displays em dash for null price', () => {
@@ -247,6 +250,17 @@ describe('WineTable', () => {
       expect(mockOnSort).toHaveBeenCalledWith('price');
     });
 
+    it('calls onSort when Rating header clicked', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const ratingHeader = screen.getByText('Rating').parentElement;
+      await user.click(ratingHeader!);
+
+      expect(mockOnSort).toHaveBeenCalledTimes(1);
+      expect(mockOnSort).toHaveBeenCalledWith('rating');
+    });
+
     it('does not call onSort when Type header clicked', async () => {
       const user = userEvent.setup();
       render(<WineTable {...defaultProps} />);
@@ -279,7 +293,7 @@ describe('WineTable', () => {
   });
 
   describe('Wine Colors', () => {
-    it('displays wine type badge for RED wine', () => {
+    it('displays wine type label for RED wine', () => {
       const redWine = [
         {
           ...mockWines[0],
@@ -289,11 +303,11 @@ describe('WineTable', () => {
 
       render(<WineTable {...defaultProps} wines={redWine} />);
 
-      // Check that the wine type is displayed in the Type column
-      expect(screen.getByText('RED')).toBeInTheDocument();
+      // Check that the wine type is displayed in the Type column with mixed case
+      expect(screen.getByText('Red')).toBeInTheDocument();
     });
 
-    it('displays wine type badge for WHITE wine', () => {
+    it('displays wine type label for WHITE wine', () => {
       const whiteWine = [
         {
           ...mockWines[1],
@@ -303,11 +317,11 @@ describe('WineTable', () => {
 
       render(<WineTable {...defaultProps} wines={whiteWine} />);
 
-      // Check that the wine type is displayed in the Type column
-      expect(screen.getByText('WHITE')).toBeInTheDocument();
+      // Check that the wine type is displayed in the Type column with mixed case
+      expect(screen.getByText('White')).toBeInTheDocument();
     });
 
-    it('displays wine type badge for SPARKLING wine', () => {
+    it('displays wine type label for SPARKLING wine', () => {
       const sparklingWine = [
         {
           ...mockWines[2],
@@ -317,8 +331,8 @@ describe('WineTable', () => {
 
       render(<WineTable {...defaultProps} wines={sparklingWine} />);
 
-      // Check that the wine type is displayed in the Type column
-      expect(screen.getByText('SPARKLING')).toBeInTheDocument();
+      // Check that the wine type is displayed in the Type column with mixed case
+      expect(screen.getByText('Sparkling')).toBeInTheDocument();
     });
   });
 
