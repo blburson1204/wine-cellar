@@ -113,7 +113,7 @@ export default function WineFilters({
               backgroundColor: '#221a13',
             }}
           >
-            Search
+            Search (Name, Producer, Region)
           </label>
           <input
             id="search"
@@ -186,16 +186,32 @@ export default function WineFilters({
                     checked={isSelected}
                     onChange={() => handleColorToggle(color.value)}
                     style={{
-                      width: '16px',
-                      height: '16px',
-                      cursor: 'pointer',
-                      accentColor: 'rgba(255, 255, 255, 0.4)',
-                      flexShrink: 0,
+                      position: 'absolute',
+                      opacity: 0,
+                      width: 0,
+                      height: 0,
                     }}
                   />
-                  <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)' }}>
-                    {color.label}
+                  <span
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '3px',
+                      border: isSelected ? '2px solid #7C2D3C' : '2px solid #d5ccc5',
+                      backgroundColor: isSelected ? '#7C2D3C' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {isSelected && (
+                      <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+                        ✓
+                      </span>
+                    )}
                   </span>
+                  <span style={{ fontSize: '13px', color: '#d5ccc5' }}>{color.label}</span>
                 </label>
               );
             })}
@@ -313,7 +329,7 @@ export default function WineFilters({
                 backgroundColor: '#221a13',
               }}
             >
-              In Cellar
+              Show Wine
             </label>
             <label
               style={{
@@ -333,16 +349,30 @@ export default function WineFilters({
                 checked={showOnlyInCellar}
                 onChange={(e) => onShowOnlyInCellarChange(e.target.checked)}
                 style={{
-                  width: '16px',
-                  height: '16px',
-                  cursor: 'pointer',
-                  accentColor: 'rgba(255, 255, 255, 0.4)',
-                  flexShrink: 0,
+                  position: 'absolute',
+                  opacity: 0,
+                  width: 0,
+                  height: 0,
                 }}
               />
-              <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)' }}>
-                Currently in cellar
+              <span
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '3px',
+                  border: showOnlyInCellar ? '2px solid #7C2D3C' : '2px solid #d5ccc5',
+                  backgroundColor: showOnlyInCellar ? '#7C2D3C' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {showOnlyInCellar && (
+                  <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>✓</span>
+                )}
               </span>
+              <span style={{ fontSize: '13px', color: '#d5ccc5' }}>Currently In Cellar</span>
             </label>
           </div>
           <div>
@@ -363,7 +393,7 @@ export default function WineFilters({
               id="min-rating"
               value={minRating ?? ''}
               onChange={(e) =>
-                onMinRatingChange(e.target.value ? parseInt(e.target.value, 10) : null)
+                onMinRatingChange(e.target.value ? parseFloat(e.target.value) : null)
               }
               style={{
                 padding: '8px',
@@ -384,28 +414,28 @@ export default function WineFilters({
                 Any
               </option>
               <option
-                value="95"
+                value="4.5"
                 style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
               >
-                95+
+                4.5+
               </option>
               <option
-                value="90"
+                value="4"
                 style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
               >
-                90+
+                4.0+
               </option>
               <option
-                value="85"
+                value="3.5"
                 style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
               >
-                85+
+                3.5+
               </option>
               <option
-                value="80"
+                value="3"
                 style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
               >
-                80+
+                3.0+
               </option>
             </select>
           </div>

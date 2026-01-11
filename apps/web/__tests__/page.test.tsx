@@ -142,10 +142,11 @@ describe('Home Page - Wine Cellar', () => {
       });
 
       // Fill form using text inputs
+      // Order: Wine Name, Producer, Country, Region, Grape Variety, Blend, Wine Link, Notes
       const textInputs = screen.getAllByRole('textbox');
       await user.type(textInputs[0], 'Test Wine'); // Wine Name
       await user.type(textInputs[1], 'Test Producer'); // Producer
-      await user.type(textInputs[3], 'France'); // Country
+      await user.type(textInputs[2], 'France'); // Country
 
       // Submit - click the second Add Wine button (in modal)
       const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });
@@ -172,10 +173,16 @@ describe('Home Page - Wine Cellar', () => {
       region: null,
       country: 'France',
       grapeVariety: null,
+      blendDetail: null,
       color: 'RED',
       quantity: 1,
+      purchasePrice: null,
+      purchaseDate: null,
+      drinkByDate: null,
       rating: null,
       notes: null,
+      wineLink: null,
+      imageUrl: null,
     };
 
     it('opens detail modal when clicking wine row', async () => {
@@ -196,12 +203,9 @@ describe('Home Page - Wine Cellar', () => {
       const wineNameElements = screen.getAllByText('Test Wine');
       await user.click(wineNameElements[0]);
 
-      // Detail modal should open
+      // Detail modal should open - color is displayed in Title Case (e.g., "Red")
       await waitFor(() => {
-        expect(screen.getByText(/2020 · Test Producer ·/)).toBeInTheDocument();
-        // Check that RED appears in the header (there may be multiple REDs on page from filters)
-        const redBadges = screen.getAllByText('RED');
-        expect(redBadges.length).toBeGreaterThan(0);
+        expect(screen.getByText(/2020 · Test Producer · Red/)).toBeInTheDocument();
       });
     });
 
@@ -294,10 +298,11 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getByText('Add New Wine')).toBeInTheDocument();
       });
 
+      // Order: Wine Name, Producer, Country, Region, Grape Variety, Blend, Wine Link, Notes
       const textInputs = screen.getAllByRole('textbox');
       await user.type(textInputs[0], 'Test Wine');
       await user.type(textInputs[1], 'Test Producer');
-      await user.type(textInputs[3], 'France');
+      await user.type(textInputs[2], 'France'); // Country
 
       const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });
       await user.click(submitButtons[submitButtons.length - 1]);

@@ -21,6 +21,7 @@ interface Wine {
   drinkByDate: string | null;
   rating: number | null;
   notes: string | null;
+  wineLink: string | null;
   imageUrl: string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -391,7 +392,7 @@ export default function Home(): React.JSX.Element {
         <button
           onClick={() => setModalMode('add')}
           style={{
-            padding: '10px 20px',
+            padding: '10px 28px',
             backgroundColor: '#3d010b',
             color: 'rgba(255, 255, 255, 0.7)',
             border: 'none',

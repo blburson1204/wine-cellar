@@ -18,6 +18,7 @@ interface Wine {
   drinkByDate: string | null;
   rating: number | null;
   notes: string | null;
+  wineLink: string | null;
   imageUrl: string | null;
 }
 

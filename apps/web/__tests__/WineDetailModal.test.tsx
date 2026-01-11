@@ -20,6 +20,7 @@ describe('WineDetailModal', () => {
     drinkByDate: '2030-12-31T00:00:00.000Z',
     rating: 4.5,
     notes: 'Excellent wine with great aging potential',
+    wineLink: null,
     imageUrl: null,
   };
 
@@ -174,7 +175,8 @@ describe('WineDetailModal', () => {
         />
       );
 
-      const backdrop = container.firstChild as HTMLElement;
+      // Find the backdrop div (fixed position overlay)
+      const backdrop = container.querySelector('div[style*="position: fixed"]') as HTMLElement;
       await user.click(backdrop);
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
@@ -301,7 +303,7 @@ describe('WineDetailModal', () => {
 
       // Check default values
       expect(screen.getByDisplayValue(new Date().getFullYear().toString())).toBeInTheDocument();
-      expect(screen.getByDisplayValue('1')).toBeInTheDocument(); // Default quantity
+      expect(screen.getByDisplayValue('0')).toBeInTheDocument(); // Default quantity
     });
 
     it('closes modal when cancel clicked in add mode', async () => {
@@ -335,13 +337,12 @@ describe('WineDetailModal', () => {
         />
       );
 
-      // Get all input fields
+      // Get all text inputs and fill required fields
+      // Order: Wine Name, Producer, Country, Region, Grape Variety, Blend, Wine Link, Notes (textarea)
       const textInputs = screen.getAllByRole('textbox');
-
-      // Fill in required fields (Wine Name, Producer, Country)
       await user.type(textInputs[0], 'New Wine'); // Wine Name
       await user.type(textInputs[1], 'New Producer'); // Producer
-      await user.type(textInputs[3], 'Italy'); // Country (after Region)
+      await user.type(textInputs[2], 'Italy'); // Country
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -470,10 +471,11 @@ describe('WineDetailModal', () => {
         />
       );
 
+      // Fill in required fields
       const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Test');
-      await user.type(textInputs[1], 'Test Producer');
-      await user.type(textInputs[3], 'France');
+      await user.type(textInputs[0], 'Test'); // Wine Name
+      await user.type(textInputs[1], 'Test Producer'); // Producer
+      await user.type(textInputs[2], 'France'); // Country
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -499,10 +501,11 @@ describe('WineDetailModal', () => {
         />
       );
 
+      // Fill in required fields
       const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Test');
-      await user.type(textInputs[1], 'Test Producer');
-      await user.type(textInputs[3], 'France');
+      await user.type(textInputs[0], 'Test'); // Wine Name
+      await user.type(textInputs[1], 'Test Producer'); // Producer
+      await user.type(textInputs[2], 'France'); // Country
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 

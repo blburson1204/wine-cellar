@@ -20,6 +20,7 @@ describe('WineDetailModal - Image Upload/Delete', () => {
     drinkByDate: '2030-12-31',
     rating: 4.5,
     notes: 'Great wine',
+    wineLink: null,
     imageUrl: null,
   };
 
@@ -73,8 +74,8 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await user.click(editButton);
 
       // Should show replace and delete buttons
-      expect(screen.getByRole('button', { name: /replace.*image/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /delete.*image/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /replace/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument();
     });
 
     it('should accept only jpeg, png, and webp files', async () => {
@@ -359,7 +360,7 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await user.click(editButton);
 
       // Click delete button
-      const deleteButton = screen.getByRole('button', { name: /delete.*image/i });
+      const deleteButton = screen.getByRole('button', { name: /^delete$/i });
       await user.click(deleteButton);
 
       // Should show confirmation dialog
@@ -392,7 +393,7 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await user.click(editButton);
 
       // Click delete button
-      const deleteButton = screen.getByRole('button', { name: /delete.*image/i });
+      const deleteButton = screen.getByRole('button', { name: /^delete$/i });
       await user.click(deleteButton);
 
       // Confirm deletion
@@ -444,7 +445,7 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await user.click(editButton);
 
       // Click delete button
-      const deleteButton = screen.getByRole('button', { name: /delete.*image/i });
+      const deleteButton = screen.getByRole('button', { name: /^delete$/i });
       await user.click(deleteButton);
 
       // Should show confirmation dialog
@@ -452,9 +453,10 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         expect(screen.getByText(/delete this image/i)).toBeInTheDocument();
       });
 
-      // Click cancel (find all cancel buttons and click the last one which is in the confirmation dialog)
+      // Click cancel in the delete confirmation dialog (it's the first Cancel button in the scrollable content)
+      // The footer Cancel button comes after, so we click the first one
       const cancelButtons = screen.getAllByRole('button', { name: /cancel/i });
-      await user.click(cancelButtons[cancelButtons.length - 1]);
+      await user.click(cancelButtons[0]);
 
       // Should close dialog
       await waitFor(() => {
@@ -489,7 +491,7 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await user.click(editButton);
 
       // Click delete button
-      const deleteButton = screen.getByRole('button', { name: /delete.*image/i });
+      const deleteButton = screen.getByRole('button', { name: /^delete$/i });
       await user.click(deleteButton);
 
       // Confirm deletion
@@ -539,7 +541,7 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await user.click(editButton);
 
       // Click delete button
-      const deleteButton = screen.getByRole('button', { name: /delete.*image/i });
+      const deleteButton = screen.getByRole('button', { name: /^delete$/i });
       await user.click(deleteButton);
 
       // Confirm deletion

@@ -46,7 +46,7 @@ describe('WineFilters', () => {
       expect(screen.getByText('Filter Criteria')).toBeInTheDocument();
       expect(screen.getByText('Wine Type')).toBeInTheDocument();
       expect(screen.getByLabelText('Country')).toBeInTheDocument();
-      expect(screen.getByText('In Cellar')).toBeInTheDocument();
+      expect(screen.getByText('Show Wine')).toBeInTheDocument();
       expect(screen.getByText('Price ($)')).toBeInTheDocument();
     });
 
@@ -85,10 +85,10 @@ describe('WineFilters', () => {
 
       expect(screen.getByLabelText('Rating')).toBeInTheDocument();
       expect(screen.getByRole('option', { name: 'Any' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '95+' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '90+' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '85+' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '80+' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '4.5+' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '4.0+' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '3.5+' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '3.0+' })).toBeInTheDocument();
     });
   });
 
@@ -96,7 +96,7 @@ describe('WineFilters', () => {
     it('displays current search text', () => {
       render(<WineFilters {...defaultProps} searchText="Bordeaux" />);
 
-      const searchInput = screen.getByLabelText('Search');
+      const searchInput = screen.getByLabelText('Search (Name, Producer, Region)');
       expect(searchInput).toHaveValue('Bordeaux');
     });
 
@@ -104,7 +104,7 @@ describe('WineFilters', () => {
       const user = userEvent.setup();
       render(<WineFilters {...defaultProps} />);
 
-      const searchInput = screen.getByLabelText('Search');
+      const searchInput = screen.getByLabelText('Search (Name, Producer, Region)');
       await user.type(searchInput, 'Margaux');
 
       expect(mockOnSearchChange).toHaveBeenCalled();
@@ -182,10 +182,10 @@ describe('WineFilters', () => {
 
   describe('Rating Filter', () => {
     it('displays selected rating', () => {
-      render(<WineFilters {...defaultProps} minRating={90} />);
+      render(<WineFilters {...defaultProps} minRating={4} />);
 
       const ratingSelect = screen.getByLabelText('Rating');
-      expect(ratingSelect).toHaveValue('90');
+      expect(ratingSelect).toHaveValue('4');
     });
 
     it('calls onMinRatingChange when selecting a rating', async () => {
@@ -193,14 +193,14 @@ describe('WineFilters', () => {
       render(<WineFilters {...defaultProps} />);
 
       const ratingSelect = screen.getByLabelText('Rating');
-      await user.selectOptions(ratingSelect, '95');
+      await user.selectOptions(ratingSelect, '4.5');
 
-      expect(mockOnMinRatingChange).toHaveBeenCalledWith(95);
+      expect(mockOnMinRatingChange).toHaveBeenCalledWith(4.5);
     });
 
     it('calls onMinRatingChange with null when selecting Any', async () => {
       const user = userEvent.setup();
-      render(<WineFilters {...defaultProps} minRating={90} />);
+      render(<WineFilters {...defaultProps} minRating={4} />);
 
       const ratingSelect = screen.getByLabelText('Rating');
       await user.selectOptions(ratingSelect, '');
