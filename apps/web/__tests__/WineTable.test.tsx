@@ -25,6 +25,7 @@ describe('WineTable', () => {
       rating: 4.5,
       notes: 'Excellent wine',
       imageUrl: null,
+      wineLink: null,
     },
     {
       id: '2',
@@ -43,6 +44,7 @@ describe('WineTable', () => {
       rating: 4.0,
       notes: 'Fresh and crisp',
       imageUrl: null,
+      wineLink: null,
     },
     {
       id: '3',
@@ -61,6 +63,7 @@ describe('WineTable', () => {
       rating: null,
       notes: null,
       imageUrl: null,
+      wineLink: null,
     },
   ];
 
