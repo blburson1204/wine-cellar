@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: December 31, 2025
+**Last Updated**: January 11, 2026
 
 ## Project Overview
 
@@ -134,13 +134,17 @@ model Wine {
   region        String?
   country       String
   grapeVariety  String?
+  blendDetail   String?
   color         WineColor
   quantity      Int       @default(1)
   purchasePrice Float?
   purchaseDate  DateTime?
   drinkByDate   DateTime?
-  rating        Int?
+  rating        Float?
   notes         String?
+  wineLink      String?
+  imageUrl      String?
+  favorite      Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -157,14 +161,17 @@ enum WineColor {
 
 ## API Endpoints
 
-| Method | Endpoint         | Description                 | Status Codes  |
-| ------ | ---------------- | --------------------------- | ------------- |
-| GET    | `/api/health`    | Health check with DB status | 200, 503      |
-| GET    | `/api/wines`     | List all wines              | 200           |
-| GET    | `/api/wines/:id` | Get a single wine by ID     | 200, 404      |
-| POST   | `/api/wines`     | Create a new wine           | 201, 400      |
-| PUT    | `/api/wines/:id` | Update an existing wine     | 200, 400, 404 |
-| DELETE | `/api/wines/:id` | Delete a wine               | 204, 404      |
+| Method | Endpoint               | Description                 | Status Codes  |
+| ------ | ---------------------- | --------------------------- | ------------- |
+| GET    | `/api/health`          | Health check with DB status | 200, 503      |
+| GET    | `/api/wines`           | List all wines              | 200           |
+| GET    | `/api/wines/:id`       | Get a single wine by ID     | 200, 404      |
+| POST   | `/api/wines`           | Create a new wine           | 201, 400      |
+| PUT    | `/api/wines/:id`       | Update an existing wine     | 200, 400, 404 |
+| DELETE | `/api/wines/:id`       | Delete a wine               | 204, 404      |
+| GET    | `/api/wines/:id/image` | Get wine label image        | 200, 404      |
+| POST   | `/api/wines/:id/image` | Upload wine label image     | 200, 400, 404 |
+| DELETE | `/api/wines/:id/image` | Delete wine label image     | 204, 404      |
 
 ### Error Response Format
 
@@ -208,6 +215,24 @@ curl -X POST http://localhost:3001/api/wines \
 - [x] Color-coded wine types with visual indicators
 - [x] Form validation (required fields, vintage range)
 
+### Wine Label Images (Phase 1 Complete)
+
+- [x] Display wine label images in detail modal
+- [x] Upload new wine label images during creation
+- [x] Upload, replace, and delete images for existing wines
+- [x] Image preview before committing changes
+- [x] Image optimization (resize, compress, format conversion)
+- [x] File validation (type, size, magic number)
+- [x] Local file storage with caching
+
+### Wine Favorites
+
+- [x] Mark wines as favorites with star icon in table
+- [x] Toggle favorite status from detail modal header
+- [x] Filter to show only favorite wines
+- [x] Ruby red star color matching app theme (#E63946)
+- [x] Optimistic UI updates for instant feedback
+
 ### Database & Infrastructure
 
 - [x] PostgreSQL database with Docker setup
@@ -217,7 +242,7 @@ curl -X POST http://localhost:3001/api/wines \
 
 ### Testing
 
-- [x] **API Testing**: 49 tests passing (100% success rate)
+- [x] **API Testing**: 49+ tests passing (100% success rate)
   - 18 CRUD endpoint tests
   - 31 error handling tests
   - Input validation (Zod 3.25.76)
@@ -228,11 +253,13 @@ curl -X POST http://localhost:3001/api/wines \
   - Sequential execution to prevent race conditions
   - Isolated test database on port 5433
 
-- [x] **React Component Testing**: 126 tests with **70%+ coverage** ✅
+- [x] **React Component Testing**: 146 tests with **70%+ coverage** ✅
   - 23 API utility tests (fetchApi, ApiError, getErrorMessage)
   - 14 ErrorBoundary tests (normal rendering, error catching, Try Again)
-  - 27 WineTable tests (empty state, sorting, row clicks, color indicators)
-  - 29 WineFilters tests (search, wine types, country, vintage, price ranges)
+  - 27+ WineTable tests (empty state, sorting, row clicks, color indicators,
+    favorites)
+  - 29+ WineFilters tests (search, wine types, country, vintage, price ranges,
+    favorites)
   - 11 page.tsx tests (loading, empty state, add/delete wine)
   - 22 WineDetailModal tests (view/edit/add modes, validation, save/update)
 
@@ -244,7 +271,7 @@ curl -X POST http://localhost:3001/api/wines \
   - API: 55% branches, 75% functions/lines/statements
   - Web: **69.17% functions**, **71.39% branches**, **70.41% lines** (all exceed
     targets!)
-- Test duration: ~3s for full suite (175 tests)
+- Test duration: ~3s for full suite (146+ tests)
 - Database URL configurable via environment variable for CI/local
 
 ### Test Coverage Metrics
@@ -533,10 +560,10 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 
 1. **No Authentication**: All wines are publicly accessible
 2. **No Pagination**: Large collections may have performance issues
-3. **No Image Upload**: Wine labels/photos not supported yet
+3. **Local Image Storage Only**: Wine images stored locally (AWS S3 planned for
+   production)
 4. **Inline Styles**: No CSS modules or styled-components
-5. **No Optimistic Updates**: UI waits for API responses
-6. **No Sentry Integration**: Error tracking service not configured
+5. **No Sentry Integration**: Error tracking service not configured
    (infrastructure ready)
 
 ## Future Enhancements
@@ -544,8 +571,8 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 See [TODO.md](TODO.md) for comprehensive list. Major features planned:
 
 - User authentication and authorization
-- Search and filtering capabilities
-- Wine label photo uploads
+- Thumbnail images in wine table (Phase 2)
+- AWS S3 + CloudFront for production image storage (Phase 3)
 - Cellar location tracking
 - Drinking window recommendations
 - Collection analytics and reports
