@@ -9,6 +9,7 @@ describe('WineFilters', () => {
   const mockOnGrapeVarietyChange = vi.fn();
   const mockOnCountryChange = vi.fn();
   const mockOnShowOnlyInCellarChange = vi.fn();
+  const mockOnShowOnlyFavoritesChange = vi.fn();
   const mockOnMinRatingChange = vi.fn();
   const mockOnPriceRangeChange = vi.fn();
   const mockOnClearAll = vi.fn();
@@ -26,6 +27,8 @@ describe('WineFilters', () => {
     countries: ['France', 'Italy', 'Spain', 'USA'],
     showOnlyInCellar: false,
     onShowOnlyInCellarChange: mockOnShowOnlyInCellarChange,
+    showOnlyFavorites: false,
+    onShowOnlyFavoritesChange: mockOnShowOnlyFavoritesChange,
     minRating: null,
     onMinRatingChange: mockOnMinRatingChange,
     priceRange: null,

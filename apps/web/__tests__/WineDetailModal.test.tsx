@@ -21,6 +21,7 @@ describe('WineDetailModal', () => {
     rating: 4.5,
     notes: 'Excellent wine with great aging potential',
     wineLink: null,
+    favorite: false,
     imageUrl: null,
   };
 

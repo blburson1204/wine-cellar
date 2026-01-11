@@ -66,6 +66,8 @@ export const createWineSchema = z.object({
   wineLink: z.string().url('Wine link must be a valid URL').optional().nullable(),
 
   imageUrl: z.string().optional().nullable(),
+
+  favorite: z.boolean().default(false),
 });
 
 /**
@@ -144,6 +146,8 @@ export const updateWineSchema = z
     wineLink: z.string().url('Wine link must be a valid URL').optional().nullable(),
 
     imageUrl: z.string().optional().nullable(),
+
+    favorite: z.boolean().optional(),
   })
   .strict(); // Reject unknown fields
 

@@ -182,6 +182,7 @@ describe('Home Page - Wine Cellar', () => {
       rating: null,
       notes: null,
       wineLink: null,
+      favorite: false,
       imageUrl: null,
     };
 

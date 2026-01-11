@@ -19,6 +19,7 @@ interface Wine {
   rating: number | null;
   notes: string | null;
   wineLink: string | null;
+  favorite: boolean;
   imageUrl: string | null;
 }
 
@@ -29,6 +30,7 @@ interface WineDetailModalProps {
   onUpdate: (id: string, data: Partial<Wine>) => Promise<void>;
   onCreate?: (data: Omit<Wine, 'id'>) => Promise<Wine>;
   onDelete?: (id: string) => void;
+  onToggleFavorite?: (wine: Wine) => void;
 }
 
 const formatDate = (dateString: string | null): string => {
@@ -103,6 +105,7 @@ export default function WineDetailModal({
   onUpdate,
   onCreate,
   onDelete,
+  onToggleFavorite,
 }: WineDetailModalProps): React.JSX.Element | null {
   const [isEditMode, setIsEditMode] = useState(mode === 'add');
   const [editForm, setEditForm] = useState<Partial<Wine>>({});
@@ -144,6 +147,7 @@ export default function WineDetailModal({
         rating: null,
         notes: null,
         wineLink: null,
+        favorite: false,
         imageUrl: null,
       });
     } else if (wine) {
@@ -546,17 +550,48 @@ export default function WineDetailModal({
             {/* Header - only show for view mode (not edit/add mode) */}
             {mode === 'view' && wine && !isEditMode && (
               <div style={{ marginBottom: '24px' }}>
-                <h2
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <h2
+                    style={{
+                      margin: '0',
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                    }}
+                  >
+                    {wine.name}
+                  </h2>
+                  {onToggleFavorite && (
+                    <span
+                      onClick={() => onToggleFavorite(wine)}
+                      style={{
+                        fontSize: '24px',
+                        cursor: 'pointer',
+                        color: wine.favorite ? '#E63946' : 'rgba(255, 255, 255, 0.3)',
+                        transition: 'color 0.2s',
+                      }}
+                      onMouseOver={(e) => {
+                        if (!wine.favorite) {
+                          e.currentTarget.style.color = 'rgba(230, 57, 70, 0.6)';
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.color = wine.favorite
+                          ? '#E63946'
+                          : 'rgba(255, 255, 255, 0.3)';
+                      }}
+                    >
+                      {wine.favorite ? '★' : '☆'}
+                    </span>
+                  )}
+                </div>
+                <p
                   style={{
-                    margin: '0 0 8px 0',
-                    fontSize: '24px',
-                    fontWeight: '700',
+                    margin: '8px 0 0 0',
+                    fontSize: '16px',
                     color: 'rgba(255, 255, 255, 0.7)',
                   }}
                 >
-                  {wine.name}
-                </h2>
-                <p style={{ margin: 0, fontSize: '16px', color: 'rgba(255, 255, 255, 0.7)' }}>
                   {wine.vintage} · {wine.producer} ·{' '}
                   {wine.color.charAt(0) + wine.color.slice(1).toLowerCase()}
                 </p>

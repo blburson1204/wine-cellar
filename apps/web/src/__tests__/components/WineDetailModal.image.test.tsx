@@ -21,6 +21,7 @@ describe('WineDetailModal - Image Upload/Delete', () => {
     rating: 4.5,
     notes: 'Great wine',
     wineLink: null,
+    favorite: false,
     imageUrl: null,
   };
 

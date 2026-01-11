@@ -22,6 +22,7 @@ interface Wine {
   rating: number | null;
   notes: string | null;
   wineLink: string | null;
+  favorite: boolean;
   imageUrl: string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -40,6 +41,7 @@ export default function Home(): React.JSX.Element {
   const [selectedGrapeVariety, setSelectedGrapeVariety] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [showOnlyInCellar, setShowOnlyInCellar] = useState(false);
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [vintageRange, setVintageRange] = useState<[number, number] | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
   const [minRating, setMinRating] = useState<number | null>(null);
@@ -112,6 +114,11 @@ export default function Home(): React.JSX.Element {
       result = result.filter((wine) => wine.quantity > 0);
     }
 
+    // Stage 5b: Favorites filter
+    if (showOnlyFavorites) {
+      result = result.filter((wine) => wine.favorite);
+    }
+
     // Stage 6: Vintage range filter
     if (vintageRange) {
       result = result.filter(
@@ -166,6 +173,7 @@ export default function Home(): React.JSX.Element {
     selectedGrapeVariety,
     selectedCountry,
     showOnlyInCellar,
+    showOnlyFavorites,
     vintageRange,
     priceRange,
     minRating,
@@ -179,6 +187,7 @@ export default function Home(): React.JSX.Element {
     setSelectedGrapeVariety(null);
     setSelectedCountry(null);
     setShowOnlyInCellar(false);
+    setShowOnlyFavorites(false);
     setVintageRange(null);
     setPriceRange(null);
     setMinRating(null);
@@ -281,6 +290,32 @@ export default function Home(): React.JSX.Element {
     } catch (error) {
       console.error('❌ Error updating wine:', error);
       throw error;
+    }
+  };
+
+  const handleToggleFavorite = async (wine: Wine): Promise<void> => {
+    try {
+      const response = await fetch(`/api/wines/${wine.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ favorite: !wine.favorite }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to toggle favorite');
+      }
+
+      // Update local state immediately for responsiveness
+      setWines((prevWines) =>
+        prevWines.map((w) => (w.id === wine.id ? { ...w, favorite: !w.favorite } : w))
+      );
+
+      // Also update selected wine if it's the same
+      if (selectedWine?.id === wine.id) {
+        setSelectedWine({ ...selectedWine, favorite: !selectedWine.favorite });
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
     }
   };
 
@@ -432,6 +467,8 @@ export default function Home(): React.JSX.Element {
               countries={countries}
               showOnlyInCellar={showOnlyInCellar}
               onShowOnlyInCellarChange={setShowOnlyInCellar}
+              showOnlyFavorites={showOnlyFavorites}
+              onShowOnlyFavoritesChange={setShowOnlyFavorites}
               minRating={minRating}
               onMinRatingChange={setMinRating}
               priceRange={priceRange}
@@ -456,6 +493,7 @@ export default function Home(): React.JSX.Element {
               setSelectedWine(wine);
               setModalMode('view');
             }}
+            onToggleFavorite={handleToggleFavorite}
             sortBy={sortBy}
             sortDirection={sortDirection}
             onSort={(column) => {
@@ -484,6 +522,7 @@ export default function Home(): React.JSX.Element {
           }}
           onUpdate={handleUpdateWine}
           onDelete={handleDelete}
+          onToggleFavorite={handleToggleFavorite}
         />
       )}
 

@@ -6,6 +6,7 @@ import WineTable from '../src/components/WineTable';
 describe('WineTable', () => {
   const mockOnRowClick = vi.fn();
   const mockOnSort = vi.fn();
+  const mockOnToggleFavorite = vi.fn();
 
   const mockWines = [
     {
@@ -26,6 +27,7 @@ describe('WineTable', () => {
       notes: 'Excellent wine',
       imageUrl: null,
       wineLink: null,
+      favorite: false,
     },
     {
       id: '2',
@@ -45,6 +47,7 @@ describe('WineTable', () => {
       notes: 'Fresh and crisp',
       imageUrl: null,
       wineLink: null,
+      favorite: true,
     },
     {
       id: '3',
@@ -64,12 +67,14 @@ describe('WineTable', () => {
       notes: null,
       imageUrl: null,
       wineLink: null,
+      favorite: false,
     },
   ];
 
   const defaultProps = {
     wines: mockWines,
     onRowClick: mockOnRowClick,
+    onToggleFavorite: mockOnToggleFavorite,
     sortBy: 'name' as const,
     sortDirection: 'asc' as const,
     onSort: mockOnSort,

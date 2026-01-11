@@ -19,12 +19,14 @@ interface Wine {
   rating: number | null;
   notes: string | null;
   wineLink: string | null;
+  favorite: boolean;
   imageUrl: string | null;
 }
 
 interface WineTableProps {
   wines: Wine[];
   onRowClick: (wine: Wine) => void;
+  onToggleFavorite: (wine: Wine) => void;
   sortBy: 'name' | 'vintage' | 'producer' | 'price' | 'rating';
   sortDirection: 'asc' | 'desc';
   onSort: (column: 'name' | 'vintage' | 'producer' | 'price' | 'rating') => void;
@@ -43,6 +45,7 @@ const COLOR_LABELS: Record<string, string> = {
 export default function WineTable({
   wines,
   onRowClick,
+  onToggleFavorite,
   sortBy,
   sortDirection,
   onSort,
@@ -133,9 +136,21 @@ export default function WineTable({
         <thead style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#3d010b' }}>
           <tr style={{ backgroundColor: '#3d010b' }}>
             <th
+              style={{
+                padding: '10px 4px 10px 12px',
+                textAlign: 'center',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                width: '40px',
+              }}
+            >
+              {/* Favorite column header - no label */}
+            </th>
+            <th
               onClick={() => onSort('vintage')}
               style={{
-                padding: '10px 8px 10px 20px',
+                padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '700',
@@ -342,7 +357,39 @@ export default function WineTable({
                   onRowClick(wine);
                 }}
               >
-                <td style={{ padding: '6px 8px 6px 20px', fontSize: '14px' }}>{wine.vintage}</td>
+                <td
+                  style={{
+                    padding: '6px 4px 6px 12px',
+                    fontSize: '18px',
+                    textAlign: 'center',
+                    width: '40px',
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleFavorite(wine);
+                  }}
+                >
+                  <span
+                    style={{
+                      cursor: 'pointer',
+                      color: wine.favorite ? '#E63946' : 'rgba(255, 255, 255, 0.3)',
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseOver={(e) => {
+                      if (!wine.favorite) {
+                        e.currentTarget.style.color = 'rgba(230, 57, 70, 0.6)';
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.color = wine.favorite
+                        ? '#E63946'
+                        : 'rgba(255, 255, 255, 0.3)';
+                    }}
+                  >
+                    {wine.favorite ? '★' : '☆'}
+                  </span>
+                </td>
+                <td style={{ padding: '6px 8px', fontSize: '14px' }}>{wine.vintage}</td>
                 <td
                   style={{
                     padding: '6px 8px',

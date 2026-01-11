@@ -11,6 +11,8 @@ interface WineFiltersProps {
   countries: string[];
   showOnlyInCellar: boolean;
   onShowOnlyInCellarChange: (value: boolean) => void;
+  showOnlyFavorites: boolean;
+  onShowOnlyFavoritesChange: (value: boolean) => void;
   minRating: number | null;
   onMinRatingChange: (rating: number | null) => void;
   priceRange: [number, number] | null;
@@ -42,6 +44,8 @@ export default function WineFilters({
   countries,
   showOnlyInCellar,
   onShowOnlyInCellarChange,
+  showOnlyFavorites,
+  onShowOnlyFavoritesChange,
   minRating,
   onMinRatingChange,
   priceRange,
@@ -152,7 +156,7 @@ export default function WineFilters({
             style={{
               padding: '8px',
               backgroundColor: 'rgba(255, 255, 255, 0.4)',
-              borderRadius: '6px',
+              borderRadius: '4px',
               display: 'grid',
               gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '4px',
@@ -167,18 +171,7 @@ export default function WineFilters({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    padding: '0 6px',
-                    height: '34px',
                     cursor: 'pointer',
-                    transition: 'background-color 0.2s',
-                    borderRadius: '4px',
-                    boxSizing: 'border-box',
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
                   <input
@@ -316,217 +309,268 @@ export default function WineFilters({
           </div>
         </div>
 
-        {/* In Cellar & Rating - Side by Side */}
+        {/* Show Wine & Rating (left) / Price Range (right) - Side by Side */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <div>
-            <label
-              style={{
-                display: 'block',
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontWeight: '700',
-                color: 'rgba(255, 255, 255, 0.7)',
-                backgroundColor: '#221a13',
-              }}
-            >
-              Show Wine
-            </label>
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 8px',
-                height: '34px',
-                backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                boxSizing: 'border-box',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={showOnlyInCellar}
-                onChange={(e) => onShowOnlyInCellarChange(e.target.checked)}
-                style={{
-                  position: 'absolute',
-                  opacity: 0,
-                  width: 0,
-                  height: 0,
-                }}
-              />
-              <span
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: '3px',
-                  border: showOnlyInCellar ? '2px solid #7C2D3C' : '2px solid #d5ccc5',
-                  backgroundColor: showOnlyInCellar ? '#7C2D3C' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {showOnlyInCellar && (
-                  <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>✓</span>
-                )}
-              </span>
-              <span style={{ fontSize: '13px', color: '#d5ccc5' }}>Currently In Cellar</span>
-            </label>
-          </div>
-          <div>
-            <label
-              htmlFor="min-rating"
-              style={{
-                display: 'block',
-                marginBottom: '4px',
-                fontSize: '14px',
-                fontWeight: '700',
-                color: 'rgba(255, 255, 255, 0.7)',
-                backgroundColor: '#221a13',
-              }}
-            >
-              Rating
-            </label>
-            <select
-              id="min-rating"
-              value={minRating ?? ''}
-              onChange={(e) =>
-                onMinRatingChange(e.target.value ? parseFloat(e.target.value) : null)
-              }
-              style={{
-                padding: '8px',
-                fontSize: '13px',
-                border: 'none',
-                borderRadius: '4px',
-                width: '100%',
-                backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                color: 'rgba(255, 255, 255, 0.7)',
-                cursor: 'pointer',
-                boxSizing: 'border-box',
-              }}
-            >
-              <option
-                value=""
-                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
-              >
-                Any
-              </option>
-              <option
-                value="4.5"
-                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
-              >
-                4.5+
-              </option>
-              <option
-                value="4"
-                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
-              >
-                4.0+
-              </option>
-              <option
-                value="3.5"
-                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
-              >
-                3.5+
-              </option>
-              <option
-                value="3"
-                style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
-              >
-                3.0+
-              </option>
-            </select>
-          </div>
-        </div>
-
-        {/* Price Range */}
-        <div>
-          <label
-            style={{
-              display: 'block',
-              marginBottom: '4px',
-              fontSize: '14px',
-              fontWeight: '700',
-              color: 'rgba(255, 255, 255, 0.7)',
-              backgroundColor: '#221a13',
-            }}
-          >
-            Price ($)
-          </label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          {/* Left column: Show Wine + Rating stacked */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div>
               <label
-                htmlFor="price-from"
                 style={{
                   display: 'block',
-                  marginBottom: '2px',
-                  fontSize: '11px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   color: 'rgba(255, 255, 255, 0.7)',
                   backgroundColor: '#221a13',
                 }}
               >
-                From
+                Show Wine
               </label>
-              <input
-                id="price-from"
-                type="number"
-                min={priceMin}
-                max={priceMax}
-                step="0.01"
-                value={priceRange?.[0] ?? priceMin}
-                onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
-                disabled={priceMin === priceMax}
+              <div
                 style={{
-                  width: '100%',
-                  padding: '6px',
-                  fontSize: '13px',
-                  border: 'none',
-                  borderRadius: '4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  padding: '8px',
                   backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  boxSizing: 'border-box',
-                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                  borderRadius: '4px',
                 }}
-              />
+              >
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showOnlyInCellar}
+                    onChange={(e) => onShowOnlyInCellarChange(e.target.checked)}
+                    style={{
+                      position: 'absolute',
+                      opacity: 0,
+                      width: 0,
+                      height: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '3px',
+                      border: showOnlyInCellar ? '2px solid #7C2D3C' : '2px solid #d5ccc5',
+                      backgroundColor: showOnlyInCellar ? '#7C2D3C' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {showOnlyInCellar && (
+                      <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+                        ✓
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ fontSize: '13px', color: '#d5ccc5' }}>In Cellar</span>
+                </label>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showOnlyFavorites}
+                    onChange={(e) => onShowOnlyFavoritesChange(e.target.checked)}
+                    style={{
+                      position: 'absolute',
+                      opacity: 0,
+                      width: 0,
+                      height: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '3px',
+                      border: showOnlyFavorites ? '2px solid #7C2D3C' : '2px solid #d5ccc5',
+                      backgroundColor: showOnlyFavorites ? '#7C2D3C' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {showOnlyFavorites && (
+                      <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+                        ✓
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ fontSize: '13px', color: '#d5ccc5' }}>Favorites</span>
+                </label>
+              </div>
             </div>
             <div>
               <label
-                htmlFor="price-to"
+                htmlFor="min-rating"
                 style={{
                   display: 'block',
-                  marginBottom: '2px',
-                  fontSize: '11px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   color: 'rgba(255, 255, 255, 0.7)',
                   backgroundColor: '#221a13',
                 }}
               >
-                To
+                Rating
               </label>
-              <input
-                id="price-to"
-                type="number"
-                min={priceMin}
-                max={priceMax}
-                step="0.01"
-                value={priceRange?.[1] ?? priceMax}
-                onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
-                disabled={priceMin === priceMax}
+              <select
+                id="min-rating"
+                value={minRating ?? ''}
+                onChange={(e) =>
+                  onMinRatingChange(e.target.value ? parseFloat(e.target.value) : null)
+                }
                 style={{
-                  width: '100%',
-                  padding: '6px',
+                  padding: '8px',
                   fontSize: '13px',
                   border: 'none',
                   borderRadius: '4px',
+                  width: '100%',
                   backgroundColor: 'rgba(255, 255, 255, 0.4)',
                   color: 'rgba(255, 255, 255, 0.7)',
+                  cursor: 'pointer',
                   boxSizing: 'border-box',
-                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
                 }}
-              />
+              >
+                <option
+                  value=""
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  Any
+                </option>
+                <option
+                  value="4.5"
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  4.5+
+                </option>
+                <option
+                  value="4"
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  4.0+
+                </option>
+                <option
+                  value="3.5"
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  3.5+
+                </option>
+                <option
+                  value="3"
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  3.0+
+                </option>
+              </select>
+            </div>
+          </div>
+
+          {/* Right column: Price Range stacked */}
+          <div>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontWeight: '700',
+                color: 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: '#221a13',
+              }}
+            >
+              Price ($)
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div>
+                <label
+                  htmlFor="price-from"
+                  style={{
+                    display: 'block',
+                    marginBottom: '2px',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    backgroundColor: '#221a13',
+                  }}
+                >
+                  From
+                </label>
+                <input
+                  id="price-from"
+                  type="number"
+                  min={priceMin}
+                  max={priceMax}
+                  step="0.01"
+                  value={priceRange?.[0] ?? priceMin}
+                  onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
+                  disabled={priceMin === priceMax}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    fontSize: '13px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    boxSizing: 'border-box',
+                    cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="price-to"
+                  style={{
+                    display: 'block',
+                    marginBottom: '2px',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    backgroundColor: '#221a13',
+                  }}
+                >
+                  To
+                </label>
+                <input
+                  id="price-to"
+                  type="number"
+                  min={priceMin}
+                  max={priceMax}
+                  step="0.01"
+                  value={priceRange?.[1] ?? priceMax}
+                  onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
+                  disabled={priceMin === priceMax}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    fontSize: '13px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    boxSizing: 'border-box',
+                    cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
