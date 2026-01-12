@@ -585,16 +585,46 @@ export default function WineDetailModal({
                     </span>
                   )}
                 </div>
-                <p
+                <div
                   style={{
-                    margin: '8px 0 0 0',
-                    fontSize: '16px',
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '35px',
+                    marginTop: '8px',
                   }}
                 >
-                  {wine.vintage} · {wine.producer} ·{' '}
-                  {wine.color.charAt(0) + wine.color.slice(1).toLowerCase()}
-                </p>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: '16px',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                    }}
+                  >
+                    {wine.vintage} · {wine.producer} ·{' '}
+                    {wine.color.charAt(0) + wine.color.slice(1).toLowerCase()}
+                  </p>
+                  {wine.wineLink && (
+                    <a
+                      href={wine.wineLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#d4a574',
+                        textDecoration: 'none',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.textDecoration = 'underline';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.textDecoration = 'none';
+                      }}
+                    >
+                      Wine Details →
+                    </a>
+                  )}
+                </div>
               </div>
             )}
 
@@ -787,37 +817,6 @@ export default function WineDetailModal({
                           {formatDate(wine.purchaseDate)}
                         </p>
                       </div>
-
-                      {/* Wine Details Link - only show if link exists */}
-                      {wine.wineLink && (
-                        <div>
-                          <label
-                            style={{
-                              display: 'block',
-                              marginBottom: '4px',
-                              fontSize: '12px',
-                              fontWeight: '700',
-                              color: 'rgba(255, 255, 255, 0.5)',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.5px',
-                            }}
-                          >
-                            Wine Details
-                          </label>
-                          <a
-                            href={wine.wineLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              color: '#d4a574',
-                              textDecoration: 'underline',
-                              fontSize: '16px',
-                            }}
-                          >
-                            link
-                          </a>
-                        </div>
-                      )}
 
                       {/* Tasting Notes - Full Width spanning both columns */}
                       {wine.notes && (

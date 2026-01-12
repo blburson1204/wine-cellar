@@ -484,7 +484,7 @@ export default function WineFilters({
             </div>
           </div>
 
-          {/* Right column: Price Range stacked */}
+          {/* Right column: Price Range */}
           <div>
             <label
               style={{
@@ -498,79 +498,68 @@ export default function WineFilters({
             >
               Price ($)
             </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div>
-                <label
-                  htmlFor="price-from"
-                  style={{
-                    display: 'block',
-                    marginBottom: '2px',
-                    fontSize: '11px',
-                    fontWeight: '700',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    backgroundColor: '#221a13',
-                  }}
-                >
-                  From
-                </label>
-                <input
-                  id="price-from"
-                  type="number"
-                  min={priceMin}
-                  max={priceMax}
-                  step="0.01"
-                  value={priceRange?.[0] ?? priceMin}
-                  onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
-                  disabled={priceMin === priceMax}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    fontSize: '13px',
-                    border: 'none',
-                    borderRadius: '4px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    boxSizing: 'border-box',
-                    cursor: priceMin === priceMax ? 'not-allowed' : 'text',
-                  }}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="price-to"
-                  style={{
-                    display: 'block',
-                    marginBottom: '2px',
-                    fontSize: '11px',
-                    fontWeight: '700',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    backgroundColor: '#221a13',
-                  }}
-                >
-                  To
-                </label>
-                <input
-                  id="price-to"
-                  type="number"
-                  min={priceMin}
-                  max={priceMax}
-                  step="0.01"
-                  value={priceRange?.[1] ?? priceMax}
-                  onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
-                  disabled={priceMin === priceMax}
-                  style={{
-                    width: '100%',
-                    padding: '6px',
-                    fontSize: '13px',
-                    border: 'none',
-                    borderRadius: '4px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    boxSizing: 'border-box',
-                    cursor: priceMin === priceMax ? 'not-allowed' : 'text',
-                  }}
-                />
-              </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                borderRadius: '4px',
+                height: '59px',
+                boxSizing: 'border-box',
+              }}
+            >
+              <input
+                id="price-from"
+                type="number"
+                min={priceMin}
+                max={priceMax}
+                step="0.01"
+                placeholder="Min"
+                value={priceRange?.[0] ?? priceMin}
+                onChange={(e) => handlePriceMinChange(parseFloat(e.target.value) || priceMin)}
+                disabled={priceMin === priceMax}
+                aria-label="Minimum price"
+                style={{
+                  flex: 1,
+                  padding: '6px',
+                  fontSize: '13px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  boxSizing: 'border-box',
+                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                  minWidth: 0,
+                }}
+              />
+              <span style={{ fontSize: '13px', color: '#d5ccc5', flexShrink: 0 }}>to</span>
+              <input
+                id="price-to"
+                type="number"
+                min={priceMin}
+                max={priceMax}
+                step="0.01"
+                placeholder="Max"
+                value={priceRange?.[1] ?? priceMax}
+                onChange={(e) => handlePriceMaxChange(parseFloat(e.target.value) || priceMax)}
+                disabled={priceMin === priceMax}
+                aria-label="Maximum price"
+                style={{
+                  flex: 1,
+                  padding: '6px',
+                  fontSize: '13px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  boxSizing: 'border-box',
+                  cursor: priceMin === priceMax ? 'not-allowed' : 'text',
+                  minWidth: 0,
+                }}
+              />
             </div>
           </div>
         </div>
