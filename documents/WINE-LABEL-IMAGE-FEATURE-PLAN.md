@@ -642,9 +642,6 @@ drag-and-drop
 
 ## Related Documentation
 
-- [Phase-1-Implementation-Checklist.md](Phase-1-Implementation-Checklist.md) -
-  Detailed task checklist
-- [NEXT-SESSION-TODO.md](NEXT-SESSION-TODO.md) - Next session planning
 - [Code-Review-Standards-Summary.md](Code-Review-Standards-Summary.md)
 - [ERROR-HANDLING-SUMMARY.md](ERROR-HANDLING-SUMMARY.md)
 - [Test-Summary.md](Test-Summary.md)
