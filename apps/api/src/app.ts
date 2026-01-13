@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
+import swaggerUi from 'swagger-ui-express';
 import { prisma } from '@wine-cellar/database';
 import { requestIdMiddleware } from './middleware/requestId';
 import { httpLogger } from './middleware/httpLogger';
@@ -15,6 +16,7 @@ import { NotFoundError, ImageUploadError } from './errors/AppError';
 import { createLogger } from './utils/logger';
 import { storageService } from './services/storage';
 import { storageConfig } from './config/storage';
+import { openApiDocument } from './docs/openapi';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,6 +47,10 @@ export const createApp = (): Express => {
   // Request tracking and logging
   app.use(requestIdMiddleware);
   app.use(httpLogger);
+
+  // API Documentation (Swagger UI)
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+  app.get('/api/docs.json', (_req, res) => res.json(openApiDocument));
 
   // Health check endpoint
   app.get('/api/health', async (req, res) => {

@@ -143,13 +143,24 @@ See [Test-Summary.md](Test-Summary.md) for detailed test breakdown.
 
 ## API Endpoints
 
-| Method | Endpoint         | Description       |
-| ------ | ---------------- | ----------------- |
-| GET    | `/api/wines`     | List all wines    |
-| GET    | `/api/wines/:id` | Get a single wine |
-| POST   | `/api/wines`     | Create a wine     |
-| PUT    | `/api/wines/:id` | Update a wine     |
-| DELETE | `/api/wines/:id` | Delete a wine     |
+| Method | Endpoint         | Description                                |
+| ------ | ---------------- | ------------------------------------------ |
+| GET    | `/api/docs`      | Interactive API documentation (Swagger UI) |
+| GET    | `/api/docs.json` | OpenAPI 3.0 specification (JSON)           |
+| GET    | `/api/wines`     | List all wines                             |
+| GET    | `/api/wines/:id` | Get a single wine                          |
+| POST   | `/api/wines`     | Create a wine                              |
+| PUT    | `/api/wines/:id` | Update a wine                              |
+| DELETE | `/api/wines/:id` | Delete a wine                              |
+
+### API Documentation
+
+Interactive API documentation is available at http://localhost:3001/api/docs
+when the server is running. The documentation includes:
+
+- All endpoint descriptions with request/response schemas
+- "Try it out" functionality to test endpoints directly
+- Example requests and responses
 
 ### Example API Request
 

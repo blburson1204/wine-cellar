@@ -12,6 +12,7 @@
     "test:db:setup": "tsx scripts/setup-test-db.ts"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.0",
     "@wine-cellar/database": "*",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -20,6 +21,7 @@
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "sharp": "^0.34.5",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.19.0",
     "zod": "^3.25.76"
   },
@@ -30,6 +32,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^20.0.0",
     "@types/supertest": "^6.0.3",
+    "@types/swagger-ui-express": "^4.1.8",
     "@vitest/coverage-v8": "^4.0.16",
     "supertest": "^7.1.4",
     "tsx": "^4.19.0",

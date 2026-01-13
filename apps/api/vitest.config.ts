@@ -1,8 +1,14 @@
 import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 // Set test database URL if not already set (allows CI to override)
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
+}
+
+// Use a separate upload directory for tests to avoid deleting real uploaded images
+if (!process.env.UPLOAD_DIR) {
+  process.env.UPLOAD_DIR = path.join(process.cwd(), 'uploads-test/wines');
 }
 
 export default defineConfig({

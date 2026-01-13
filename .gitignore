@@ -19,3 +19,6 @@ assets/wine-labels/*.png
 
 # Image uploads (development and production)
 apps/api/uploads/
+
+# Test uploads directory
+apps/api/uploads-test/

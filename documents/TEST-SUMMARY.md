@@ -613,6 +613,8 @@ export default defineConfig({
   conditions
 - Test database:
   `postgresql://postgres:postgres@localhost:5433/wine_cellar_test`
+- Test upload directory: `uploads-test/wines` (set via `UPLOAD_DIR` env var)
+  - Prevents test cleanup from deleting real uploaded images in `uploads/wines`
 - Environment: Node.js (not jsdom)
 - Setup script: `scripts/setup-test-db.ts` (runs before tests)
 

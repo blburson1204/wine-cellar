@@ -161,17 +161,30 @@ enum WineColor {
 
 ## API Endpoints
 
-| Method | Endpoint               | Description                 | Status Codes  |
-| ------ | ---------------------- | --------------------------- | ------------- |
-| GET    | `/api/health`          | Health check with DB status | 200, 503      |
-| GET    | `/api/wines`           | List all wines              | 200           |
-| GET    | `/api/wines/:id`       | Get a single wine by ID     | 200, 404      |
-| POST   | `/api/wines`           | Create a new wine           | 201, 400      |
-| PUT    | `/api/wines/:id`       | Update an existing wine     | 200, 400, 404 |
-| DELETE | `/api/wines/:id`       | Delete a wine               | 204, 404      |
-| GET    | `/api/wines/:id/image` | Get wine label image        | 200, 404      |
-| POST   | `/api/wines/:id/image` | Upload wine label image     | 200, 400, 404 |
-| DELETE | `/api/wines/:id/image` | Delete wine label image     | 204, 404      |
+| Method | Endpoint               | Description                       | Status Codes  |
+| ------ | ---------------------- | --------------------------------- | ------------- |
+| GET    | `/api/docs`            | Interactive API docs (Swagger UI) | 200           |
+| GET    | `/api/docs.json`       | OpenAPI 3.0 specification         | 200           |
+| GET    | `/api/health`          | Health check with DB status       | 200, 503      |
+| GET    | `/api/wines`           | List all wines                    | 200           |
+| GET    | `/api/wines/:id`       | Get a single wine by ID           | 200, 404      |
+| POST   | `/api/wines`           | Create a new wine                 | 201, 400      |
+| PUT    | `/api/wines/:id`       | Update an existing wine           | 200, 400, 404 |
+| DELETE | `/api/wines/:id`       | Delete a wine                     | 204, 404      |
+| GET    | `/api/wines/:id/image` | Get wine label image              | 200, 404      |
+| POST   | `/api/wines/:id/image` | Upload wine label image           | 200, 400, 404 |
+| DELETE | `/api/wines/:id/image` | Delete wine label image           | 204, 404      |
+
+### API Documentation
+
+Interactive API documentation is available at http://localhost:3001/api/docs.
+Built with:
+
+- **@asteasolutions/zod-to-openapi**: Auto-generates OpenAPI specs from Zod
+  schemas
+- **swagger-ui-express**: Provides interactive documentation UI
+
+The documentation stays in sync with validation schemas automatically.
 
 ### Error Response Format
 
@@ -273,6 +286,8 @@ curl -X POST http://localhost:3001/api/wines \
     targets!)
 - Test duration: ~3s for full suite (146+ tests)
 - Database URL configurable via environment variable for CI/local
+- **Isolated test directories**: Tests use separate `uploads-test/wines`
+  directory to prevent cleanup from deleting real uploaded images
 
 ### Test Coverage Metrics
 
