@@ -45,7 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
               gap: '12px',
             }}
           >
-            <span style={{ fontSize: '28px' }}>🍷</span>
+            <span style={{ fontSize: '28px' }} aria-hidden="true">
+              🍷
+            </span>
             <h1
               style={{
                 margin: 0,

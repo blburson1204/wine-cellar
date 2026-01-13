@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: January 11, 2026
+**Last Updated**: January 12, 2026
 
 ## Project Overview
 
@@ -324,6 +324,34 @@ detailed test breakdown.
       add/edit mode)
 - [x] Hover effects and transitions (200ms)
 - [x] Inter font family for clean typography
+
+### Accessibility (WCAG Compliance)
+
+- [x] **Modal Accessibility**: `role="dialog"`, `aria-modal="true"`,
+      `aria-labelledby` linking to modal title
+- [x] **Escape Key Support**: Press Escape to close modals
+- [x] **Focus Trap**: Tab/Shift+Tab cycles within modal, preventing focus escape
+- [x] **Visible Focus Indicators**: Burgundy outline (`#7C2D3C`) on all
+      interactive elements when focused via keyboard
+  - Form inputs, selects, textareas: 2px outline with box-shadow
+  - Buttons: 2px outline with 2px offset on `:focus-visible`
+  - Table rows: 2px inset outline on focused row
+  - Custom checkboxes: `:focus-within` on parent label highlights checkbox
+    indicator
+- [x] **Screen Reader Support**: Decorative emojis hidden with
+      `aria-hidden="true"`
+  - Header wine glass icon
+  - Empty state wine icons
+  - Error boundary warning icon
+  - Placeholder wine icons in detail modal
+
+**Files Modified for Accessibility:**
+
+- `WineDetailModal.tsx` - Modal ARIA attributes, Escape key, focus trap
+- `WineFilters.tsx` - Focus styles for inputs, selects, custom checkboxes
+- `WineTable.tsx` - Focus indicator on table rows with tabIndex
+- `layout.tsx` - aria-hidden on header emoji
+- `ErrorBoundary.tsx` - aria-hidden on warning emoji
 
 ### Error Handling & Logging ✅
 

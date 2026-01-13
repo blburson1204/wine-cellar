@@ -97,7 +97,9 @@ export default function WineTable({
           borderRadius: '8px',
         }}
       >
-        <div style={{ fontSize: '64px', marginBottom: '16px' }}>🍷</div>
+        <div style={{ fontSize: '64px', marginBottom: '16px' }} aria-hidden="true">
+          🍷
+        </div>
         <h3
           style={{
             color: 'rgba(255, 255, 255, 0.7)',
@@ -329,12 +331,15 @@ export default function WineTable({
             return (
               <tr
                 key={wine.id}
+                tabIndex={isFocused ? 0 : -1}
                 style={{
                   transition: 'background-color 0.2s',
                   cursor: 'pointer',
                   backgroundColor: isFocused ? '#7a0215' : '#221a13',
                   color: isFocused ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.7)',
                   fontWeight: isFocused ? '700' : '400',
+                  outline: isFocused ? '2px solid #7C2D3C' : 'none',
+                  outlineOffset: '-2px',
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.backgroundColor = '#7a0215';

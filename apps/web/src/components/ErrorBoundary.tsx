@@ -59,6 +59,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 fontSize: '64px',
                 marginBottom: '16px',
               }}
+              aria-hidden="true"
             >
               ⚠️
             </div>

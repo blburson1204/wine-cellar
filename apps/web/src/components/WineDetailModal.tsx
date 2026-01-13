@@ -122,6 +122,7 @@ export default function WineDetailModal({
   const nameInputRef = useRef<HTMLInputElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Update currentImageUrl when wine prop changes
   useEffect(() => {
@@ -163,6 +164,38 @@ export default function WineDetailModal({
       closeButtonRef.current.focus();
     }
   }, [isEditMode, mode]);
+
+  // Escape key handler and focus trap for accessibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Close modal on Escape
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      // Focus trap - keep Tab cycling within modal
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   if (mode === 'view' && !wine) return null;
 
@@ -477,13 +510,17 @@ export default function WineDetailModal({
 
   return (
     <>
-      {/* Custom focus styles for form inputs */}
+      {/* Custom focus styles for form inputs and buttons */}
       <style>{`
         .wine-modal-form input:focus,
         .wine-modal-form select:focus,
         .wine-modal-form textarea:focus {
           outline: none;
           box-shadow: 0 0 0 2px #7C2D3C;
+        }
+        .wine-modal-form button:focus-visible {
+          outline: 2px solid #7C2D3C;
+          outline-offset: 2px;
         }
       `}</style>
       <div
@@ -503,6 +540,10 @@ export default function WineDetailModal({
         onClick={onClose}
       >
         <div
+          ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wine-modal-title"
           className="wine-modal-form"
           style={{
             backgroundColor: '#221a13',
@@ -527,6 +568,7 @@ export default function WineDetailModal({
               }}
             >
               <h2
+                id="wine-modal-title"
                 style={{
                   margin: 0,
                   fontSize: '24px',
@@ -552,6 +594,7 @@ export default function WineDetailModal({
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <h2
+                    id="wine-modal-title"
                     style={{
                       margin: '0',
                       fontSize: '24px',
@@ -882,7 +925,12 @@ export default function WineDetailModal({
                         padding: '40px 20px',
                       }}
                     >
-                      <div style={{ fontSize: '80px', color: 'rgba(255, 255, 255, 0.3)' }}>🍷</div>
+                      <div
+                        style={{ fontSize: '80px', color: 'rgba(255, 255, 255, 0.3)' }}
+                        aria-hidden="true"
+                      >
+                        🍷
+                      </div>
                       <div
                         style={{
                           fontSize: '14px',
@@ -1669,7 +1717,10 @@ export default function WineDetailModal({
                               padding: '40px 20px',
                             }}
                           >
-                            <div style={{ fontSize: '80px', color: 'rgba(255, 255, 255, 0.3)' }}>
+                            <div
+                              style={{ fontSize: '80px', color: 'rgba(255, 255, 255, 0.3)' }}
+                              aria-hidden="true"
+                            >
                               🍷
                             </div>
                             <div
@@ -1694,7 +1745,10 @@ export default function WineDetailModal({
                             padding: '40px 20px',
                           }}
                         >
-                          <div style={{ fontSize: '80px', color: 'rgba(255, 255, 255, 0.3)' }}>
+                          <div
+                            style={{ fontSize: '80px', color: 'rgba(255, 255, 255, 0.3)' }}
+                            aria-hidden="true"
+                          >
                             🍷
                           </div>
                           <div
