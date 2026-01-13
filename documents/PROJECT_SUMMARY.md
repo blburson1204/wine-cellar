@@ -289,6 +289,15 @@ curl -X POST http://localhost:3001/api/wines \
 - **Isolated test directories**: Tests use separate `uploads-test/wines`
   directory to prevent cleanup from deleting real uploaded images
 
+**CI/CD Pipeline** (GitHub Actions):
+
+- Runs on all PRs and pushes to main/develop branches
+- **Lint job**: ESLint + Prettier format checking
+- **Type-check job**: TypeScript compilation verification
+- **Test job**: Full test suite with PostgreSQL service container, coverage
+  upload to Codecov
+- **Build job**: Verifies both API and Web apps compile successfully
+
 ### Test Coverage Metrics
 
 **API Coverage:**
