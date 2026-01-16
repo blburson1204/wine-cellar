@@ -522,6 +522,10 @@ export default function WineDetailModal({
           outline: 2px solid #7C2D3C;
           outline-offset: 2px;
         }
+        .wine-modal-form input::placeholder,
+        .wine-modal-form textarea::placeholder {
+          color: rgba(0, 0, 0, 0.5);
+        }
       `}</style>
       <div
         style={{
@@ -563,7 +567,7 @@ export default function WineDetailModal({
           {isEditMode && (
             <div
               style={{
-                padding: '24px 32px 16px 32px',
+                padding: '16px 24px 12px 24px',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
               }}
             >
@@ -586,7 +590,7 @@ export default function WineDetailModal({
             style={{
               flex: 1,
               overflowY: 'auto',
-              padding: '32px',
+              padding: '24px',
             }}
           >
             {/* Header - only show for view mode (not edit/add mode) */}
@@ -1050,7 +1054,7 @@ export default function WineDetailModal({
                 )}
 
                 {/* Main content flex container */}
-                <div style={{ display: 'flex', gap: '24px', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', gap: '20px', marginBottom: '12px' }}>
                   {/* Left side - Edit Form */}
                   <div style={{ flex: 1 }}>
                     {/* Edit Form Grid - 12 column layout for flexible widths */}
@@ -1058,8 +1062,8 @@ export default function WineDetailModal({
                       style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(12, 1fr)',
-                        gap: '16px 24px',
-                        marginBottom: '24px',
+                        gap: '12px 16px',
+                        marginBottom: '8px',
                       }}
                     >
                       {/* Vintage - (3 cols) */}
@@ -1067,8 +1071,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1085,13 +1089,13 @@ export default function WineDetailModal({
                           min={1900}
                           max={new Date().getFullYear()}
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.vintage ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1107,8 +1111,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1120,13 +1124,13 @@ export default function WineDetailModal({
                           value={editForm.name || ''}
                           onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.name ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1142,8 +1146,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1154,13 +1158,13 @@ export default function WineDetailModal({
                           value={editForm.color || ''}
                           onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.color ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             cursor: 'pointer',
                             boxSizing: 'border-box',
                           }}
@@ -1232,8 +1236,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1245,13 +1249,13 @@ export default function WineDetailModal({
                           value={editForm.producer || ''}
                           onChange={(e) => setEditForm({ ...editForm, producer: e.target.value })}
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.producer ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1267,8 +1271,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1280,13 +1284,13 @@ export default function WineDetailModal({
                           value={editForm.country || ''}
                           onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.country ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1302,8 +1306,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1317,13 +1321,13 @@ export default function WineDetailModal({
                             setEditForm({ ...editForm, region: e.target.value || null })
                           }
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.region ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1334,13 +1338,13 @@ export default function WineDetailModal({
                         )}
                       </div>
 
-                      {/* Grape Variety - Narrower (5 cols) */}
-                      <div style={{ gridColumn: 'span 5' }}>
+                      {/* Grape Variety - (4 cols) */}
+                      <div style={{ gridColumn: 'span 4' }}>
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1354,13 +1358,13 @@ export default function WineDetailModal({
                             setEditForm({ ...editForm, grapeVariety: e.target.value || null })
                           }
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.grapeVariety ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1371,13 +1375,13 @@ export default function WineDetailModal({
                         )}
                       </div>
 
-                      {/* Blend Details - Wider (7 cols) */}
-                      <div style={{ gridColumn: 'span 7' }}>
+                      {/* Blend Details - (8 cols) */}
+                      <div style={{ gridColumn: 'span 8' }}>
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1392,13 +1396,13 @@ export default function WineDetailModal({
                             setEditForm({ ...editForm, blendDetail: e.target.value || null })
                           }
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.blendDetail ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1414,8 +1418,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1436,13 +1440,13 @@ export default function WineDetailModal({
                           }
                           placeholder="e.g., 3.6"
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.rating ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1458,8 +1462,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1477,13 +1481,13 @@ export default function WineDetailModal({
                             })
                           }
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.purchasePrice ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1499,8 +1503,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1566,13 +1570,13 @@ export default function WineDetailModal({
                             }));
                           }}
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.purchaseDate ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1595,8 +1599,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1611,13 +1615,13 @@ export default function WineDetailModal({
                           }
                           min={0}
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.quantity ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1633,8 +1637,8 @@ export default function WineDetailModal({
                         <label
                           style={{
                             display: 'block',
-                            marginBottom: '4px',
-                            fontSize: '14px',
+                            marginBottom: '2px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
@@ -1649,13 +1653,13 @@ export default function WineDetailModal({
                           }
                           placeholder="https://..."
                           style={{
-                            padding: '10px',
-                            fontSize: '16px',
+                            padding: '8px',
+                            fontSize: '14px',
                             border: errors.wineLink ? '1px solid #C73E3A' : 'none',
                             borderRadius: '4px',
                             width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
                             boxSizing: 'border-box',
                           }}
                         />
@@ -1670,7 +1674,7 @@ export default function WineDetailModal({
 
                   {/* Right side - Wine Label Image with Upload/Delete */}
                   {(wine || mode === 'add') && (
-                    <div style={{ flexShrink: 0, width: '300px' }}>
+                    <div style={{ flexShrink: 0, width: '270px' }}>
                       {/* Image Display */}
                       {mode === 'add' && stagedImagePreview ? (
                         // Show staged image preview in add mode
@@ -1945,12 +1949,12 @@ export default function WineDetailModal({
                 </div>
 
                 {/* Tasting Notes - Full Width Below */}
-                <div style={{ marginBottom: '24px' }}>
+                <div style={{ marginBottom: '8px' }}>
                   <label
                     style={{
                       display: 'block',
-                      marginBottom: '4px',
-                      fontSize: '14px',
+                      marginBottom: '2px',
+                      fontSize: '13px',
                       fontWeight: '700',
                       color: 'rgba(255, 255, 255, 0.7)',
                     }}
@@ -1961,15 +1965,15 @@ export default function WineDetailModal({
                     value={editForm.notes || ''}
                     onChange={(e) => setEditForm({ ...editForm, notes: e.target.value || null })}
                     maxLength={2000}
-                    rows={4}
+                    rows={3}
                     style={{
-                      padding: '10px',
-                      fontSize: '16px',
+                      padding: '8px',
+                      fontSize: '14px',
                       border: errors.notes ? '1px solid #C73E3A' : 'none',
                       borderRadius: '4px',
                       width: '100%',
-                      backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                      color: 'rgba(255, 255, 255, 0.7)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                      color: 'rgba(0, 0, 0, 0.8)',
                       boxSizing: 'border-box',
                       fontFamily: 'inherit',
                       resize: 'vertical',
@@ -1999,7 +2003,7 @@ export default function WineDetailModal({
           {(isEditMode || mode === 'add') && (
             <div
               style={{
-                padding: '16px 32px',
+                padding: '12px 24px',
                 borderTop: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'flex',
                 justifyContent: 'flex-end',
@@ -2011,13 +2015,13 @@ export default function WineDetailModal({
                 onClick={handleCancelEdit}
                 disabled={isSaving}
                 style={{
-                  padding: '10px 20px',
-                  minWidth: '130px',
+                  padding: '8px 16px',
+                  minWidth: '110px',
                   backgroundColor: 'transparent',
                   color: 'rgba(255, 255, 255, 0.7)',
                   border: '1px solid rgba(255, 255, 255, 0.4)',
                   borderRadius: '6px',
-                  fontSize: '16px',
+                  fontSize: '14px',
                   cursor: isSaving ? 'not-allowed' : 'pointer',
                   fontWeight: '700',
                   transition: 'all 0.2s',
@@ -2036,13 +2040,13 @@ export default function WineDetailModal({
                 onClick={handleSave}
                 disabled={isSaving}
                 style={{
-                  padding: '10px 20px',
-                  minWidth: '130px',
+                  padding: '8px 16px',
+                  minWidth: '110px',
                   backgroundColor: isSaving ? '#5a0210' : '#3d010b',
                   color: 'rgba(255, 255, 255, 0.7)',
                   border: 'none',
                   borderRadius: '6px',
-                  fontSize: '16px',
+                  fontSize: '14px',
                   cursor: isSaving ? 'not-allowed' : 'pointer',
                   fontWeight: '700',
                   transition: 'all 0.2s',

@@ -91,6 +91,9 @@ export default function WineFilters({
           outline: 2px solid #7C2D3C;
           outline-offset: 2px;
         }
+        .wine-filters input::placeholder {
+          color: rgba(0, 0, 0, 0.5);
+        }
       `}</style>
       <div
         className="wine-filters"
@@ -130,7 +133,7 @@ export default function WineFilters({
                 display: 'block',
                 marginBottom: '4px',
                 fontSize: '14px',
-                fontWeight: '700',
+                fontWeight: '400',
                 color: 'rgba(255, 255, 255, 0.7)',
                 backgroundColor: '#221a13',
               }}
@@ -149,8 +152,8 @@ export default function WineFilters({
                 border: 'none',
                 borderRadius: '4px',
                 width: '100%',
-                backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                color: 'rgba(255, 255, 255, 0.7)',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                color: 'rgba(0, 0, 0, 0.7)',
                 boxSizing: 'border-box',
               }}
             />
@@ -163,7 +166,7 @@ export default function WineFilters({
                 display: 'block',
                 marginBottom: '4px',
                 fontSize: '14px',
-                fontWeight: '700',
+                fontWeight: '400',
                 color: 'rgba(255, 255, 255, 0.7)',
                 backgroundColor: '#221a13',
               }}
@@ -173,7 +176,7 @@ export default function WineFilters({
             <div
               style={{
                 padding: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
                 borderRadius: '4px',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
@@ -209,7 +212,7 @@ export default function WineFilters({
                         width: '16px',
                         height: '16px',
                         borderRadius: '3px',
-                        border: isSelected ? '2px solid #7C2D3C' : '2px solid #d5ccc5',
+                        border: isSelected ? '2px solid #7C2D3C' : '2px solid rgba(0, 0, 0, 0.4)',
                         backgroundColor: isSelected ? '#7C2D3C' : 'transparent',
                         display: 'flex',
                         alignItems: 'center',
@@ -223,7 +226,9 @@ export default function WineFilters({
                         </span>
                       )}
                     </span>
-                    <span style={{ fontSize: '13px', color: '#d5ccc5' }}>{color.label}</span>
+                    <span style={{ fontSize: '13px', color: 'rgba(0, 0, 0, 0.7)' }}>
+                      {color.label}
+                    </span>
                   </label>
                 );
               })}
@@ -239,7 +244,7 @@ export default function WineFilters({
                   display: 'block',
                   marginBottom: '4px',
                   fontSize: '14px',
-                  fontWeight: '700',
+                  fontWeight: '400',
                   color: 'rgba(255, 255, 255, 0.7)',
                   backgroundColor: '#221a13',
                 }}
@@ -256,8 +261,8 @@ export default function WineFilters({
                   border: 'none',
                   borderRadius: '4px',
                   width: '100%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                  color: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                  color: 'rgba(0, 0, 0, 0.7)',
                   cursor: 'pointer',
                   boxSizing: 'border-box',
                 }}
@@ -286,7 +291,7 @@ export default function WineFilters({
                   display: 'block',
                   marginBottom: '4px',
                   fontSize: '14px',
-                  fontWeight: '700',
+                  fontWeight: '400',
                   color: 'rgba(255, 255, 255, 0.7)',
                   backgroundColor: '#221a13',
                 }}
@@ -303,8 +308,8 @@ export default function WineFilters({
                   border: 'none',
                   borderRadius: '4px',
                   width: '100%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                  color: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                  color: 'rgba(0, 0, 0, 0.7)',
                   cursor: 'pointer',
                   boxSizing: 'border-box',
                 }}
@@ -338,7 +343,7 @@ export default function WineFilters({
                     display: 'block',
                     marginBottom: '4px',
                     fontSize: '14px',
-                    fontWeight: '700',
+                    fontWeight: '400',
                     color: 'rgba(255, 255, 255, 0.7)',
                     backgroundColor: '#221a13',
                   }}
@@ -351,7 +356,7 @@ export default function WineFilters({
                     flexDirection: 'column',
                     gap: '4px',
                     padding: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
                     borderRadius: '4px',
                   }}
                 >
@@ -380,7 +385,9 @@ export default function WineFilters({
                         width: '16px',
                         height: '16px',
                         borderRadius: '3px',
-                        border: showOnlyInCellar ? '2px solid #7C2D3C' : '2px solid #d5ccc5',
+                        border: showOnlyInCellar
+                          ? '2px solid #7C2D3C'
+                          : '2px solid rgba(0, 0, 0, 0.4)',
                         backgroundColor: showOnlyInCellar ? '#7C2D3C' : 'transparent',
                         display: 'flex',
                         alignItems: 'center',
@@ -394,7 +401,7 @@ export default function WineFilters({
                         </span>
                       )}
                     </span>
-                    <span style={{ fontSize: '13px', color: '#d5ccc5' }}>In Cellar</span>
+                    <span style={{ fontSize: '13px', color: 'rgba(0, 0, 0, 0.7)' }}>In Cellar</span>
                   </label>
                   <label
                     style={{
@@ -421,7 +428,9 @@ export default function WineFilters({
                         width: '16px',
                         height: '16px',
                         borderRadius: '3px',
-                        border: showOnlyFavorites ? '2px solid #7C2D3C' : '2px solid #d5ccc5',
+                        border: showOnlyFavorites
+                          ? '2px solid #7C2D3C'
+                          : '2px solid rgba(0, 0, 0, 0.4)',
                         backgroundColor: showOnlyFavorites ? '#7C2D3C' : 'transparent',
                         display: 'flex',
                         alignItems: 'center',
@@ -435,7 +444,7 @@ export default function WineFilters({
                         </span>
                       )}
                     </span>
-                    <span style={{ fontSize: '13px', color: '#d5ccc5' }}>Favorites</span>
+                    <span style={{ fontSize: '13px', color: 'rgba(0, 0, 0, 0.7)' }}>Favorites</span>
                   </label>
                 </div>
               </div>
@@ -446,7 +455,7 @@ export default function WineFilters({
                     display: 'block',
                     marginBottom: '4px',
                     fontSize: '14px',
-                    fontWeight: '700',
+                    fontWeight: '400',
                     color: 'rgba(255, 255, 255, 0.7)',
                     backgroundColor: '#221a13',
                   }}
@@ -465,8 +474,8 @@ export default function WineFilters({
                     border: 'none',
                     borderRadius: '4px',
                     width: '100%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                    color: 'rgba(0, 0, 0, 0.7)',
                     cursor: 'pointer',
                     boxSizing: 'border-box',
                   }}
@@ -512,7 +521,7 @@ export default function WineFilters({
                   display: 'block',
                   marginBottom: '4px',
                   fontSize: '14px',
-                  fontWeight: '700',
+                  fontWeight: '400',
                   color: 'rgba(255, 255, 255, 0.7)',
                   backgroundColor: '#221a13',
                 }}
@@ -526,7 +535,7 @@ export default function WineFilters({
                   justifyContent: 'center',
                   gap: '8px',
                   padding: '8px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
                   borderRadius: '4px',
                   height: '59px',
                   boxSizing: 'border-box',
@@ -550,7 +559,7 @@ export default function WineFilters({
                     border: 'none',
                     borderRadius: '4px',
                     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    color: 'rgba(255, 255, 255, 0.9)',
+                    color: 'rgba(0, 0, 0, 0.7)',
                     boxSizing: 'border-box',
                     cursor: priceMin === priceMax ? 'not-allowed' : 'text',
                     minWidth: 0,
@@ -575,7 +584,7 @@ export default function WineFilters({
                     border: 'none',
                     borderRadius: '4px',
                     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                    color: 'rgba(255, 255, 255, 0.9)',
+                    color: 'rgba(0, 0, 0, 0.7)',
                     boxSizing: 'border-box',
                     cursor: priceMin === priceMax ? 'not-allowed' : 'text',
                     minWidth: 0,
