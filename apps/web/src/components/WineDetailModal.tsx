@@ -898,7 +898,7 @@ export default function WineDetailModal({
                   </div>
 
                   {/* Right side - Wine Label Image */}
-                  <div style={{ flexShrink: 0, width: '300px' }}>
+                  <div style={{ flexShrink: 0, width: '270px' }}>
                     {currentImageUrl ? (
                       <img
                         src={`/api/wines/${wine.id}/image?t=${imageTimestamp}`}
