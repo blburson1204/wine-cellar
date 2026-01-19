@@ -322,9 +322,163 @@ instances._
 
 ---
 
+## Low-Cost Alternative: Vercel + Railway/Supabase (Recommended for Personal Use)
+
+For a single-user application with minimal ongoing costs, this approach is
+simpler and can stay free or under $5/month indefinitely.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│  ┌─────────────┐         ┌─────────────────────────────┐   │
+│  │   Vercel    │         │  Railway OR Supabase        │   │
+│  │  (Next.js)  │ ──API──▶│  (Express API + PostgreSQL) │   │
+│  │   FREE      │         │  FREE tier / ~$5/mo         │   │
+│  └─────────────┘         └─────────────────────────────┘   │
+│                                    │                        │
+│                                    ▼                        │
+│                          ┌─────────────────┐               │
+│                          │  Cloudinary OR  │               │
+│                          │  Uploadthing    │               │
+│                          │  (Images) FREE  │               │
+│                          └─────────────────┘               │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Option A: Vercel + Railway (Recommended)
+
+**Vercel (Frontend)** - FREE
+
+- Native Next.js support with zero configuration
+- Automatic deployments from GitHub
+- Global CDN included
+- Free tier: 100GB bandwidth, unlimited deploys
+
+**Railway (Backend + Database)** - FREE to ~$5/mo
+
+- Simple deploy from GitHub
+- PostgreSQL included
+- Free tier: $5 credit/month (usually covers personal use)
+- No cold starts, always running
+
+**Steps:**
+
+1. Sign up for Vercel, connect GitHub repo
+2. Configure build: `apps/web` as root, `npm run build`
+3. Sign up for Railway, create new project
+4. Add PostgreSQL database (one click)
+5. Deploy API from `apps/api` directory
+6. Set environment variables in both services
+7. Update API URL in Vercel environment
+
+### Option B: Vercel + Supabase
+
+**Vercel (Frontend)** - FREE (same as above)
+
+**Supabase (Database + Storage)** - FREE
+
+- PostgreSQL database with generous free tier
+- Built-in file storage for wine images
+- Free tier: 500MB database, 1GB storage, 2GB bandwidth
+- REST API included (could replace Express for simple queries)
+
+**Steps:**
+
+1. Sign up for Supabase, create project
+2. Get connection string for Prisma
+3. Deploy API to Vercel as serverless functions OR Railway
+4. Use Supabase Storage for wine images
+5. Connect frontend to API
+
+### Option C: Vercel + Neon (Serverless Postgres)
+
+**Neon** - FREE
+
+- Serverless PostgreSQL (scales to zero)
+- Free tier: 0.5GB storage, autosuspend after 5 min inactivity
+- Great for low-traffic personal apps
+
+### Cost Comparison
+
+| Approach              | Monthly Cost | Complexity | Best For                           |
+| --------------------- | ------------ | ---------- | ---------------------------------- |
+| **Vercel + Railway**  | $0-5         | Low        | Personal use, always-on            |
+| **Vercel + Supabase** | $0           | Low        | If using Supabase features         |
+| **Vercel + Neon**     | $0           | Low        | Minimal usage, OK with cold starts |
+| **Full AWS**          | $50-110      | High       | Production, multiple users         |
+
+### Image Storage Options (Free Tier)
+
+| Service              | Free Tier                    | Notes                     |
+| -------------------- | ---------------------------- | ------------------------- |
+| **Cloudinary**       | 25GB storage, 25GB bandwidth | Easy transforms, good API |
+| **Uploadthing**      | 2GB storage                  | Simple React integration  |
+| **Supabase Storage** | 1GB storage                  | If using Supabase         |
+| **Vercel Blob**      | 1GB                          | Native Vercel integration |
+
+### Implementation Steps for Vercel + Railway
+
+#### Phase 1: Prepare the Codebase
+
+- [ ] Add `vercel.json` for frontend configuration
+- [ ] Update API for Railway (Procfile or railway.json)
+- [ ] Create production environment variables template
+- [ ] Update image storage to use Cloudinary/Uploadthing
+
+#### Phase 2: Deploy Database
+
+- [ ] Create Railway account and project
+- [ ] Add PostgreSQL plugin
+- [ ] Get DATABASE_URL connection string
+- [ ] Run Prisma migrations
+
+#### Phase 3: Deploy API
+
+- [ ] Connect Railway to GitHub repo (apps/api)
+- [ ] Configure environment variables
+- [ ] Verify API is running
+- [ ] Note the public API URL
+
+#### Phase 4: Deploy Frontend
+
+- [ ] Create Vercel account
+- [ ] Import GitHub repo
+- [ ] Set root directory to `apps/web`
+- [ ] Add environment variables (API_URL)
+- [ ] Deploy
+
+#### Phase 5: Configure Domain (Optional)
+
+- [ ] Add custom domain in Vercel (free)
+- [ ] Update CORS settings in API
+
+### Advantages Over Full AWS
+
+1. **Zero DevOps**: No VPC, security groups, IAM roles to manage
+2. **Automatic scaling**: Both services handle traffic spikes
+3. **Free SSL**: Included automatically
+4. **Git-based deploys**: Push to main = deployed
+5. **No expiring free tier**: Unlike AWS 12-month limit
+6. **Simpler debugging**: Better logs and error tracking
+
+### When to Upgrade to AWS
+
+Consider moving to AWS when:
+
+- Multiple users need the app simultaneously
+- You need guaranteed uptime SLAs
+- Storage needs exceed free tier limits
+- You want more control over infrastructure
+- Compliance requirements demand it
+
+---
+
 ## Next Steps
 
-1. Decide on deployment option (App Runner vs ECS vs EC2)
-2. Decide on frontend hosting (Amplify vs S3+CloudFront)
-3. Set up AWS account and IAM
-4. Begin Phase 1 preparation work
+1. **For personal/low-cost**: Start with Vercel + Railway approach
+2. **For production/scale**: Follow the full AWS deployment phases
+3. Decide on image storage solution
+4. Begin preparation work
