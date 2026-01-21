@@ -414,4 +414,348 @@ describe('WineTable', () => {
       expect(priceHeader).toHaveTextContent('↑');
     });
   });
+
+  describe('Keyboard Navigation', () => {
+    it('navigates down with ArrowDown key', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      // First row should be focused initially
+      const rows = screen.getAllByRole('row').slice(1); // Skip header row
+      expect(rows[0]).toHaveAttribute('tabIndex', '0');
+      expect(rows[1]).toHaveAttribute('tabIndex', '-1');
+
+      // Press arrow down
+      await user.keyboard('{ArrowDown}');
+
+      // Second row should now be focused
+      expect(rows[0]).toHaveAttribute('tabIndex', '-1');
+      expect(rows[1]).toHaveAttribute('tabIndex', '0');
+    });
+
+    it('navigates up with ArrowUp key', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const rows = screen.getAllByRole('row').slice(1);
+
+      // Navigate down first
+      await user.keyboard('{ArrowDown}');
+      expect(rows[1]).toHaveAttribute('tabIndex', '0');
+
+      // Navigate back up
+      await user.keyboard('{ArrowUp}');
+      expect(rows[0]).toHaveAttribute('tabIndex', '0');
+    });
+
+    it('does not go below the last row', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const rows = screen.getAllByRole('row').slice(1);
+
+      // Navigate to last row
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{ArrowDown}');
+      expect(rows[2]).toHaveAttribute('tabIndex', '0');
+
+      // Try to go past last row
+      await user.keyboard('{ArrowDown}');
+      expect(rows[2]).toHaveAttribute('tabIndex', '0'); // Should stay on last row
+    });
+
+    it('does not go above the first row', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const rows = screen.getAllByRole('row').slice(1);
+
+      // Try to go above first row
+      await user.keyboard('{ArrowUp}');
+      expect(rows[0]).toHaveAttribute('tabIndex', '0'); // Should stay on first row
+    });
+
+    it('opens wine details with Enter key', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      // Press Enter to open first wine
+      await user.keyboard('{Enter}');
+
+      expect(mockOnRowClick).toHaveBeenCalledWith(mockWines[0]);
+    });
+
+    it('opens correct wine after navigation with Enter', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      // Navigate to second row and press Enter
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{Enter}');
+
+      expect(mockOnRowClick).toHaveBeenCalledWith(mockWines[1]);
+    });
+
+    it('does not navigate when wines list is empty', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} wines={[]} />);
+
+      // These should not throw errors
+      await user.keyboard('{ArrowDown}');
+      await user.keyboard('{ArrowUp}');
+      await user.keyboard('{Enter}');
+
+      expect(mockOnRowClick).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Focus Management', () => {
+    it('resets focus index when wines list changes and focused index is out of bounds', () => {
+      const { rerender } = render(<WineTable {...defaultProps} />);
+
+      // Rerender with fewer wines - should reset focus to 0
+      const fewerWines = [mockWines[0]];
+      rerender(<WineTable {...defaultProps} wines={fewerWines} />);
+
+      const rows = screen.getAllByRole('row').slice(1);
+      expect(rows[0]).toHaveAttribute('tabIndex', '0');
+    });
+
+    it('updates focus when row is clicked', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const rows = screen.getAllByRole('row').slice(1);
+
+      // Click on second row
+      await user.click(rows[1]);
+
+      expect(rows[1]).toHaveAttribute('tabIndex', '0');
+      expect(rows[0]).toHaveAttribute('tabIndex', '-1');
+    });
+  });
+
+  describe('Favorite Toggle', () => {
+    it('calls onToggleFavorite when favorite star is clicked', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      // Find the first unfavorited star (☆)
+      const stars = screen.getAllByText('☆');
+      await user.click(stars[0]);
+
+      expect(mockOnToggleFavorite).toHaveBeenCalledWith(mockWines[0]);
+    });
+
+    it('calls onToggleFavorite when favorited star is clicked', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      // Find the favorited star (★) - second wine is favorited
+      const filledStar = screen.getByText('★');
+      await user.click(filledStar);
+
+      expect(mockOnToggleFavorite).toHaveBeenCalledWith(mockWines[1]);
+    });
+
+    it('does not trigger row click when favorite star is clicked', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const stars = screen.getAllByText('☆');
+      await user.click(stars[0]);
+
+      // onToggleFavorite should be called, but not onRowClick
+      expect(mockOnToggleFavorite).toHaveBeenCalled();
+      expect(mockOnRowClick).not.toHaveBeenCalled();
+    });
+
+    it('displays filled star for favorited wines', () => {
+      render(<WineTable {...defaultProps} />);
+
+      // Second wine is favorited
+      expect(screen.getByText('★')).toBeInTheDocument();
+    });
+
+    it('displays empty star for non-favorited wines', () => {
+      render(<WineTable {...defaultProps} />);
+
+      // First and third wines are not favorited
+      expect(screen.getAllByText('☆')).toHaveLength(2);
+    });
+  });
+
+  describe('Row Hover Effects', () => {
+    it('changes row style on mouse over', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const row = screen.getByText('Chateau Margaux').closest('tr')!;
+
+      await user.hover(row);
+
+      expect(row.style.backgroundColor).toBe('rgb(122, 2, 21)');
+      expect(row.style.fontWeight).toBe('700');
+    });
+
+    it('restores row style on mouse out for non-focused row', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      // Second row is not focused
+      const row = screen.getByText('Cloudy Bay Sauvignon Blanc').closest('tr')!;
+
+      await user.hover(row);
+      await user.unhover(row);
+
+      expect(row.style.backgroundColor).toBe('rgb(34, 26, 19)');
+      expect(row.style.fontWeight).toBe('400');
+    });
+
+    it('maintains highlight style on mouse out for focused row', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      // First row is focused by default
+      const row = screen.getByText('Chateau Margaux').closest('tr')!;
+
+      await user.hover(row);
+      await user.unhover(row);
+
+      // Should maintain focused style
+      expect(row.style.backgroundColor).toBe('rgb(122, 2, 21)');
+      expect(row.style.fontWeight).toBe('700');
+    });
+  });
+
+  describe('Null/Undefined Value Display', () => {
+    it('displays em dash for null region', () => {
+      const wineWithNullRegion = [
+        {
+          ...mockWines[0],
+          region: null,
+        },
+      ];
+
+      render(<WineTable {...defaultProps} wines={wineWithNullRegion} />);
+
+      const rows = screen.getAllByRole('row');
+      const dataRow = rows[1];
+      // Region column should show em dash
+      expect(dataRow).toHaveTextContent('—');
+    });
+
+    it('displays em dash for null grape variety', () => {
+      const wineWithNullGrape = [
+        {
+          ...mockWines[0],
+          grapeVariety: null,
+        },
+      ];
+
+      render(<WineTable {...defaultProps} wines={wineWithNullGrape} />);
+
+      const rows = screen.getAllByRole('row');
+      const dataRow = rows[1];
+      expect(dataRow).toHaveTextContent('—');
+    });
+
+    it('displays em dash for null rating', () => {
+      const wineWithNullRating = [
+        {
+          ...mockWines[0],
+          rating: null,
+        },
+      ];
+
+      render(<WineTable {...defaultProps} wines={wineWithNullRating} />);
+
+      const rows = screen.getAllByRole('row');
+      const dataRow = rows[1];
+      expect(dataRow).toHaveTextContent('—');
+    });
+
+    it('displays No for zero quantity', () => {
+      const wineWithZeroQuantity = [
+        {
+          ...mockWines[0],
+          quantity: 0,
+        },
+      ];
+
+      render(<WineTable {...defaultProps} wines={wineWithZeroQuantity} />);
+
+      expect(screen.getByText('No')).toBeInTheDocument();
+    });
+  });
+
+  describe('Additional Wine Colors', () => {
+    it('displays wine type label for ROSE wine', () => {
+      const roseWine = [
+        {
+          ...mockWines[0],
+          color: 'ROSE',
+        },
+      ];
+
+      render(<WineTable {...defaultProps} wines={roseWine} />);
+
+      expect(screen.getByText('Rosé')).toBeInTheDocument();
+    });
+
+    it('displays wine type label for DESSERT wine', () => {
+      const dessertWine = [
+        {
+          ...mockWines[0],
+          color: 'DESSERT',
+        },
+      ];
+
+      render(<WineTable {...defaultProps} wines={dessertWine} />);
+
+      expect(screen.getByText('Dessert')).toBeInTheDocument();
+    });
+
+    it('displays wine type label for FORTIFIED wine', () => {
+      const fortifiedWine = [
+        {
+          ...mockWines[0],
+          color: 'FORTIFIED',
+        },
+      ];
+
+      render(<WineTable {...defaultProps} wines={fortifiedWine} />);
+
+      expect(screen.getByText('Fortified')).toBeInTheDocument();
+    });
+
+    it('displays raw color value for unknown color types', () => {
+      const unknownColorWine = [
+        {
+          ...mockWines[0],
+          color: 'ORANGE',
+        },
+      ];
+
+      render(<WineTable {...defaultProps} wines={unknownColorWine} />);
+
+      expect(screen.getByText('ORANGE')).toBeInTheDocument();
+    });
+  });
+
+  describe('MaxHeight Prop', () => {
+    it('applies maxHeight when provided', () => {
+      render(<WineTable {...defaultProps} maxHeight="500px" />);
+
+      const tableContainer = screen.getByRole('table').parentElement;
+      expect(tableContainer).toHaveStyle({ maxHeight: '500px' });
+    });
+
+    it('does not apply maxHeight when not provided', () => {
+      render(<WineTable {...defaultProps} />);
+
+      const tableContainer = screen.getByRole('table').parentElement;
+      expect(tableContainer).toHaveStyle({ maxHeight: '' });
+    });
+  });
 });

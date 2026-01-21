@@ -642,4 +642,485 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       });
     });
   });
+
+  describe('Image Upload in Add Mode', () => {
+    const mockOnCreate = vi.fn();
+
+    beforeEach(() => {
+      mockOnCreate.mockClear();
+    });
+
+    it('should show image upload UI in add mode', () => {
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Should show upload button in add mode
+      const uploadButton = screen.getByRole('button', { name: /upload.*image/i });
+      expect(uploadButton).toBeInTheDocument();
+
+      // Should have file input
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      expect(fileInput).toBeInTheDocument();
+      expect(fileInput?.accept).toBe('image/jpeg,image/png,image/webp');
+    });
+
+    it('should stage image and show preview when file selected in add mode', async () => {
+      const user = userEvent.setup();
+      const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
+
+      // Mock URL.createObjectURL
+      const mockObjectUrl = 'blob:http://localhost/test-image-preview';
+      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue(mockObjectUrl);
+
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Upload file
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, mockFile);
+
+      // Should show preview image
+      await waitFor(() => {
+        const previewImg = document.querySelector(
+          'img[alt="Wine label preview"]'
+        ) as HTMLImageElement;
+        expect(previewImg).toBeInTheDocument();
+        expect(previewImg.src).toBe(mockObjectUrl);
+      });
+
+      // Should NOT call fetch (image is staged, not uploaded yet)
+      expect(global.fetch).not.toHaveBeenCalled();
+
+      createObjectURLSpy.mockRestore();
+    });
+
+    it('should allow replacing staged image before saving', async () => {
+      const user = userEvent.setup();
+      const mockFile1 = new File(['test-image-1'], 'test1.jpg', { type: 'image/jpeg' });
+      const mockFile2 = new File(['test-image-2'], 'test2.jpg', { type: 'image/jpeg' });
+
+      const mockObjectUrl1 = 'blob:http://localhost/test-image-1';
+      const mockObjectUrl2 = 'blob:http://localhost/test-image-2';
+      const createObjectURLSpy = vi
+        .spyOn(URL, 'createObjectURL')
+        .mockReturnValueOnce(mockObjectUrl1)
+        .mockReturnValueOnce(mockObjectUrl2);
+      const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Upload first file
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, mockFile1);
+
+      // Verify first image is shown
+      await waitFor(() => {
+        const previewImg = document.querySelector(
+          'img[alt="Wine label preview"]'
+        ) as HTMLImageElement;
+        expect(previewImg).toBeInTheDocument();
+        expect(previewImg.src).toBe(mockObjectUrl1);
+      });
+
+      // Should now show "Replace" button
+      expect(screen.getByRole('button', { name: /replace/i })).toBeInTheDocument();
+
+      // Upload second file (replace)
+      await user.upload(fileInput, mockFile2);
+
+      // Verify second image is shown
+      await waitFor(() => {
+        const previewImg = document.querySelector(
+          'img[alt="Wine label preview"]'
+        ) as HTMLImageElement;
+        expect(previewImg.src).toBe(mockObjectUrl2);
+      });
+
+      createObjectURLSpy.mockRestore();
+      revokeObjectURLSpy.mockRestore();
+    });
+
+    it('should allow deleting staged image before saving', async () => {
+      const user = userEvent.setup();
+      const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
+
+      const mockObjectUrl = 'blob:http://localhost/test-image-preview';
+      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue(mockObjectUrl);
+      const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Upload file
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, mockFile);
+
+      // Verify image is shown
+      await waitFor(() => {
+        const previewImg = document.querySelector(
+          'img[alt="Wine label preview"]'
+        ) as HTMLImageElement;
+        expect(previewImg).toBeInTheDocument();
+      });
+
+      // Click delete button
+      const deleteButton = screen.getByRole('button', { name: /^delete$/i });
+      await user.click(deleteButton);
+
+      // Should show confirmation
+      await waitFor(() => {
+        expect(screen.getByText(/delete this image/i)).toBeInTheDocument();
+      });
+
+      // Confirm delete
+      const confirmButton = screen.getByRole('button', { name: /yes, delete/i });
+      await user.click(confirmButton);
+
+      // Image should be removed, placeholder should show
+      await waitFor(() => {
+        expect(screen.queryByAltText('Wine label preview')).not.toBeInTheDocument();
+        expect(screen.getByText(/no image/i)).toBeInTheDocument();
+      });
+
+      // Should revoke the blob URL
+      expect(revokeObjectURLSpy).toHaveBeenCalledWith(mockObjectUrl);
+
+      // Should NOT call fetch (no server request for staged image)
+      expect(global.fetch).not.toHaveBeenCalled();
+
+      createObjectURLSpy.mockRestore();
+      revokeObjectURLSpy.mockRestore();
+    });
+
+    it('should validate file size (5MB max) in add mode', async () => {
+      const user = userEvent.setup();
+      // Create a file that's larger than 5MB
+      const largeContent = new Array(6 * 1024 * 1024).fill('a').join('');
+      const largeFile = new File([largeContent], 'large.jpg', { type: 'image/jpeg' });
+
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Upload large file
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, largeFile);
+
+      // Should show error message
+      await waitFor(() => {
+        expect(screen.getByText(/exceeds maximum 5mb/i)).toBeInTheDocument();
+      });
+
+      // Should NOT stage the image
+      expect(screen.queryByAltText('Wine label preview')).not.toBeInTheDocument();
+    });
+
+    it('should validate file type (JPEG, PNG, WebP) in add mode', async () => {
+      const invalidFile = new File(['test-content'], 'test.gif', { type: 'image/gif' });
+
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Get the file input and simulate a change event directly
+      // (bypasses userEvent.upload which respects the accept attribute)
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+
+      // Create a custom event that simulates file selection
+      Object.defineProperty(fileInput, 'files', {
+        value: [invalidFile],
+        writable: false,
+      });
+
+      // Dispatch change event
+      const changeEvent = new Event('change', { bubbles: true });
+      fileInput.dispatchEvent(changeEvent);
+
+      // Should show error message
+      await waitFor(() => {
+        expect(screen.getByText(/please upload a jpeg, png, or webp image/i)).toBeInTheDocument();
+      });
+
+      // Should NOT stage the image
+      expect(screen.queryByAltText('Wine label preview')).not.toBeInTheDocument();
+    });
+
+    it('should upload staged image after creating wine', async () => {
+      const user = userEvent.setup();
+      const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
+      const createdWine = {
+        id: 'new-wine-123',
+        name: 'New Wine',
+        vintage: 2020,
+        producer: 'Test Producer',
+        country: 'France',
+        region: null,
+        grapeVariety: null,
+        blendDetail: null,
+        color: 'RED',
+        quantity: 0,
+        purchasePrice: null,
+        purchaseDate: null,
+        drinkByDate: null,
+        rating: null,
+        notes: null,
+        wineLink: null,
+        favorite: false,
+        imageUrl: null,
+      };
+
+      // Mock onCreate to return the created wine
+      mockOnCreate.mockResolvedValue(createdWine);
+
+      // Mock the image upload request
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ...createdWine, imageUrl: 'new-wine-123.jpg' }),
+      } as Response);
+
+      const mockObjectUrl = 'blob:http://localhost/test-image-preview';
+      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue(mockObjectUrl);
+      const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Fill required fields
+      const textInputs = screen.getAllByRole('textbox');
+      await user.type(textInputs[0], 'New Wine'); // Wine Name
+      await user.type(textInputs[1], 'Test Producer'); // Producer
+      await user.type(textInputs[2], 'France'); // Country
+
+      // Stage an image
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, mockFile);
+
+      // Verify image is staged
+      await waitFor(() => {
+        expect(screen.getByAltText('Wine label preview')).toBeInTheDocument();
+      });
+
+      // Submit the form
+      await user.click(screen.getByRole('button', { name: 'Add Wine' }));
+
+      // Should call onCreate first
+      await waitFor(() => {
+        expect(mockOnCreate).toHaveBeenCalled();
+      });
+
+      // Should then upload the image
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/wines/new-wine-123/image',
+          expect.objectContaining({
+            method: 'POST',
+            body: expect.any(FormData),
+          })
+        );
+      });
+
+      // Should call onUpdate with the new imageUrl
+      await waitFor(() => {
+        expect(mockOnUpdate).toHaveBeenCalledWith('new-wine-123', {
+          imageUrl: 'new-wine-123.jpg',
+        });
+      });
+
+      // Should clean up blob URL
+      expect(revokeObjectURLSpy).toHaveBeenCalledWith(mockObjectUrl);
+
+      // Should close the modal
+      expect(mockOnClose).toHaveBeenCalled();
+
+      createObjectURLSpy.mockRestore();
+      revokeObjectURLSpy.mockRestore();
+    });
+
+    it('should handle image upload failure gracefully (wine still created)', async () => {
+      const user = userEvent.setup();
+      const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
+      const createdWine = {
+        id: 'new-wine-123',
+        name: 'New Wine',
+        vintage: 2020,
+        producer: 'Test Producer',
+        country: 'France',
+        region: null,
+        grapeVariety: null,
+        blendDetail: null,
+        color: 'RED',
+        quantity: 0,
+        purchasePrice: null,
+        purchaseDate: null,
+        drinkByDate: null,
+        rating: null,
+        notes: null,
+        wineLink: null,
+        favorite: false,
+        imageUrl: null,
+      };
+
+      // Mock onCreate to return the created wine
+      mockOnCreate.mockResolvedValue(createdWine);
+
+      // Mock the image upload to fail
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: 'Upload failed' }),
+      } as Response);
+
+      const mockObjectUrl = 'blob:http://localhost/test-image-preview';
+      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue(mockObjectUrl);
+      const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Fill required fields
+      const textInputs = screen.getAllByRole('textbox');
+      await user.type(textInputs[0], 'New Wine');
+      await user.type(textInputs[1], 'Test Producer');
+      await user.type(textInputs[2], 'France');
+
+      // Stage an image
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, mockFile);
+
+      // Submit the form
+      await user.click(screen.getByRole('button', { name: 'Add Wine' }));
+
+      // Wine should still be created
+      await waitFor(() => {
+        expect(mockOnCreate).toHaveBeenCalled();
+      });
+
+      // Should show error message about image upload failure
+      await waitFor(() => {
+        expect(screen.getByText(/wine created, but image upload failed/i)).toBeInTheDocument();
+      });
+
+      // Should NOT call onUpdate since image upload failed
+      expect(mockOnUpdate).not.toHaveBeenCalled();
+
+      // Should eventually close the modal (after showing error)
+      await waitFor(
+        () => {
+          expect(mockOnClose).toHaveBeenCalled();
+        },
+        { timeout: 3000 }
+      );
+
+      createObjectURLSpy.mockRestore();
+      revokeObjectURLSpy.mockRestore();
+    });
+
+    it('should clear staged image when cancel is clicked', async () => {
+      const user = userEvent.setup();
+      const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
+
+      const mockObjectUrl = 'blob:http://localhost/test-image-preview';
+      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue(mockObjectUrl);
+
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      // Stage an image
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      await user.upload(fileInput, mockFile);
+
+      // Verify image is staged
+      await waitFor(() => {
+        expect(screen.getByAltText('Wine label preview')).toBeInTheDocument();
+      });
+
+      // Click cancel
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      // Should close the modal
+      expect(mockOnClose).toHaveBeenCalled();
+
+      // Should NOT have uploaded anything
+      expect(global.fetch).not.toHaveBeenCalled();
+
+      createObjectURLSpy.mockRestore();
+    });
+
+    it('should accept valid file types from file input accept attribute', () => {
+      render(
+        <WineDetailModal
+          wine={null}
+          mode="add"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+          onCreate={mockOnCreate}
+        />
+      );
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      expect(fileInput).toBeInTheDocument();
+      expect(fileInput.accept).toBe('image/jpeg,image/png,image/webp');
+    });
+  });
 });

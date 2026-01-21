@@ -170,7 +170,7 @@ phases.
 
 #### Testing
 
-1. **Backend Tests** (270 tests passing)
+1. **Backend Tests** (144 tests passing)
    - Upload endpoint tests (JPEG, PNG, WebP)
    - Delete endpoint tests
    - File validation tests
@@ -179,7 +179,16 @@ phases.
    - Concurrent upload tests
    - Security tests (file type spoofing, etc.)
 
-2. **Manual Testing** (7 scenarios)
+2. **Frontend Component Tests** (28 image tests + 73 additional coverage tests)
+   - Image display in view mode ✅
+   - Image upload in edit mode ✅
+   - Image upload in add mode ✅ (10 new tests - January 20, 2026)
+   - Staged image preview and replacement ✅
+   - File validation (size and type) ✅
+   - Graceful error handling ✅
+   - Blob URL cleanup ✅
+
+3. **Manual Testing** (7 scenarios)
    - Create wine with image ✅
    - Replace staged image before saving ✅
    - Remove staged image before saving ✅
@@ -187,6 +196,8 @@ phases.
    - Validation still works ✅
    - File type validation ✅
    - File size validation ✅
+
+**Total Tests**: 343 (144 API + 199 Web) - All passing ✅
 
 ### Technical Achievements
 
@@ -402,9 +413,9 @@ await sharp(buffer)
 
 ## Testing Strategy
 
-### Completed (Phase 1B)
+### Completed (Phase 1B + January 2026 Updates)
 
-**Backend Integration Tests** (270 tests passing):
+**Backend Tests** (144 tests passing):
 
 - ✅ Upload JPEG successfully
 - ✅ Upload PNG successfully
@@ -417,27 +428,37 @@ await sharp(buffer)
 - ✅ Cascade deletion (delete wine → delete image)
 - ✅ Image optimization
 
+**Frontend Component Tests** (28 image tests - January 20, 2026):
+
+- ✅ Image display in view mode
+- ✅ Image upload UI in add mode
+- ✅ Staged image preview
+- ✅ Replace/delete staged images
+- ✅ File validation in add mode (size and type)
+- ✅ Error handling in add mode
+- ✅ Blob URL cleanup
+- ✅ Image upload after wine creation
+- ✅ Graceful failure handling (wine created, image failed)
+
 **Manual Testing** (All scenarios passing):
 
 - ✅ 7 user scenarios tested and validated
 
 ### Planned (Phase 2)
 
-**Frontend Component Tests**:
+**Thumbnail Tests**:
 
-- ⏸️ Image upload UI in add mode
-- ⏸️ Staged image preview
-- ⏸️ Replace/delete staged images
-- ⏸️ File validation in add mode
-- ⏸️ Error handling in add mode
+- ⏸️ Thumbnail generation on upload
+- ⏸️ Thumbnail display in wine table
+- ⏸️ Lazy loading for thumbnails
 
 ---
 
 ## Future Phases
 
-### Phase 2: Thumbnails & Component Tests
+### Phase 2: Thumbnails
 
-**Goal**: Add thumbnail images to wine table and complete frontend test coverage
+**Goal**: Add thumbnail images to wine table for visual browsing
 
 **Priority**: MEDIUM
 
@@ -447,17 +468,18 @@ await sharp(buffer)
 2. Store thumbnailUrl in database
 3. Display thumbnails in wine table (40x40px display size)
 4. Implement lazy loading for thumbnails
-5. Add component tests for image upload in add mode
-6. Add integration tests for create-with-image flow
 
 **Success Criteria**:
 
 - Thumbnails appear in wine table
 - Fast loading with lazy loading
-- All frontend component tests passing
-- No regression in existing 270 tests
+- Thumbnail file size < 30KB average
+- No regression in existing 343 tests
 
 **Estimated Time**: 2-3 days
+
+**Note**: Component tests for image upload in add mode were completed January
+20, 2026 and are no longer part of this phase.
 
 ---
 
@@ -650,12 +672,12 @@ drag-and-drop
 
 ## Next Steps
 
-✅ **Phase 1A & 1B: COMPLETE**
+✅ **Phase 1A & 1B: COMPLETE** ✅ **Component Tests: COMPLETE** (January
+20, 2026)
 
 **Immediate Next (Optional)**:
 
-1. Add component tests for image upload in add mode (deferred but valuable)
-2. Consider Phase 2 implementation (thumbnails in table view)
+1. Consider Phase 2 implementation (thumbnails in table view)
 
 **Production Deployment**:
 
@@ -670,5 +692,5 @@ drag-and-drop
 
 ---
 
-**Document Status**: Updated January 8, 2026 **Phase 1 Status**: COMPLETE ✅
-**Next Phase**: Phase 2 - Thumbnails & Tests (optional)
+**Document Status**: Updated January 20, 2026 **Phase 1 Status**: COMPLETE ✅
+**Component Tests**: COMPLETE ✅ **Next Phase**: Phase 2 - Thumbnails (optional)

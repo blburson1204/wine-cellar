@@ -257,6 +257,653 @@ describe('Home Page - Wine Cellar', () => {
     });
   });
 
+  describe('Sorting', () => {
+    const mockWines = [
+      {
+        id: '1',
+        name: 'Zinfandel Reserve',
+        vintage: 2018,
+        producer: 'Alpha Winery',
+        region: 'Napa',
+        country: 'USA',
+        grapeVariety: 'Zinfandel',
+        blendDetail: null,
+        color: 'RED',
+        quantity: 2,
+        purchasePrice: 50,
+        purchaseDate: null,
+        drinkByDate: null,
+        rating: 4.5,
+        notes: null,
+        wineLink: null,
+        favorite: false,
+        imageUrl: null,
+      },
+      {
+        id: '2',
+        name: 'Chardonnay Classic',
+        vintage: 2020,
+        producer: 'Beta Estates',
+        region: 'Sonoma',
+        country: 'USA',
+        grapeVariety: 'Chardonnay',
+        blendDetail: null,
+        color: 'WHITE',
+        quantity: 1,
+        purchasePrice: 30,
+        purchaseDate: null,
+        drinkByDate: null,
+        rating: 3.5,
+        notes: null,
+        wineLink: null,
+        favorite: false,
+        imageUrl: null,
+      },
+    ];
+
+    it('sorts by name by default', async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => mockWines,
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row').slice(1);
+        // Chardonnay should come before Zinfandel alphabetically
+        expect(rows[0]).toHaveTextContent('Chardonnay Classic');
+        expect(rows[1]).toHaveTextContent('Zinfandel Reserve');
+      });
+    });
+
+    it('toggles sort direction when clicking same column header', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => mockWines,
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Chardonnay Classic')).toBeInTheDocument();
+      });
+
+      // Click Wine header to toggle to descending
+      const wineHeader = screen.getByText('Wine').closest('th')!;
+      await user.click(wineHeader);
+
+      // Should now be descending - Zinfandel before Chardonnay
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row').slice(1);
+        expect(rows[0]).toHaveTextContent('Zinfandel Reserve');
+        expect(rows[1]).toHaveTextContent('Chardonnay Classic');
+      });
+    });
+
+    it('sorts by vintage when Vintage header clicked', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => mockWines,
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Chardonnay Classic')).toBeInTheDocument();
+      });
+
+      const vintageHeader = screen.getByText('Vintage').closest('th')!;
+      await user.click(vintageHeader);
+
+      // Should sort by vintage ascending - 2018 before 2020
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row').slice(1);
+        expect(rows[0]).toHaveTextContent('2018');
+        expect(rows[1]).toHaveTextContent('2020');
+      });
+    });
+
+    it('sorts by producer when Producer header clicked', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => mockWines,
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Chardonnay Classic')).toBeInTheDocument();
+      });
+
+      const producerHeader = screen.getByText('Producer').closest('th')!;
+      await user.click(producerHeader);
+
+      // Should sort by producer ascending - Alpha before Beta
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row').slice(1);
+        expect(rows[0]).toHaveTextContent('Alpha Winery');
+        expect(rows[1]).toHaveTextContent('Beta Estates');
+      });
+    });
+
+    it('sorts by price when Price header clicked', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => mockWines,
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Chardonnay Classic')).toBeInTheDocument();
+      });
+
+      const priceHeader = screen.getByText('Price').closest('th')!;
+      await user.click(priceHeader);
+
+      // Should sort by price ascending - $30 before $50
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row').slice(1);
+        expect(rows[0]).toHaveTextContent('$30.00');
+        expect(rows[1]).toHaveTextContent('$50.00');
+      });
+    });
+
+    it('sorts by rating when Rating header clicked', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => mockWines,
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Chardonnay Classic')).toBeInTheDocument();
+      });
+
+      // Find all Rating texts and get the one in th (table header)
+      const ratingTexts = screen.getAllByText('Rating');
+      const ratingHeader = ratingTexts.find((el) => el.closest('th'))?.closest('th');
+      expect(ratingHeader).toBeTruthy();
+      await user.click(ratingHeader!);
+
+      // Should sort by rating ascending - 3.5 before 4.5
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row').slice(1);
+        expect(rows[0]).toHaveTextContent('3.5');
+        expect(rows[1]).toHaveTextContent('4.5');
+      });
+    });
+  });
+
+  describe('Favorite Toggle', () => {
+    const mockWine = {
+      id: '1',
+      name: 'Test Wine',
+      vintage: 2020,
+      producer: 'Test Producer',
+      region: null,
+      country: 'France',
+      grapeVariety: null,
+      blendDetail: null,
+      color: 'RED',
+      quantity: 1,
+      purchasePrice: null,
+      purchaseDate: null,
+      drinkByDate: null,
+      rating: null,
+      notes: null,
+      wineLink: null,
+      favorite: false,
+      imageUrl: null,
+    };
+
+    it('toggles favorite when star is clicked in table', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => [mockWine],
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Test Wine')).toBeInTheDocument();
+      });
+
+      // Click the star to favorite
+      const star = screen.getByText('☆');
+      await user.click(star);
+
+      // Should have called PUT to update favorite
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/wines/1',
+          expect.objectContaining({
+            method: 'PUT',
+            body: JSON.stringify({ favorite: true }),
+          })
+        );
+      });
+    });
+
+    it('handles toggle favorite error gracefully', async () => {
+      const user = userEvent.setup();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      vi.mocked(global.fetch).mockImplementation((_url, options): Promise<Response> => {
+        if (options?.method === 'PUT') {
+          return Promise.resolve({ ok: false } as Response);
+        }
+        return Promise.resolve({ ok: true, json: async () => [mockWine] } as Response);
+      });
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Test Wine')).toBeInTheDocument();
+      });
+
+      const star = screen.getByText('☆');
+      await user.click(star);
+
+      await waitFor(() => {
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Error toggling favorite:', expect.any(Error));
+      });
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('updates selected wine favorite status when toggled from detail modal', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => [mockWine],
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Test Wine')).toBeInTheDocument();
+      });
+
+      // Open detail modal by clicking wine name
+      await user.click(screen.getByText('Test Wine'));
+
+      await waitFor(() => {
+        expect(screen.getByText(/2020 · Test Producer · Red/)).toBeInTheDocument();
+      });
+
+      // Toggle favorite from modal (clicking the star in modal - first one found)
+      const modalStar = screen.getAllByText('☆')[0];
+      await user.click(modalStar);
+
+      // Verify the PUT was called
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/wines/1',
+          expect.objectContaining({
+            method: 'PUT',
+          })
+        );
+      });
+    });
+  });
+
+  describe('Update Wine', () => {
+    const mockWine = {
+      id: '1',
+      name: 'Test Wine',
+      vintage: 2020,
+      producer: 'Test Producer',
+      region: null,
+      country: 'France',
+      grapeVariety: null,
+      blendDetail: null,
+      color: 'RED',
+      quantity: 1,
+      purchasePrice: null,
+      purchaseDate: null,
+      drinkByDate: null,
+      rating: null,
+      notes: null,
+      wineLink: null,
+      favorite: false,
+      imageUrl: null,
+    };
+
+    it('updates wine when saved from detail modal', async () => {
+      const user = userEvent.setup();
+
+      const updatedWine = { ...mockWine, notes: 'Updated notes' };
+
+      vi.mocked(global.fetch).mockImplementation((url, options): Promise<Response> => {
+        if (options?.method === 'PUT') {
+          return Promise.resolve({ ok: true, json: async () => updatedWine } as Response);
+        }
+        // Return updated wine after PUT
+        if (url === '/api/wines') {
+          return Promise.resolve({ ok: true, json: async () => [updatedWine] } as Response);
+        }
+        return Promise.resolve({ ok: true, json: async () => [mockWine] } as Response);
+      });
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Test Wine')).toBeInTheDocument();
+      });
+
+      // Open detail modal by clicking wine name
+      await user.click(screen.getByText('Test Wine'));
+
+      await waitFor(() => {
+        expect(screen.getByText(/2020 · Test Producer · Red/)).toBeInTheDocument();
+      });
+
+      // Click Edit button
+      await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
+
+      // Wait for edit mode
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Save Changes' })).toBeInTheDocument();
+      });
+
+      // Save changes (no edits needed to test the save flow)
+      await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+      // Verify PUT was called
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith(
+          '/api/wines/1',
+          expect.objectContaining({
+            method: 'PUT',
+          })
+        );
+      });
+    });
+
+    it('handles update wine error with non-ok response', async () => {
+      const user = userEvent.setup();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      vi.mocked(global.fetch).mockImplementation((_url, options): Promise<Response> => {
+        if (options?.method === 'PUT') {
+          return Promise.resolve({
+            ok: false,
+            status: 500,
+            text: async () => 'Server error',
+          } as Response);
+        }
+        return Promise.resolve({ ok: true, json: async () => [mockWine] } as Response);
+      });
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Test Wine')).toBeInTheDocument();
+      });
+
+      // Open detail modal by clicking wine name
+      await user.click(screen.getByText('Test Wine'));
+
+      // Wait for modal to open - check for wine subtitle
+      await waitFor(() => {
+        expect(screen.getByText(/2020 · Test Producer · Red/)).toBeInTheDocument();
+      });
+
+      // Click Edit button
+      await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
+
+      // Wait for edit mode and click Save
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Save Changes' })).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+      await waitFor(() => {
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          expect.stringContaining('PUT request failed'),
+          expect.anything()
+        );
+      });
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('Delete Confirmation Modal', () => {
+    const mockWine = {
+      id: '1',
+      name: 'Test Wine',
+      vintage: 2020,
+      producer: 'Test Producer',
+      region: null,
+      country: 'France',
+      grapeVariety: null,
+      blendDetail: null,
+      color: 'RED',
+      quantity: 1,
+      purchasePrice: null,
+      purchaseDate: null,
+      drinkByDate: null,
+      rating: null,
+      notes: null,
+      wineLink: null,
+      favorite: false,
+      imageUrl: null,
+    };
+
+    it('closes delete confirmation when Cancel is clicked', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => [mockWine],
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Test Wine')).toBeInTheDocument();
+      });
+
+      // Open detail modal
+      const wineRow = screen.getByText('Test Wine').closest('tr')!;
+      await user.click(wineRow);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Delete Wine' })).toBeInTheDocument();
+      });
+
+      // Click Delete Wine
+      await user.click(screen.getByRole('button', { name: 'Delete Wine' }));
+
+      // Confirm modal should appear
+      await waitFor(() => {
+        expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
+      });
+
+      // Click Cancel
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      // Confirm modal should be gone
+      await waitFor(() => {
+        expect(screen.queryByText('Confirm Delete')).not.toBeInTheDocument();
+      });
+    });
+
+    it('closes delete confirmation when clicking overlay', async () => {
+      const user = userEvent.setup();
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => [mockWine],
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('Test Wine')).toBeInTheDocument();
+      });
+
+      // Open detail modal
+      const wineRow = screen.getByText('Test Wine').closest('tr')!;
+      await user.click(wineRow);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Delete Wine' })).toBeInTheDocument();
+      });
+
+      // Click Delete Wine
+      await user.click(screen.getByRole('button', { name: 'Delete Wine' }));
+
+      // Confirm modal should appear
+      await waitFor(() => {
+        expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
+      });
+
+      // Click the overlay (the background)
+      const overlay = screen.getByText('Confirm Delete').closest('div')?.parentElement;
+      if (overlay) {
+        await user.click(overlay);
+      }
+
+      // Confirm modal should be gone
+      await waitFor(() => {
+        expect(screen.queryByText('Confirm Delete')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Bottle Count Display', () => {
+    it('shows singular "Bottle" for 1 wine', async () => {
+      const mockWine = {
+        id: '1',
+        name: 'Single Wine',
+        vintage: 2020,
+        producer: 'Producer',
+        region: null,
+        country: 'France',
+        grapeVariety: null,
+        blendDetail: null,
+        color: 'RED',
+        quantity: 1,
+        purchasePrice: null,
+        purchaseDate: null,
+        drinkByDate: null,
+        rating: null,
+        notes: null,
+        wineLink: null,
+        favorite: false,
+        imageUrl: null,
+      };
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => [mockWine],
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('1 Bottle in Collection')).toBeInTheDocument();
+      });
+    });
+
+    it('shows plural "Bottles" for multiple wines', async () => {
+      const mockWines = [
+        {
+          id: '1',
+          name: 'Wine 1',
+          vintage: 2020,
+          producer: 'Producer',
+          country: 'France',
+          color: 'RED',
+          quantity: 1,
+        },
+        {
+          id: '2',
+          name: 'Wine 2',
+          vintage: 2021,
+          producer: 'Producer',
+          country: 'France',
+          color: 'WHITE',
+          quantity: 1,
+        },
+      ];
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => mockWines,
+      } as Response);
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 Bottles in Collection')).toBeInTheDocument();
+      });
+    });
+
+    it('shows filtered count when filters are applied', async () => {
+      const mockWines = [
+        {
+          id: '1',
+          name: 'Red Wine',
+          vintage: 2020,
+          producer: 'Producer',
+          country: 'France',
+          color: 'RED',
+          quantity: 1,
+        },
+        {
+          id: '2',
+          name: 'White Wine',
+          vintage: 2021,
+          producer: 'Producer',
+          country: 'France',
+          color: 'WHITE',
+          quantity: 1,
+        },
+      ];
+
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        json: async () => mockWines,
+      } as Response);
+
+      const user = userEvent.setup();
+
+      render(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText('2 Bottles in Collection')).toBeInTheDocument();
+      });
+
+      // Type in search to filter
+      const searchInput = screen.getByPlaceholderText(/Name, producer, region/i);
+      await user.type(searchInput, 'Red');
+
+      await waitFor(() => {
+        expect(screen.getByText('Showing 1 of 2 Bottles')).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('Error Handling', () => {
     it('handles fetch error gracefully', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
