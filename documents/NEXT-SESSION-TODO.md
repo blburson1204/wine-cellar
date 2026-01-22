@@ -86,4 +86,62 @@ comprehensive test coverage.
 
 ---
 
-**Last Updated**: January 20, 2026
+## Next Session: Install Bryan's Framework Components
+
+### Status: READY FOR INSTALLATION
+
+Framework evaluation complete (January 21, 2026). Selective adoption plan
+documented.
+
+**Full plan with all details**:
+[bryan-framework-adoption-plan.md](bryan-framework-adoption-plan.md)
+
+### Quick Summary
+
+**Components to Install (Tier 1)**:
+
+| Type       | Components                                                                                                                              |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Skills (7) | test-driven-development, verification-before-completion, systematic-debugging, code-review-quality, rca, accessibility, security-review |
+| Agents (3) | code-reviewer, test-analyzer, auto-fixer                                                                                                |
+| Hooks (1)  | pre-edit-verify (optional)                                                                                                              |
+
+**Existing Skill Rename**:
+
+- `code-review-standards/` → `coding-standards/` (it's a reference doc, not a
+  workflow)
+
+**Skipped (Enterprise Overhead)**:
+
+- Full SpecKit commands (consider later for larger features)
+- Data sensitivity classification, portal/permission layers
+- AWS-specific skills, Ralph looping, compaction hooks
+
+### Installation Checklist
+
+1. [ ] Rename `.claude/skills/code-review-standards` →
+       `.claude/skills/coding-standards`
+2. [ ] Copy 7 skills from `_bg_template/claude/skills/`
+3. [ ] Create `.claude/agents/` directory
+4. [ ] Copy 3 agents from `_bg_template/claude/agents/`
+5. [ ] (Optional) Set up pre-edit-verify hook
+6. [ ] Verify installation structure
+7. [ ] Test each component works
+8. [ ] Decide whether to keep or remove `_bg_template/`
+
+### Key "Iron Laws" to Remember
+
+| Skill        | Rule                                                       |
+| ------------ | ---------------------------------------------------------- |
+| TDD          | "NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST"          |
+| Verification | "NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE" |
+| Debugging    | "NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST"          |
+
+### GitHub Action Compatibility
+
+No changes needed. Framework catches issues during development; GitHub Action is
+the CI safety net.
+
+---
+
+**Last Updated**: January 21, 2026
