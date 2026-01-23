@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: January 12, 2026
+**Last Updated**: January 23, 2026
 
 ## Project Overview
 
@@ -127,26 +127,28 @@ wine-cellar/
 
 ```prisma
 model Wine {
-  id            String    @id @default(cuid())
-  name          String
-  vintage       Int
-  producer      String
-  region        String?
-  country       String
-  grapeVariety  String?
-  blendDetail   String?
-  color         WineColor
-  quantity      Int       @default(1)
-  purchasePrice Float?
-  purchaseDate  DateTime?
-  drinkByDate   DateTime?
-  rating        Float?
-  notes         String?
-  wineLink      String?
-  imageUrl      String?
-  favorite      Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String
+  vintage        Int
+  producer       String
+  region         String?
+  country        String
+  grapeVariety   String?
+  blendDetail    String?
+  color          WineColor
+  quantity       Int       @default(1)
+  purchasePrice  Float?
+  purchaseDate   DateTime?
+  drinkByDate    DateTime?
+  rating         Float?
+  expertRatings  String?
+  wherePurchased String?
+  notes          String?
+  wineLink       String?
+  imageUrl       String?
+  favorite       Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 enum WineColor {
@@ -227,6 +229,10 @@ curl -X POST http://localhost:3001/api/wines \
 - [x] Confirmation dialogs for destructive actions
 - [x] Color-coded wine types with visual indicators
 - [x] Form validation (required fields, vintage range)
+- [x] Combo dropdown fields for Producer, Country, Grape Variety, Region
+      (auto-complete from existing values)
+- [x] All table columns sortable (Wine, Vintage, Producer, Price, Rating, Type,
+      Region, Grape, Country, In Cellar)
 
 ### Wine Label Images (Phase 1 Complete)
 
@@ -255,9 +261,10 @@ curl -X POST http://localhost:3001/api/wines \
 
 ### Testing
 
-- [x] **API Testing**: 49+ tests passing (100% success rate)
+- [x] **API Testing**: 144 tests passing (100% success rate)
   - 18 CRUD endpoint tests
   - 31 error handling tests
+  - 95 image upload tests (validation, processing, storage, integration)
   - Input validation (Zod 3.25.76)
   - Request ID tracking
   - Database operations
@@ -266,25 +273,26 @@ curl -X POST http://localhost:3001/api/wines \
   - Sequential execution to prevent race conditions
   - Isolated test database on port 5433
 
-- [x] **React Component Testing**: 146 tests with **70%+ coverage** ✅
+- [x] **React Component Testing**: 204 tests with **78%+ coverage** ✅
   - 23 API utility tests (fetchApi, ApiError, getErrorMessage)
   - 14 ErrorBoundary tests (normal rendering, error catching, Try Again)
-  - 27+ WineTable tests (empty state, sorting, row clicks, color indicators,
+  - 69 WineTable tests (empty state, sorting all columns, row clicks, color
+    indicators, favorites, keyboard navigation)
+  - 29 WineFilters tests (search, wine types, country, rating, price ranges,
     favorites)
-  - 29+ WineFilters tests (search, wine types, country, vintage, price ranges,
-    favorites)
-  - 11 page.tsx tests (loading, empty state, add/delete wine)
+  - 23 page.tsx tests (loading, empty state, add/delete wine, sorting)
   - 22 WineDetailModal tests (view/edit/add modes, validation, save/update)
+  - 28 WineDetailModal image tests (upload, delete, preview, validation)
 
 **Test Configuration:**
 
 - Vitest 4.0.16 with `fileParallelism: false`
 - ESM module system for compatibility
 - **Coverage targets exceeded** ✅:
-  - API: 55% branches, 75% functions/lines/statements
-  - Web: **69.17% functions**, **71.39% branches**, **70.41% lines** (all exceed
+  - API: 77% branches, 89% functions, 83% lines/statements
+  - Web: **78% functions**, **69% branches**, **80% lines** (all exceed
     targets!)
-- Test duration: ~3s for full suite (146+ tests)
+- Test duration: ~5s for full suite (348 tests)
 - Database URL configurable via environment variable for CI/local
 - **Isolated test directories**: Tests use separate `uploads-test/wines`
   directory to prevent cleanup from deleting real uploaded images
@@ -302,28 +310,28 @@ curl -X POST http://localhost:3001/api/wines \
 
 **API Coverage:**
 
-- Functions: 76.66% (target: 80%) - Close to target
-- Branches: 57.37% (target: 70%)
+- Functions: 89.94% (target: 80%) ✅ **Exceeds target**
+- Branches: 77.34% (target: 70%) ✅ **Exceeds target**
 - Lines: 83.33% (target: 80%) ✅ **Exceeds target**
 - Statements: 83.63% (target: 80%) ✅ **Exceeds target**
 
 **Web Coverage:**
 
-- Functions: 69.17% (target: 50%) ✅ **Exceeds by 38%**
-- Branches: 71.39% (target: 35%) ✅ **Exceeds by 104%**
-- Lines: 70.41% (target: 50%) ✅ **Exceeds by 41%**
-- Statements: 69.65% (target: 50%) ✅ **Exceeds by 39%**
+- Functions: 78.85% (target: 50%) ✅ **Exceeds by 58%**
+- Branches: 69.44% (target: 35%) ✅ **Exceeds by 98%**
+- Lines: 80.16% (target: 50%) ✅ **Exceeds by 60%**
+- Statements: 78.85% (target: 50%) ✅ **Exceeds by 58%**
 
 **Component Coverage Breakdown:**
 
-- page.tsx: 61.87% lines
-- WineTable.tsx: 82.6% lines (27 tests)
+- page.tsx: 83.52% lines (23 tests)
+- WineTable.tsx: 88.33% lines (69 tests)
 - WineFilters.tsx: 96.96% lines (29 tests)
-- WineDetailModal.tsx: 65.34% lines (22 tests)
+- WineDetailModal.tsx: 65.34% lines (50 tests combined)
 - ErrorBoundary.tsx: 100% lines (14 tests)
 - api.ts utils: 100% lines (23 tests)
 
-All web coverage targets exceeded. See [Test-Summary.md](Test-Summary.md) for
+All coverage targets exceeded. See [TEST-SUMMARY.md](TEST-SUMMARY.md) for
 detailed test breakdown.
 
 ### Design & UX
@@ -348,6 +356,8 @@ detailed test breakdown.
       add/edit mode)
 - [x] Hover effects and transitions (200ms)
 - [x] Inter font family for clean typography
+- [x] Consistent burgundy (#7C2D3C) styling in filter panel (checkbox labels,
+      checkbox borders, dropdown text, input text)
 
 ### Accessibility (WCAG Compliance)
 

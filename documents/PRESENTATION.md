@@ -6,7 +6,7 @@
 
 **Wine Cellar** A Modern Full-Stack Web Application
 
-_Brian Burson_ _December 24, 2025_
+_Brian Burson_ _January 23, 2026_
 
 ---
 
@@ -20,10 +20,14 @@ A full-stack web application for managing personal wine collections
 
 - Clean, intuitive interface with keyboard navigation
 - Full CRUD operations with search and filtering
+- All table columns sortable (Wine, Type, Region, Grape, Producer, Country,
+  etc.)
+- Combo dropdown fields with auto-complete (Producer, Country, Grape, Region)
+- Wine label image upload with optimization
+- Mark wines as favorites with filtering
 - Real-time validation
 - Production-ready error handling
-- Comprehensive test coverage
-- Auto-focus and consistent interactions
+- Comprehensive test coverage (348 tests)
 
 ---
 
@@ -70,14 +74,18 @@ A full-stack web application for managing personal wine collections
 
 **RESTful API Design**
 
-| Method | Endpoint         | Description    | Status        |
-| ------ | ---------------- | -------------- | ------------- |
-| GET    | `/api/health`    | Health check   | 200, 503      |
-| GET    | `/api/wines`     | List all wines | 200           |
-| GET    | `/api/wines/:id` | Get wine by ID | 200, 404      |
-| POST   | `/api/wines`     | Create wine    | 201, 400      |
-| PUT    | `/api/wines/:id` | Update wine    | 200, 400, 404 |
-| DELETE | `/api/wines/:id` | Delete wine    | 204, 404      |
+| Method | Endpoint               | Description     | Status        |
+| ------ | ---------------------- | --------------- | ------------- |
+| GET    | `/api/health`          | Health check    | 200, 503      |
+| GET    | `/api/wines`           | List all wines  | 200           |
+| GET    | `/api/wines/:id`       | Get wine by ID  | 200, 404      |
+| POST   | `/api/wines`           | Create wine     | 201, 400      |
+| PUT    | `/api/wines/:id`       | Update wine     | 200, 400, 404 |
+| DELETE | `/api/wines/:id`       | Delete wine     | 204, 404      |
+| GET    | `/api/wines/:id/image` | Get wine image  | 200, 404      |
+| POST   | `/api/wines/:id/image` | Upload image    | 200, 400, 404 |
+| DELETE | `/api/wines/:id/image` | Delete image    | 204, 404      |
+| GET    | `/api/docs`            | Swagger UI docs | 200           |
 
 ---
 
@@ -206,23 +214,24 @@ A full-stack web application for managing personal wine collections
 
 **Comprehensive Testing Strategy**
 
-**175 Tests Passing (100% success rate)** ✅
+**348 Tests Passing (100% success rate)** ✅
 
-**API Tests (49):**
+**API Tests (144):**
 
 - 18 CRUD endpoint tests
 - 31 error handling tests
+- 95 image upload tests (validation, processing, storage)
 
-**Web Tests (126):**
+**Web Tests (204):**
 
 - 23 API utility tests
 - 14 ErrorBoundary tests
-- 27 WineTable tests
+- 69 WineTable tests (sorting all columns, keyboard nav, favorites)
 - 29 WineFilters tests
-- 11 page.tsx integration tests
-- 22 WineDetailModal tests
+- 23 page.tsx integration tests
+- 50 WineDetailModal tests (including image upload)
 
-**Test duration: ~3s**
+**Test duration: ~5s**
 
 **All coverage targets exceeded!**
 
@@ -278,23 +287,23 @@ A full-stack web application for managing personal wine collections
 
 ## Slide 14: Test Breakdown - Web Tests
 
-**126 Component & Utility Tests**
+**204 Component & Utility Tests**
 
 **Test Coverage Achievements:**
 
-- **Functions**: 69.17% (target: 50%) - **Exceeds by 38%** ✅
-- **Branches**: 71.39% (target: 35%) - **Exceeds by 104%** ✅
-- **Lines**: 70.41% (target: 50%) - **Exceeds by 41%** ✅
-- **Statements**: 69.65% (target: 50%) - **Exceeds by 39%** ✅
+- **Functions**: 78.85% (target: 50%) - **Exceeds by 58%** ✅
+- **Branches**: 69.44% (target: 35%) - **Exceeds by 98%** ✅
+- **Lines**: 80.16% (target: 50%) - **Exceeds by 60%** ✅
+- **Statements**: 78.85% (target: 50%) - **Exceeds by 58%** ✅
 
 **Component Coverage:**
 
 - api.ts utils: 100% lines (23 tests)
 - ErrorBoundary: 100% lines (14 tests)
 - WineFilters: 96.96% lines (29 tests)
-- WineTable: 82.6% lines (27 tests)
-- WineDetailModal: 65.34% lines (22 tests)
-- page.tsx: 61.87% lines (11 tests)
+- WineTable: 88.33% lines (69 tests)
+- WineDetailModal: 65.34% lines (50 tests)
+- page.tsx: 83.52% lines (23 tests)
 
 ---
 
@@ -306,12 +315,13 @@ A full-stack web application for managing personal wine collections
 
 - id (String, CUID)
 - name, vintage, producer, country (required)
-- region, grapeVariety (optional)
+- region, grapeVariety, blendDetail (optional)
 - color (Enum: RED, WHITE, ROSE, SPARKLING, DESSERT, FORTIFIED)
 - quantity (default: 1)
-- purchasePrice, purchaseDate
-- drinkByDate, rating (1-100)
-- notes (max 2000 chars)
+- purchasePrice, purchaseDate, wherePurchased
+- drinkByDate, rating (1-100), expertRatings
+- notes (max 2000 chars), wineLink
+- imageUrl, favorite (default: false)
 - createdAt, updatedAt
 
 **Type-safe with Prisma Client**
@@ -379,46 +389,38 @@ A full-stack web application for managing personal wine collections
 
 ## Slide 18: Recent Achievements
 
-**December 30, 2025 - Test Coverage Excellence**
+**January 2026 - Major Feature Updates**
 
-**Comprehensive Test Suite:**
+**Combo Dropdown Fields (January 22):**
 
-- Increased total tests from 60 to 175 (+115 tests)
-- Added 64 new web component tests
-- Achieved 70%+ coverage on all metrics
-- All 175 tests passing with 100% success rate
+- Producer, Country, Grape Variety, Region now auto-complete
+- Dropdown shows existing values from database
+- Type to filter or add new values
 
-**Coverage Improvements:**
+**All Columns Sortable (January 23):**
 
-- Web functions: 56.39% → 69.17% (+12.78%)
-- Web branches: 65.41% → 71.39% (+5.98%)
-- Web lines: 59.65% → 70.41% (+10.76%)
+- Extended sorting to Type, Region, Grape, Country, In Cellar
+- All 10 columns now sortable with click-to-sort headers
+- Consistent styling with dotted underlines and hover effects
 
-**December 26, 2025 - Code Quality**
+**UI Styling Consistency (January 23):**
 
-**Code Quality & Standards Implementation:**
+- Burgundy (#7C2D3C) color throughout filter panel
+- Checkbox labels, borders, dropdown text, input text unified
 
-1. ESLint Configuration
-   - Strict TypeScript and React rules
-   - Import organization and best practices
-   - Zero errors across entire codebase
+**Test Coverage Excellence:**
 
-2. Prettier Integration
-   - Automatic code formatting
-   - Consistent style enforcement
-   - No conflicts with ESLint
+- 348 tests passing (100% success rate)
+- Web coverage: 80%+ lines, 78%+ functions
+- API coverage: 89%+ functions, 83%+ lines
 
-3. Git Hooks & CI/CD
-   - Pre-commit quality checks with Husky
-   - GitHub Actions workflow
-   - Conventional commits with commitlint
+**Wine Label Images (Phase 1 Complete):**
 
-4. Documentation Updates
-   - All docs reflect new standards
-   - Code review skill added
-   - Complete implementation guide
+- Upload, replace, delete wine label images
+- Image optimization (resize, compress, format conversion)
+- Preview before saving
 
-**Result: Professional-grade development workflow**
+**Result: Feature-rich, professionally tested application**
 
 ---
 
@@ -520,11 +522,10 @@ npm run test:coverage # Coverage report
 **Areas for Future Enhancement**
 
 1. No authentication (public access)
-2. No pagination (performance risk)
-3. No image uploads
+2. No pagination (performance risk with large collections)
+3. Local image storage only (AWS S3 planned for production)
 4. Inline styles (no CSS modules)
-5. No optimistic updates
-6. Sentry not configured (infrastructure ready)
+5. Sentry not configured (infrastructure ready)
 
 **Trade-offs for rapid development**
 
@@ -552,21 +553,20 @@ npm run test:coverage # Coverage report
 
 **By the Numbers**
 
-- **49** tests passing (100%)
-- **851ms** test execution time
-- **80%+** code coverage
+- **348** tests passing (100%)
+- **~5s** test execution time
+- **80%+** code coverage (web)
+- **89%+** API function coverage
 - **7** custom error classes
-- **6** API endpoints
-- **14** new files created (error handling)
-- **11** files modified (error handling)
-- **15** new files created (code quality)
-- **8** files modified (code quality)
+- **11** API endpoints (including image upload)
+- **10** sortable table columns
+- **4** combo dropdown fields
 - **0** linting errors
 - **0** formatting issues
 - **0** type errors
 - **0** test failures
 
-**Professional development workflow established!**
+**Production-ready application!**
 
 ---
 
@@ -622,9 +622,10 @@ npm run test:coverage # Coverage report
 **What We Built**
 
 ✅ Production-ready full-stack application ✅ Comprehensive error handling &
-logging ✅ Automated code quality enforcement ✅ 100% test pass rate (49 tests)
-✅ Type-safe end-to-end ✅ Docker-based development ✅ Modern tooling & best
-practices ✅ CI/CD pipeline with GitHub Actions ✅ Complete documentation
+logging ✅ Wine label image upload with optimization ✅ All columns sortable,
+combo dropdown fields ✅ 100% test pass rate (348 tests) ✅ 80%+ code coverage
+✅ Type-safe end-to-end ✅ Docker-based development ✅ CI/CD pipeline with
+GitHub Actions ✅ Complete documentation
 
 **Ready for production deployment**
 

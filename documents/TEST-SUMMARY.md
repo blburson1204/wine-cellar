@@ -1,6 +1,6 @@
 # Wine Cellar - Test Summary
 
-## ✅ All Tests Passing (343/343)
+## ✅ All Tests Passing (348/348)
 
 ### Test Suite Results
 
@@ -25,25 +25,25 @@ Duration    ~2.3s
 ```
 ✓ apps/web/__tests__/api.test.ts (23 tests) - Unit
 ✓ apps/web/__tests__/ErrorBoundary.test.tsx (14 tests) - Component
-✓ apps/web/__tests__/WineTable.test.tsx (64 tests) - Component
+✓ apps/web/__tests__/WineTable.test.tsx (69 tests) - Component
 ✓ apps/web/__tests__/WineFilters.test.tsx (29 tests) - Component
 ✓ apps/web/__tests__/page.test.tsx (23 tests) - Component
 ✓ apps/web/__tests__/WineDetailModal.test.tsx (22 tests) - Component
 ✓ apps/web/src/__tests__/components/WineDetailModal.image.test.tsx (28 tests) - Component
 
 Test Files  7 passed (7)
-Tests       199 passed (199)
+Tests       204 passed (204)
 Duration    ~2.5s
 ```
 
 ### Quick Stats
 
 - **Test Runner**: Vitest 4.0.16
-- **Total Tests**: 343 (144 API + 199 web)
+- **Total Tests**: 348 (144 API + 204 web)
 - **Pass Rate**: 100%
 - **Execution Time**: ~4.8s
 - **Test Files**: 14 (7 API + 7 web)
-- **Test Types**: Unit (76), Integration (68), Component (199)
+- **Test Types**: Unit (76), Integration (68), Component (204)
 
 ---
 
@@ -295,7 +295,7 @@ Full lifecycle:
 - ✓ catches errors from deeply nested components
 - ✓ does not affect sibling components outside boundary
 
-#### WineTable.test.tsx (64 tests)
+#### WineTable.test.tsx (69 tests)
 
 **Empty State**
 
@@ -324,9 +324,12 @@ Full lifecycle:
 - ✓ calls onSort when Producer header clicked
 - ✓ calls onSort when Vintage header clicked
 - ✓ calls onSort when Price header clicked
-- ✓ does not call onSort when Type header clicked
-- ✓ does not call onSort when Country header clicked
-- ✓ does not call onSort when Qty header clicked
+- ✓ calls onSort when Rating header clicked
+- ✓ calls onSort when Type header clicked
+- ✓ calls onSort when Region header clicked
+- ✓ calls onSort when Grape header clicked
+- ✓ calls onSort when Country header clicked
+- ✓ calls onSort when In Cellar header clicked
 
 **Wine Colors**
 
@@ -611,7 +614,7 @@ Full lifecycle:
 **Web Components:**
 
 - page.tsx: 83.52% lines ✅ (23 tests) - **+21.65% improvement**
-- WineTable.tsx: 88.33% lines ✅ (64 tests) - **+5.73% improvement**
+- WineTable.tsx: 88.33% lines ✅ (69 tests) - **+5.73% improvement**
 - WineFilters.tsx: 96.96% lines ✅ (29 tests)
 - WineDetailModal.tsx: 65.34% lines ✅ (50 tests combined)
 - ErrorBoundary.tsx: 100% lines ✅ (14 tests)
@@ -747,6 +750,13 @@ export default defineConfig({
 
 ### Recent Changes
 
+- **January 23, 2026**: All Columns Sortable
+  - Added 5 new WineTable sorting tests (64 → 69 tests)
+  - All table columns now sortable: Type, Region, Grape, Country, In Cellar
+  - Updated sorting tests to verify all column headers call onSort
+  - Total tests: 343 → 348 (+5 tests)
+  - All 348 tests passing ✅
+
 - **January 20, 2026**: Comprehensive Coverage Improvement & Image Add Mode
   Tests
   - Added 73 new web tests (126 → 199 total web tests)
@@ -842,4 +852,4 @@ export default defineConfig({
 
 ---
 
-**Last Updated**: January 20, 2026 (Coverage Improvement & Image Add Mode Tests)
+**Last Updated**: January 23, 2026 (All Columns Sortable)
