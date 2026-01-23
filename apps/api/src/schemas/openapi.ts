@@ -54,6 +54,14 @@ export const WineSchema = z
       .number()
       .nullable()
       .openapi({ description: 'Personal rating (1.0-5.0)', example: 4.5 }),
+    expertRatings: z.string().nullable().openapi({
+      description: 'Expert ratings (e.g., Wine Spectator, Robert Parker)',
+      example: 'WS 95, RP 97',
+    }),
+    wherePurchased: z.string().nullable().openapi({
+      description: 'Where the wine was purchased',
+      example: 'Total Wine & More',
+    }),
     notes: z.string().nullable().openapi({
       description: 'Tasting notes or comments',
       example: 'Elegant with notes of blackcurrant',
@@ -150,6 +158,14 @@ export const CreateWineSchema = z
       .optional()
       .nullable()
       .openapi({ description: 'Personal rating (1.0-5.0 in 0.1 increments)', example: 4.5 }),
+    expertRatings: z.string().max(500).optional().nullable().openapi({
+      description: 'Expert ratings (e.g., Wine Spectator, Robert Parker)',
+      example: 'WS 95, RP 97',
+    }),
+    wherePurchased: z.string().max(200).optional().nullable().openapi({
+      description: 'Where the wine was purchased',
+      example: 'Total Wine & More',
+    }),
     notes: z.string().max(2000).optional().nullable().openapi({
       description: 'Tasting notes or comments',
       example: 'Elegant with notes of blackcurrant',
@@ -244,6 +260,14 @@ export const UpdateWineSchema = z
       .optional()
       .nullable()
       .openapi({ description: 'Personal rating (1.0-5.0 in 0.1 increments)', example: 4.5 }),
+    expertRatings: z.string().max(500).optional().nullable().openapi({
+      description: 'Expert ratings (e.g., Wine Spectator, Robert Parker)',
+      example: 'WS 95, RP 97',
+    }),
+    wherePurchased: z.string().max(200).optional().nullable().openapi({
+      description: 'Where the wine was purchased',
+      example: 'Total Wine & More',
+    }),
     notes: z.string().max(2000).optional().nullable().openapi({
       description: 'Tasting notes or comments',
       example: 'Elegant with notes of blackcurrant',
