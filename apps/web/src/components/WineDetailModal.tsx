@@ -18,6 +18,8 @@ interface Wine {
   drinkByDate: string | null;
   rating: number | null;
   notes: string | null;
+  expertRatings: string | null;
+  wherePurchased: string | null;
   wineLink: string | null;
   favorite: boolean;
   imageUrl: string | null;
@@ -119,6 +121,11 @@ export default function WineDetailModal({
   const [imageTimestamp, setImageTimestamp] = useState(Date.now());
   const [stagedImageFile, setStagedImageFile] = useState<File | null>(null);
   const [stagedImagePreview, setStagedImagePreview] = useState<string | null>(null);
+  const [wherePurchasedOptions, setWherePurchasedOptions] = useState<string[]>([]);
+  const [producerOptions, setProducerOptions] = useState<string[]>([]);
+  const [countryOptions, setCountryOptions] = useState<string[]>([]);
+  const [regionOptions, setRegionOptions] = useState<string[]>([]);
+  const [grapeVarietyOptions, setGrapeVarietyOptions] = useState<string[]>([]);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -147,6 +154,8 @@ export default function WineDetailModal({
         drinkByDate: null,
         rating: null,
         notes: null,
+        expertRatings: null,
+        wherePurchased: null,
         wineLink: null,
         favorite: false,
         imageUrl: null,
@@ -155,6 +164,30 @@ export default function WineDetailModal({
       setEditForm(wine);
     }
   }, [mode, wine]);
+
+  // Fetch combobox options for various fields
+  useEffect(() => {
+    const fetchOptions = async (endpoint: string, setter: (options: string[]) => void) => {
+      try {
+        const response = await fetch(endpoint);
+        if (response.ok) {
+          const data = await response.json();
+          // Only set if response is actually an array
+          if (Array.isArray(data)) {
+            setter(data);
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching options from ${endpoint}:`, error);
+      }
+    };
+
+    fetchOptions('/api/wines/meta/where-purchased', setWherePurchasedOptions);
+    fetchOptions('/api/wines/meta/producers', setProducerOptions);
+    fetchOptions('/api/wines/meta/countries', setCountryOptions);
+    fetchOptions('/api/wines/meta/regions', setRegionOptions);
+    fetchOptions('/api/wines/meta/grape-varieties', setGrapeVarietyOptions);
+  }, []);
 
   // Auto-focus the name field when entering edit mode, or close button in view mode
   useEffect(() => {
@@ -285,7 +318,7 @@ export default function WineDetailModal({
     }
     // Also check if there's a browser validation error on the purchase date input
     const purchaseDateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
-    if (purchaseDateInput && !purchaseDateInput.validity.valid) {
+    if (purchaseDateInput && purchaseDateInput.value && !purchaseDateInput.validity.valid) {
       newErrors.purchaseDate = 'Please enter a valid date';
     }
 
@@ -298,7 +331,7 @@ export default function WineDetailModal({
     }
     // Also check if there's a browser validation error on the drink by date input
     const drinkByDateInput = document.querySelectorAll('input[type="date"]')[1] as HTMLInputElement;
-    if (drinkByDateInput && !drinkByDateInput.validity.valid) {
+    if (drinkByDateInput && drinkByDateInput.value && !drinkByDateInput.validity.valid) {
       newErrors.drinkByDate = 'Please enter a valid date';
     }
 
@@ -312,6 +345,14 @@ export default function WineDetailModal({
 
     if (editForm.notes && editForm.notes.length > 2000) {
       newErrors.notes = 'Notes must be less than 2000 characters';
+    }
+
+    if (editForm.expertRatings && editForm.expertRatings.length > 500) {
+      newErrors.expertRatings = 'Expert ratings must be less than 500 characters';
+    }
+
+    if (editForm.wherePurchased && editForm.wherePurchased.length > 200) {
+      newErrors.wherePurchased = 'Where purchased must be less than 200 characters';
     }
 
     setErrors(newErrors);
@@ -894,6 +935,62 @@ export default function WineDetailModal({
                           </p>
                         </div>
                       )}
+
+                      {/* Expert Ratings - Full Width */}
+                      {wine.expertRatings && (
+                        <div style={{ gridColumn: '1 / -1' }}>
+                          <label
+                            style={{
+                              display: 'block',
+                              marginBottom: '4px',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                              color: 'rgba(255, 255, 255, 0.5)',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                            }}
+                          >
+                            Expert Ratings
+                          </label>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: '16px',
+                              color: 'rgba(255, 255, 255, 0.7)',
+                            }}
+                          >
+                            {wine.expertRatings}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Where Purchased */}
+                      {wine.wherePurchased && (
+                        <div>
+                          <label
+                            style={{
+                              display: 'block',
+                              marginBottom: '4px',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                              color: 'rgba(255, 255, 255, 0.5)',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                            }}
+                          >
+                            Where Purchased
+                          </label>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: '16px',
+                              color: 'rgba(255, 255, 255, 0.7)',
+                            }}
+                          >
+                            {wine.wherePurchased}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1121,6 +1218,7 @@ export default function WineDetailModal({
                         </label>
                         <input
                           type="text"
+                          placeholder="Enter wine name"
                           value={editForm.name || ''}
                           onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                           style={{
@@ -1246,6 +1344,8 @@ export default function WineDetailModal({
                         </label>
                         <input
                           type="text"
+                          list="producer-options"
+                          placeholder="Enter producer"
                           value={editForm.producer || ''}
                           onChange={(e) => setEditForm({ ...editForm, producer: e.target.value })}
                           style={{
@@ -1259,6 +1359,11 @@ export default function WineDetailModal({
                             boxSizing: 'border-box',
                           }}
                         />
+                        <datalist id="producer-options">
+                          {producerOptions.map((option) => (
+                            <option key={option} value={option} />
+                          ))}
+                        </datalist>
                         {errors.producer && (
                           <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
                             {errors.producer}
@@ -1281,6 +1386,8 @@ export default function WineDetailModal({
                         </label>
                         <input
                           type="text"
+                          list="country-options"
+                          placeholder="Enter country"
                           value={editForm.country || ''}
                           onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
                           style={{
@@ -1294,6 +1401,11 @@ export default function WineDetailModal({
                             boxSizing: 'border-box',
                           }}
                         />
+                        <datalist id="country-options">
+                          {countryOptions.map((option) => (
+                            <option key={option} value={option} />
+                          ))}
+                        </datalist>
                         {errors.country && (
                           <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
                             {errors.country}
@@ -1316,6 +1428,8 @@ export default function WineDetailModal({
                         </label>
                         <input
                           type="text"
+                          list="region-options"
+                          placeholder="Enter region"
                           value={editForm.region || ''}
                           onChange={(e) =>
                             setEditForm({ ...editForm, region: e.target.value || null })
@@ -1331,6 +1445,11 @@ export default function WineDetailModal({
                             boxSizing: 'border-box',
                           }}
                         />
+                        <datalist id="region-options">
+                          {regionOptions.map((option) => (
+                            <option key={option} value={option} />
+                          ))}
+                        </datalist>
                         {errors.region && (
                           <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
                             {errors.region}
@@ -1353,6 +1472,8 @@ export default function WineDetailModal({
                         </label>
                         <input
                           type="text"
+                          list="grape-variety-options"
+                          placeholder="Enter grape variety"
                           value={editForm.grapeVariety || ''}
                           onChange={(e) =>
                             setEditForm({ ...editForm, grapeVariety: e.target.value || null })
@@ -1368,6 +1489,11 @@ export default function WineDetailModal({
                             boxSizing: 'border-box',
                           }}
                         />
+                        <datalist id="grape-variety-options">
+                          {grapeVarietyOptions.map((option) => (
+                            <option key={option} value={option} />
+                          ))}
+                        </datalist>
                         {errors.grapeVariety && (
                           <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
                             {errors.grapeVariety}
@@ -1666,6 +1792,88 @@ export default function WineDetailModal({
                         {errors.wineLink && (
                           <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
                             {errors.wineLink}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Expert Ratings (8 cols) */}
+                      <div style={{ gridColumn: 'span 8' }}>
+                        <label
+                          style={{
+                            display: 'block',
+                            marginBottom: '2px',
+                            fontSize: '13px',
+                            fontWeight: '700',
+                            color: 'rgba(255, 255, 255, 0.7)',
+                          }}
+                        >
+                          Expert Ratings
+                        </label>
+                        <input
+                          type="text"
+                          value={editForm.expertRatings || ''}
+                          onChange={(e) =>
+                            setEditForm({ ...editForm, expertRatings: e.target.value || null })
+                          }
+                          placeholder="e.g., WS 92, RP 94, JD 95"
+                          style={{
+                            padding: '8px',
+                            fontSize: '14px',
+                            border: errors.expertRatings ? '1px solid #C73E3A' : 'none',
+                            borderRadius: '4px',
+                            width: '100%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
+                            boxSizing: 'border-box',
+                          }}
+                        />
+                        {errors.expertRatings && (
+                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                            {errors.expertRatings}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Where Purchased - Combobox (4 cols) */}
+                      <div style={{ gridColumn: 'span 4' }}>
+                        <label
+                          style={{
+                            display: 'block',
+                            marginBottom: '2px',
+                            fontSize: '13px',
+                            fontWeight: '700',
+                            color: 'rgba(255, 255, 255, 0.7)',
+                          }}
+                        >
+                          Where Purchased
+                        </label>
+                        <input
+                          type="text"
+                          list="where-purchased-options"
+                          value={editForm.wherePurchased || ''}
+                          onChange={(e) =>
+                            setEditForm({ ...editForm, wherePurchased: e.target.value || null })
+                          }
+                          placeholder="Select or type..."
+                          style={{
+                            padding: '8px',
+                            fontSize: '14px',
+                            border: errors.wherePurchased ? '1px solid #C73E3A' : 'none',
+                            borderRadius: '4px',
+                            width: '100%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
+                            boxSizing: 'border-box',
+                          }}
+                        />
+                        <datalist id="where-purchased-options">
+                          {wherePurchasedOptions.map((option) => (
+                            <option key={option} value={option} />
+                          ))}
+                        </datalist>
+                        {errors.wherePurchased && (
+                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                            {errors.wherePurchased}
                           </span>
                         )}
                       </div>

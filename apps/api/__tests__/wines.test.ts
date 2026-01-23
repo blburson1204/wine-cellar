@@ -320,4 +320,188 @@ describe('Wine API', () => {
       expect(response.body.errorCode).toBe('IMAGE_FILE_NOT_FOUND');
     });
   });
+
+  describe('Expert Ratings and Where Purchased Fields', () => {
+    it('creates wine with expertRatings and wherePurchased', async () => {
+      const wineData = createWineData({
+        expertRatings: 'WS 92, RP 94',
+        wherePurchased: 'Total Wine',
+      });
+
+      const response = await request(app).post('/api/wines').send(wineData);
+
+      expect(response.status).toBe(201);
+      expect(response.body.expertRatings).toBe('WS 92, RP 94');
+      expect(response.body.wherePurchased).toBe('Total Wine');
+    });
+
+    it('updates wine with expertRatings and wherePurchased', async () => {
+      const wine = await prisma.wine.create({
+        data: createWineData(),
+      });
+
+      const response = await request(app).put(`/api/wines/${wine.id}`).send({
+        expertRatings: 'JD 95, WE 93',
+        wherePurchased: 'Wine.com',
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.expertRatings).toBe('JD 95, WE 93');
+      expect(response.body.wherePurchased).toBe('Wine.com');
+    });
+
+    it('allows null values for expertRatings and wherePurchased', async () => {
+      const wine = await prisma.wine.create({
+        data: createWineData({
+          expertRatings: 'WS 90',
+          wherePurchased: 'Local Store',
+        }),
+      });
+
+      const response = await request(app).put(`/api/wines/${wine.id}`).send({
+        expertRatings: null,
+        wherePurchased: null,
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body.expertRatings).toBeNull();
+      expect(response.body.wherePurchased).toBeNull();
+    });
+
+    it('validates expertRatings max length (500 chars)', async () => {
+      const longString = 'a'.repeat(501);
+      const response = await request(app)
+        .post('/api/wines')
+        .send(createWineData({ expertRatings: longString }));
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Validation failed');
+    });
+
+    it('validates wherePurchased max length (200 chars)', async () => {
+      const longString = 'a'.repeat(201);
+      const response = await request(app)
+        .post('/api/wines')
+        .send(createWineData({ wherePurchased: longString }));
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toBe('Validation failed');
+    });
+  });
+
+  describe('Meta Endpoints for Comboboxes', () => {
+    describe('GET /api/wines/meta/where-purchased', () => {
+      it('returns empty array when no wines exist', async () => {
+        const response = await request(app).get('/api/wines/meta/where-purchased');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual([]);
+      });
+
+      it('returns unique wherePurchased values', async () => {
+        await prisma.wine.createMany({
+          data: [
+            createWineData({ name: 'Wine 1', wherePurchased: 'Total Wine' }),
+            createWineData({ name: 'Wine 2', wherePurchased: 'Wine.com' }),
+            createWineData({ name: 'Wine 3', wherePurchased: 'Total Wine' }), // duplicate
+            createWineData({ name: 'Wine 4', wherePurchased: null }), // null should be excluded
+          ],
+        });
+
+        const response = await request(app).get('/api/wines/meta/where-purchased');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveLength(2);
+        expect(response.body).toContain('Total Wine');
+        expect(response.body).toContain('Wine.com');
+      });
+
+      it('returns values sorted alphabetically', async () => {
+        await prisma.wine.createMany({
+          data: [
+            createWineData({ name: 'Wine 1', wherePurchased: 'Costco' }),
+            createWineData({ name: 'Wine 2', wherePurchased: 'Total Wine' }),
+            createWineData({ name: 'Wine 3', wherePurchased: 'ABC Liquor' }),
+          ],
+        });
+
+        const response = await request(app).get('/api/wines/meta/where-purchased');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(['ABC Liquor', 'Costco', 'Total Wine']);
+      });
+    });
+
+    describe('GET /api/wines/meta/producers', () => {
+      it('returns unique producer values sorted alphabetically', async () => {
+        await prisma.wine.createMany({
+          data: [
+            createWineData({ name: 'Wine 1', producer: 'Chateau Margaux' }),
+            createWineData({ name: 'Wine 2', producer: 'Opus One' }),
+            createWineData({ name: 'Wine 3', producer: 'Chateau Margaux' }), // duplicate
+          ],
+        });
+
+        const response = await request(app).get('/api/wines/meta/producers');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(['Chateau Margaux', 'Opus One']);
+      });
+    });
+
+    describe('GET /api/wines/meta/countries', () => {
+      it('returns unique country values sorted alphabetically', async () => {
+        await prisma.wine.createMany({
+          data: [
+            createWineData({ name: 'Wine 1', country: 'France' }),
+            createWineData({ name: 'Wine 2', country: 'Italy' }),
+            createWineData({ name: 'Wine 3', country: 'USA' }),
+            createWineData({ name: 'Wine 4', country: 'France' }), // duplicate
+          ],
+        });
+
+        const response = await request(app).get('/api/wines/meta/countries');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(['France', 'Italy', 'USA']);
+      });
+    });
+
+    describe('GET /api/wines/meta/regions', () => {
+      it('returns unique region values excluding nulls', async () => {
+        await prisma.wine.createMany({
+          data: [
+            createWineData({ name: 'Wine 1', region: 'Bordeaux' }),
+            createWineData({ name: 'Wine 2', region: 'Napa Valley' }),
+            createWineData({ name: 'Wine 3', region: null }), // null should be excluded
+          ],
+        });
+
+        const response = await request(app).get('/api/wines/meta/regions');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveLength(2);
+        expect(response.body).toContain('Bordeaux');
+        expect(response.body).toContain('Napa Valley');
+      });
+    });
+
+    describe('GET /api/wines/meta/grape-varieties', () => {
+      it('returns unique grape variety values excluding nulls', async () => {
+        await prisma.wine.createMany({
+          data: [
+            createWineData({ name: 'Wine 1', grapeVariety: 'Cabernet Sauvignon' }),
+            createWineData({ name: 'Wine 2', grapeVariety: 'Pinot Noir' }),
+            createWineData({ name: 'Wine 3', grapeVariety: 'Cabernet Sauvignon' }), // duplicate
+            createWineData({ name: 'Wine 4', grapeVariety: null }), // null should be excluded
+          ],
+        });
+
+        const response = await request(app).get('/api/wines/meta/grape-varieties');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(['Cabernet Sauvignon', 'Pinot Noir']);
+      });
+    });
+  });
 });

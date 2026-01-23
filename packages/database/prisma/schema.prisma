@@ -23,6 +23,8 @@ model Wine {
   drinkByDate   DateTime?
   rating      Float?   // 1.0-5.0 scale with 0.1 precision
   notes       String?
+  expertRatings   String?
+  wherePurchased  String?
   wineLink    String?
   favorite    Boolean  @default(false)
 

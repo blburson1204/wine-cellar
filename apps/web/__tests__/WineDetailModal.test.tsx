@@ -20,6 +20,8 @@ describe('WineDetailModal', () => {
     drinkByDate: '2030-12-31T00:00:00.000Z',
     rating: 4.5,
     notes: 'Excellent wine with great aging potential',
+    expertRatings: null,
+    wherePurchased: null,
     wineLink: null,
     favorite: false,
     imageUrl: null,
@@ -32,6 +34,17 @@ describe('WineDetailModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock fetch to return empty arrays for meta endpoints (combobox options)
+    vi.mocked(global.fetch).mockImplementation((url: string | URL | Request) => {
+      const urlString = url.toString();
+      if (urlString.includes('/api/wines/meta/')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        } as Response);
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
+    });
   });
 
   describe('Read-Only View Mode', () => {
@@ -338,12 +351,24 @@ describe('WineDetailModal', () => {
         />
       );
 
-      // Get all text inputs and fill required fields
-      // Order: Wine Name, Producer, Country, Region, Grape Variety, Blend, Wine Link, Notes (textarea)
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'New Wine'); // Wine Name
-      await user.type(textInputs[1], 'New Producer'); // Producer
-      await user.type(textInputs[2], 'Italy'); // Country
+      // Wait for form to be fully initialized (default vintage should be visible)
+      await waitFor(() => {
+        expect(screen.getByDisplayValue(new Date().getFullYear().toString())).toBeInTheDocument();
+      });
+
+      // Fill required fields using specific placeholder text
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'New Wine');
+      await user.type(producerInput, 'New Producer');
+      await user.type(countryInput, 'Italy');
+
+      // Verify the values were entered
+      expect(nameInput).toHaveValue('New Wine');
+      expect(producerInput).toHaveValue('New Producer');
+      expect(countryInput).toHaveValue('Italy');
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -376,8 +401,8 @@ describe('WineDetailModal', () => {
       );
 
       // Clear the name field and try to submit
-      const textInputs = screen.getAllByRole('textbox');
-      await user.clear(textInputs[0]);
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      await user.clear(nameInput);
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -401,10 +426,12 @@ describe('WineDetailModal', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Test'); // Wine name
-      await user.type(textInputs[1], 'Test Producer'); // Producer
-      await user.type(textInputs[3], 'France'); // Country
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      await user.type(nameInput, 'Test');
+      await user.type(producerInput, 'Test Producer');
+      await user.type(countryInput, 'France');
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const ratingInput = spinButtons.find((input) => input.getAttribute('step') === '0.1');
@@ -436,9 +463,9 @@ describe('WineDetailModal', () => {
 
       await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.clear(textInputs[0]);
-      await user.type(textInputs[0], 'Updated Wine Name');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Updated Wine Name');
 
       await user.click(screen.getByRole('button', { name: 'Save Changes' }));
 
@@ -473,10 +500,12 @@ describe('WineDetailModal', () => {
       );
 
       // Fill in required fields
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Test'); // Wine Name
-      await user.type(textInputs[1], 'Test Producer'); // Producer
-      await user.type(textInputs[2], 'France'); // Country
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      await user.type(nameInput, 'Test');
+      await user.type(producerInput, 'Test Producer');
+      await user.type(countryInput, 'France');
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -503,10 +532,12 @@ describe('WineDetailModal', () => {
       );
 
       // Fill in required fields
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Test'); // Wine Name
-      await user.type(textInputs[1], 'Test Producer'); // Producer
-      await user.type(textInputs[2], 'France'); // Country
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      await user.type(nameInput, 'Test');
+      await user.type(producerInput, 'Test Producer');
+      await user.type(countryInput, 'France');
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -690,6 +721,202 @@ describe('WineDetailModal', () => {
       const img = document.querySelector('img[alt*="label"]') as HTMLImageElement;
       expect(img).toBeInTheDocument();
       expect(img.src).toContain(`/api/wines/${wineWithImage.id}/image`);
+    });
+  });
+
+  describe('Expert Ratings and Where Purchased Fields', () => {
+    beforeEach(() => {
+      // Mock fetch for combobox options
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => [],
+      });
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('displays expert ratings in view mode when present', () => {
+      const wineWithExpertRatings = {
+        ...mockWine,
+        expertRatings: 'WS 92, RP 94, JD 95',
+      };
+
+      render(
+        <WineDetailModal
+          wine={wineWithExpertRatings}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      expect(screen.getByText('Expert Ratings')).toBeInTheDocument();
+      expect(screen.getByText('WS 92, RP 94, JD 95')).toBeInTheDocument();
+    });
+
+    it('displays where purchased in view mode when present', () => {
+      const wineWithWherePurchased = {
+        ...mockWine,
+        wherePurchased: 'Total Wine',
+      };
+
+      render(
+        <WineDetailModal
+          wine={wineWithWherePurchased}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      expect(screen.getByText('Where Purchased')).toBeInTheDocument();
+      expect(screen.getByText('Total Wine')).toBeInTheDocument();
+    });
+
+    it('does not display expert ratings label when null', () => {
+      render(
+        <WineDetailModal
+          wine={mockWine}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      expect(screen.queryByText('Expert Ratings')).not.toBeInTheDocument();
+    });
+
+    it('does not display where purchased label when null', () => {
+      render(
+        <WineDetailModal
+          wine={mockWine}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      expect(screen.queryByText('Where Purchased')).not.toBeInTheDocument();
+    });
+
+    it('shows expert ratings input in edit mode', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <WineDetailModal
+          wine={mockWine}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
+
+      // Find the expert ratings input by placeholder
+      const expertRatingsInput = screen.getByPlaceholderText('e.g., WS 92, RP 94, JD 95');
+      expect(expertRatingsInput).toBeInTheDocument();
+    });
+
+    it('shows where purchased input with datalist in edit mode', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <WineDetailModal
+          wine={mockWine}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
+
+      // Find the where purchased input by placeholder
+      const wherePurchasedInput = screen.getByPlaceholderText('Select or type...');
+      expect(wherePurchasedInput).toBeInTheDocument();
+      expect(wherePurchasedInput).toHaveAttribute('list', 'where-purchased-options');
+    });
+
+    it('can edit expert ratings field', async () => {
+      const user = userEvent.setup();
+      mockOnUpdate.mockResolvedValue(undefined);
+
+      render(
+        <WineDetailModal
+          wine={mockWine}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
+
+      const expertRatingsInput = screen.getByPlaceholderText('e.g., WS 92, RP 94, JD 95');
+      await user.type(expertRatingsInput, 'WS 90, RP 91');
+
+      await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+      await waitFor(() => {
+        expect(mockOnUpdate).toHaveBeenCalledWith(
+          mockWine.id,
+          expect.objectContaining({
+            expertRatings: 'WS 90, RP 91',
+          })
+        );
+      });
+    });
+
+    it('can edit where purchased field', async () => {
+      const user = userEvent.setup();
+      mockOnUpdate.mockResolvedValue(undefined);
+
+      render(
+        <WineDetailModal
+          wine={mockWine}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
+
+      const wherePurchasedInput = screen.getByPlaceholderText('Select or type...');
+      await user.type(wherePurchasedInput, 'Wine.com');
+
+      await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+      await waitFor(() => {
+        expect(mockOnUpdate).toHaveBeenCalledWith(
+          mockWine.id,
+          expect.objectContaining({
+            wherePurchased: 'Wine.com',
+          })
+        );
+      });
+    });
+
+    it('fetches combobox options on mount', async () => {
+      render(
+        <WineDetailModal
+          wine={mockWine}
+          mode="view"
+          onClose={mockOnClose}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalledWith('/api/wines/meta/where-purchased');
+        expect(global.fetch).toHaveBeenCalledWith('/api/wines/meta/producers');
+        expect(global.fetch).toHaveBeenCalledWith('/api/wines/meta/countries');
+        expect(global.fetch).toHaveBeenCalledWith('/api/wines/meta/regions');
+        expect(global.fetch).toHaveBeenCalledWith('/api/wines/meta/grape-varieties');
+      });
     });
   });
 });

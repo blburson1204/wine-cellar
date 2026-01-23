@@ -141,12 +141,13 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getByText('Add New Wine')).toBeInTheDocument();
       });
 
-      // Fill form using text inputs
-      // Order: Wine Name, Producer, Country, Region, Grape Variety, Blend, Wine Link, Notes
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Test Wine'); // Wine Name
-      await user.type(textInputs[1], 'Test Producer'); // Producer
-      await user.type(textInputs[2], 'France'); // Country
+      // Fill form using placeholder-based selectors
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      await user.type(nameInput, 'Test Wine');
+      await user.type(producerInput, 'Test Producer');
+      await user.type(countryInput, 'France');
 
       // Submit - click the second Add Wine button (in modal)
       const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });
@@ -946,11 +947,13 @@ describe('Home Page - Wine Cellar', () => {
         expect(screen.getByText('Add New Wine')).toBeInTheDocument();
       });
 
-      // Order: Wine Name, Producer, Country, Region, Grape Variety, Blend, Wine Link, Notes
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Test Wine');
-      await user.type(textInputs[1], 'Test Producer');
-      await user.type(textInputs[2], 'France'); // Country
+      // Fill form using placeholder-based selectors
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      await user.type(nameInput, 'Test Wine');
+      await user.type(producerInput, 'Test Producer');
+      await user.type(countryInput, 'France');
 
       const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });
       await user.click(submitButtons[submitButtons.length - 1]);

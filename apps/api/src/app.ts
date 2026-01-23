@@ -98,6 +98,130 @@ export const createApp = (): Express => {
     }
   });
 
+  // Get unique wherePurchased values for combobox
+  app.get('/api/wines/meta/where-purchased', async (req, res, next) => {
+    const log = createLogger(req);
+
+    try {
+      log.info('Fetching unique wherePurchased values');
+
+      const results = await prisma.wine.findMany({
+        where: {
+          wherePurchased: {
+            not: null,
+          },
+        },
+        select: {
+          wherePurchased: true,
+        },
+        distinct: ['wherePurchased'],
+        orderBy: {
+          wherePurchased: 'asc',
+        },
+      });
+
+      const values = results
+        .map((r) => r.wherePurchased)
+        .filter((v): v is string => v !== null && v.trim() !== '');
+
+      log.info('Fetched wherePurchased values', { count: values.length });
+      res.json(values);
+    } catch (error) {
+      log.error('Error fetching wherePurchased values', error as Error);
+      next(error);
+    }
+  });
+
+  // Get unique producer values for combobox
+  app.get('/api/wines/meta/producers', async (req, res, next) => {
+    const log = createLogger(req);
+
+    try {
+      const results = await prisma.wine.findMany({
+        select: { producer: true },
+        distinct: ['producer'],
+        orderBy: { producer: 'asc' },
+      });
+
+      const values = results
+        .map((r) => r.producer)
+        .filter((v): v is string => v !== null && v.trim() !== '');
+
+      res.json(values);
+    } catch (error) {
+      log.error('Error fetching producer values', error as Error);
+      next(error);
+    }
+  });
+
+  // Get unique country values for combobox
+  app.get('/api/wines/meta/countries', async (req, res, next) => {
+    const log = createLogger(req);
+
+    try {
+      const results = await prisma.wine.findMany({
+        select: { country: true },
+        distinct: ['country'],
+        orderBy: { country: 'asc' },
+      });
+
+      const values = results
+        .map((r) => r.country)
+        .filter((v): v is string => v !== null && v.trim() !== '');
+
+      res.json(values);
+    } catch (error) {
+      log.error('Error fetching country values', error as Error);
+      next(error);
+    }
+  });
+
+  // Get unique region values for combobox
+  app.get('/api/wines/meta/regions', async (req, res, next) => {
+    const log = createLogger(req);
+
+    try {
+      const results = await prisma.wine.findMany({
+        where: { region: { not: null } },
+        select: { region: true },
+        distinct: ['region'],
+        orderBy: { region: 'asc' },
+      });
+
+      const values = results
+        .map((r) => r.region)
+        .filter((v): v is string => v !== null && v.trim() !== '');
+
+      res.json(values);
+    } catch (error) {
+      log.error('Error fetching region values', error as Error);
+      next(error);
+    }
+  });
+
+  // Get unique grape variety values for combobox
+  app.get('/api/wines/meta/grape-varieties', async (req, res, next) => {
+    const log = createLogger(req);
+
+    try {
+      const results = await prisma.wine.findMany({
+        where: { grapeVariety: { not: null } },
+        select: { grapeVariety: true },
+        distinct: ['grapeVariety'],
+        orderBy: { grapeVariety: 'asc' },
+      });
+
+      const values = results
+        .map((r) => r.grapeVariety)
+        .filter((v): v is string => v !== null && v.trim() !== '');
+
+      res.json(values);
+    } catch (error) {
+      log.error('Error fetching grape variety values', error as Error);
+      next(error);
+    }
+  });
+
   // Get a single wine
   app.get('/api/wines/:id', validate(wineIdSchema, 'params'), async (req, res, next) => {
     const log = createLogger(req);

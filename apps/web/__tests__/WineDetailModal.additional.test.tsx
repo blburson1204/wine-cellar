@@ -20,6 +20,8 @@ describe('WineDetailModal - Additional Coverage', () => {
     drinkByDate: '2030-12-31T00:00:00.000Z',
     rating: 3.5,
     notes: 'Great wine',
+    expertRatings: null,
+    wherePurchased: null,
     wineLink: 'https://example.com/wine',
     favorite: false,
     imageUrl: null,
@@ -32,6 +34,17 @@ describe('WineDetailModal - Additional Coverage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock fetch to return empty arrays for meta endpoints (combobox options)
+    vi.mocked(global.fetch).mockImplementation((url: string | URL | Request) => {
+      const urlString = url.toString();
+      if (urlString.includes('/api/wines/meta/')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        } as Response);
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
+    });
   });
 
   describe('Escape Key Handler', () => {
@@ -445,11 +458,14 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
       const longName = 'A'.repeat(201);
-      await user.type(textInputs[0], longName);
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
+      await user.type(nameInput, longName);
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -469,10 +485,13 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'P'.repeat(201));
-      await user.type(textInputs[2], 'Country');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'P'.repeat(201));
+      await user.type(countryInput, 'Country');
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -492,10 +511,13 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'C'.repeat(101));
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'C'.repeat(101));
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -515,11 +537,15 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
-      await user.type(textInputs[3], 'R'.repeat(201)); // Region
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      const regionInput = screen.getByPlaceholderText('Enter region');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
+      await user.type(regionInput, 'R'.repeat(201));
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -539,11 +565,15 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
-      await user.type(textInputs[4], 'G'.repeat(201)); // Grape variety
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      const grapeVarietyInput = screen.getByPlaceholderText('Enter grape variety');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
+      await user.type(grapeVarietyInput, 'G'.repeat(201));
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -565,12 +595,16 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
 
       // Notes is the last textbox (textarea)
+      const textInputs = screen.getAllByRole('textbox');
       const notesInput = textInputs[textInputs.length - 1];
       // Notes has maxLength=2000, but we test the validation logic
       await user.type(notesInput, 'N'.repeat(500)); // Start typing
@@ -596,10 +630,13 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const quantityInput = spinButtons.find((input) => input.getAttribute('min') === '0');
@@ -627,10 +664,13 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const priceInput = spinButtons.find((input) => input.getAttribute('step') === '0.01');
@@ -657,10 +697,13 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const priceInput = spinButtons.find((input) => input.getAttribute('step') === '0.01');
@@ -689,10 +732,13 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const ratingInput = spinButtons.find((input) => input.getAttribute('step') === '0.1');
@@ -725,10 +771,13 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'Wine Name');
-      await user.type(textInputs[1], 'Producer');
-      await user.type(textInputs[2], 'Country');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+
+      await user.type(nameInput, 'Wine Name');
+      await user.type(producerInput, 'Producer');
+      await user.type(countryInput, 'Country');
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 

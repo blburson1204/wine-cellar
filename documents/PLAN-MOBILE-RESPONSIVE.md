@@ -251,6 +251,46 @@ Desktop (> 1024px):
 - Clear focus states for accessibility
 - Appropriate input types (date, number, etc.)
 
+### Step 3.6: Combobox Component Upgrade
+
+**Current state**: Using HTML5 `<datalist>` for Producer, Country, Region, Grape
+Variety, and Where Purchased fields.
+
+**Mobile issues with `<datalist>`**:
+
+- iOS Safari shows picker wheel (unintuitive UX)
+- Android behavior varies by version
+- No control over styling or touch target sizes
+- Inconsistent autocomplete behavior
+
+**Recommended solution**:
+
+- **If using Tailwind CSS**: Use **Headless UI Combobox** (`@headlessui/react`)
+  - Same company (Tailwind Labs), designed to work with Tailwind
+  - Fully accessible, keyboard navigable
+  - Complete control over styling and touch targets
+
+- **If using CSS Modules**: Use **Radix UI Combobox**
+  (`@radix-ui/react-combobox`)
+  - Unstyled primitives, easy to customize
+  - Excellent accessibility out of the box
+  - Good mobile support
+
+**Fields to upgrade** (5 total):
+
+1. Producer
+2. Country
+3. Region
+4. Grape Variety
+5. Where Purchased
+
+**Benefits**:
+
+- Consistent UX across all devices
+- Proper touch targets (44px+)
+- Better autocomplete/filtering experience
+- Full control over dropdown styling
+
 ---
 
 ## Phase 4: Touch & Interaction Optimization
@@ -327,6 +367,8 @@ Desktop (> 1024px):
 - [ ] Update WineDetailModal for mobile
 - [ ] Update AddWineModal for mobile
 - [ ] Ensure all form elements have proper touch targets
+- [ ] Upgrade combobox fields (Producer, Country, Region, Grape Variety, Where
+      Purchased) from `<datalist>` to Headless UI or Radix UI
 
 ### Phase 4: Interactions
 

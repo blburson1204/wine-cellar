@@ -63,6 +63,18 @@ export const createWineSchema = z.object({
 
   notes: z.string().max(2000, 'Notes must be less than 2000 characters').optional().nullable(),
 
+  expertRatings: z
+    .string()
+    .max(500, 'Expert ratings must be less than 500 characters')
+    .optional()
+    .nullable(),
+
+  wherePurchased: z
+    .string()
+    .max(200, 'Where purchased must be less than 200 characters')
+    .optional()
+    .nullable(),
+
   wineLink: z.string().url('Wine link must be a valid URL').optional().nullable(),
 
   imageUrl: z.string().optional().nullable(),
@@ -142,6 +154,18 @@ export const updateWineSchema = z
       .nullable(),
 
     notes: z.string().max(2000, 'Notes must be less than 2000 characters').optional().nullable(),
+
+    expertRatings: z
+      .string()
+      .max(500, 'Expert ratings must be less than 500 characters')
+      .optional()
+      .nullable(),
+
+    wherePurchased: z
+      .string()
+      .max(200, 'Where purchased must be less than 200 characters')
+      .optional()
+      .nullable(),
 
     wineLink: z.string().url('Wine link must be a valid URL').optional().nullable(),
 

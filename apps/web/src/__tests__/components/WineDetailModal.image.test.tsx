@@ -20,6 +20,8 @@ describe('WineDetailModal - Image Upload/Delete', () => {
     drinkByDate: '2030-12-31',
     rating: 4.5,
     notes: 'Great wine',
+    expertRatings: null,
+    wherePurchased: null,
     wineLink: null,
     favorite: false,
     imageUrl: null,
@@ -31,7 +33,19 @@ describe('WineDetailModal - Image Upload/Delete', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
+    // Mock fetch to return empty arrays for meta endpoints (combobox options)
+    // Use mockImplementation on existing mock instead of replacing it
+    vi.mocked(global.fetch).mockImplementation((url: string | URL | Request) => {
+      const urlString = url.toString();
+      if (urlString.includes('/api/wines/meta/')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        } as Response);
+      }
+      // Default: return empty object for other endpoints
+      return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
+    });
   });
 
   describe('Image Upload UI', () => {
@@ -128,11 +142,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         name: mockWine.name,
       };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response);
-
       render(
         <WineDetailModal
           wine={mockWine}
@@ -146,6 +155,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Enter edit mode
       const editButton = screen.getByRole('button', { name: /edit/i });
       await user.click(editButton);
+
+      // Set mock for image upload AFTER render (so meta endpoint calls are handled)
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as Response);
 
       // Upload file
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -180,8 +195,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         resolveUpload = resolve;
       });
 
-      vi.mocked(global.fetch).mockReturnValueOnce(uploadPromise as any);
-
       render(
         <WineDetailModal
           wine={mockWine}
@@ -195,6 +208,9 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Enter edit mode
       const editButton = screen.getByRole('button', { name: /edit/i });
       await user.click(editButton);
+
+      // Set mock for image upload AFTER render
+      vi.mocked(global.fetch).mockReturnValueOnce(uploadPromise as any);
 
       // Upload file
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -216,11 +232,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       const user = userEvent.setup();
       const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ error: 'File too large' }),
-      } as Response);
-
       render(
         <WineDetailModal
           wine={mockWine}
@@ -234,6 +245,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Enter edit mode
       const editButton = screen.getByRole('button', { name: /edit/i });
       await user.click(editButton);
+
+      // Set mock for image upload AFTER render
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: 'File too large' }),
+      } as Response);
 
       // Upload file
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -252,8 +269,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       const user = userEvent.setup();
       const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
 
-      vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network error'));
-
       render(
         <WineDetailModal
           wine={mockWine}
@@ -267,6 +282,9 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Enter edit mode
       const editButton = screen.getByRole('button', { name: /edit/i });
       await user.click(editButton);
+
+      // Set mock for image upload AFTER render
+      vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network error'));
 
       // Upload file
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -282,11 +300,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       const user = userEvent.setup();
       const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: mockWine.id, imageUrl: 'test.jpg' }),
-      } as Response);
-
       render(
         <WineDetailModal
           wine={mockWine}
@@ -300,6 +313,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Enter edit mode
       const editButton = screen.getByRole('button', { name: /edit/i });
       await user.click(editButton);
+
+      // Set mock for image upload AFTER render
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: mockWine.id, imageUrl: 'test.jpg' }),
+      } as Response);
 
       // Upload file
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -336,8 +355,11 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await user.click(fileInput);
       // Simulate cancel (no file selected)
 
-      // Should not call fetch
-      expect(global.fetch).not.toHaveBeenCalled();
+      // Should not call fetch for image endpoint (meta endpoints are called during mount)
+      const imageCalls = vi
+        .mocked(global.fetch)
+        .mock.calls.filter((call) => String(call[0]).includes('/image'));
+      expect(imageCalls).toHaveLength(0);
     });
   });
 
@@ -374,11 +396,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       const user = userEvent.setup();
       const wineWithImage = { ...mockWine, imageUrl: 'test-wine-123.jpg' };
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        status: 204,
-      } as Response);
-
       render(
         <WineDetailModal
           wine={wineWithImage}
@@ -401,6 +418,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await waitFor(() => {
         expect(screen.getByText(/delete this image/i)).toBeInTheDocument();
       });
+
+      // Set mock for image delete AFTER render and before confirm
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        status: 204,
+      } as Response);
 
       // Find and click the confirm button within the dialog
       const confirmButtons = screen.getAllByRole('button');
@@ -464,18 +487,16 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         expect(screen.queryByText(/delete this image/i)).not.toBeInTheDocument();
       });
 
-      // Should not call DELETE endpoint
-      expect(global.fetch).not.toHaveBeenCalled();
+      // Should not call DELETE endpoint (meta endpoints are called during mount)
+      const imageCalls = vi
+        .mocked(global.fetch)
+        .mock.calls.filter((call) => String(call[0]).includes('/image'));
+      expect(imageCalls).toHaveLength(0);
     });
 
     it('should show error message when delete fails', async () => {
       const user = userEvent.setup();
       const wineWithImage = { ...mockWine, imageUrl: 'test-wine-123.jpg' };
-
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ error: 'Image not found' }),
-      } as Response);
 
       render(
         <WineDetailModal
@@ -499,6 +520,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await waitFor(() => {
         expect(screen.getByText(/delete this image/i)).toBeInTheDocument();
       });
+
+      // Set mock for image delete AFTER render
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: 'Image not found' }),
+      } as Response);
 
       const confirmButtons = screen.getAllByRole('button');
       const confirmButton = confirmButtons.find(
@@ -525,8 +552,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         resolveDelete = resolve;
       });
 
-      vi.mocked(global.fetch).mockReturnValueOnce(deletePromise as any);
-
       render(
         <WineDetailModal
           wine={wineWithImage}
@@ -549,6 +574,9 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await waitFor(() => {
         expect(screen.getByText(/delete this image/i)).toBeInTheDocument();
       });
+
+      // Set mock for image delete AFTER render
+      vi.mocked(global.fetch).mockReturnValueOnce(deletePromise as any);
 
       const confirmButtons = screen.getAllByRole('button');
       const confirmButton = confirmButtons.find(
@@ -609,11 +637,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       const user = userEvent.setup();
       const mockFile = new File(['test-image-content'], 'test.jpg', { type: 'image/jpeg' });
 
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: mockWine.id, imageUrl: 'new-image.jpg' }),
-      } as Response);
-
       render(
         <WineDetailModal
           wine={mockWine}
@@ -627,6 +650,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Enter edit mode
       const editButton = screen.getByRole('button', { name: /edit/i });
       await user.click(editButton);
+
+      // Set mock for image upload AFTER render
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: mockWine.id, imageUrl: 'new-image.jpg' }),
+      } as Response);
 
       // Upload file
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -702,8 +731,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         expect(previewImg.src).toBe(mockObjectUrl);
       });
 
-      // Should NOT call fetch (image is staged, not uploaded yet)
-      expect(global.fetch).not.toHaveBeenCalled();
+      // Should NOT call fetch for image upload (image is staged, not uploaded yet)
+      // Meta endpoints are called during mount
+      const imageCalls = vi
+        .mocked(global.fetch)
+        .mock.calls.filter((call) => String(call[0]).includes('/image'));
+      expect(imageCalls).toHaveLength(0);
 
       createObjectURLSpy.mockRestore();
     });
@@ -814,8 +847,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Should revoke the blob URL
       expect(revokeObjectURLSpy).toHaveBeenCalledWith(mockObjectUrl);
 
-      // Should NOT call fetch (no server request for staged image)
-      expect(global.fetch).not.toHaveBeenCalled();
+      // Should NOT call fetch for image endpoint (no server request for staged image)
+      // Meta endpoints are called during mount
+      const imageCalls = vi
+        .mocked(global.fetch)
+        .mock.calls.filter((call) => String(call[0]).includes('/image'));
+      expect(imageCalls).toHaveLength(0);
 
       createObjectURLSpy.mockRestore();
       revokeObjectURLSpy.mockRestore();
@@ -905,6 +942,8 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         drinkByDate: null,
         rating: null,
         notes: null,
+        expertRatings: null,
+        wherePurchased: null,
         wineLink: null,
         favorite: false,
         imageUrl: null,
@@ -912,12 +951,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
 
       // Mock onCreate to return the created wine
       mockOnCreate.mockResolvedValue(createdWine);
-
-      // Mock the image upload request
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ ...createdWine, imageUrl: 'new-wine-123.jpg' }),
-      } as Response);
 
       const mockObjectUrl = 'blob:http://localhost/test-image-preview';
       const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue(mockObjectUrl);
@@ -934,10 +967,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       );
 
       // Fill required fields
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'New Wine'); // Wine Name
-      await user.type(textInputs[1], 'Test Producer'); // Producer
-      await user.type(textInputs[2], 'France'); // Country
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      await user.type(nameInput, 'New Wine');
+      await user.type(producerInput, 'Test Producer');
+      await user.type(countryInput, 'France');
 
       // Stage an image
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -947,6 +982,12 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       await waitFor(() => {
         expect(screen.getByAltText('Wine label preview')).toBeInTheDocument();
       });
+
+      // Mock the image upload request AFTER render and before submit
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ...createdWine, imageUrl: 'new-wine-123.jpg' }),
+      } as Response);
 
       // Submit the form
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
@@ -1003,6 +1044,8 @@ describe('WineDetailModal - Image Upload/Delete', () => {
         drinkByDate: null,
         rating: null,
         notes: null,
+        expertRatings: null,
+        wherePurchased: null,
         wineLink: null,
         favorite: false,
         imageUrl: null,
@@ -1010,12 +1053,6 @@ describe('WineDetailModal - Image Upload/Delete', () => {
 
       // Mock onCreate to return the created wine
       mockOnCreate.mockResolvedValue(createdWine);
-
-      // Mock the image upload to fail
-      vi.mocked(global.fetch).mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ error: 'Upload failed' }),
-      } as Response);
 
       const mockObjectUrl = 'blob:http://localhost/test-image-preview';
       const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue(mockObjectUrl);
@@ -1032,14 +1069,22 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       );
 
       // Fill required fields
-      const textInputs = screen.getAllByRole('textbox');
-      await user.type(textInputs[0], 'New Wine');
-      await user.type(textInputs[1], 'Test Producer');
-      await user.type(textInputs[2], 'France');
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      const producerInput = screen.getByPlaceholderText('Enter producer');
+      const countryInput = screen.getByPlaceholderText('Enter country');
+      await user.type(nameInput, 'New Wine');
+      await user.type(producerInput, 'Test Producer');
+      await user.type(countryInput, 'France');
 
       // Stage an image
       const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
       await user.upload(fileInput, mockFile);
+
+      // Mock the image upload to fail AFTER render and before submit
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: 'Upload failed' }),
+      } as Response);
 
       // Submit the form
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
@@ -1101,8 +1146,11 @@ describe('WineDetailModal - Image Upload/Delete', () => {
       // Should close the modal
       expect(mockOnClose).toHaveBeenCalled();
 
-      // Should NOT have uploaded anything
-      expect(global.fetch).not.toHaveBeenCalled();
+      // Should NOT have uploaded anything (meta endpoints are called during mount)
+      const imageCalls = vi
+        .mocked(global.fetch)
+        .mock.calls.filter((call) => String(call[0]).includes('/image'));
+      expect(imageCalls).toHaveLength(0);
 
       createObjectURLSpy.mockRestore();
     });
