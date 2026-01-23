@@ -275,34 +275,59 @@ describe('WineTable', () => {
       expect(mockOnSort).toHaveBeenCalledWith('rating');
     });
 
-    it('does not call onSort when Type header clicked', async () => {
+    it('calls onSort when Type header clicked', async () => {
       const user = userEvent.setup();
       render(<WineTable {...defaultProps} />);
 
       const typeHeader = screen.getByText('Type').parentElement;
       await user.click(typeHeader!);
 
-      expect(mockOnSort).not.toHaveBeenCalled();
+      expect(mockOnSort).toHaveBeenCalledTimes(1);
+      expect(mockOnSort).toHaveBeenCalledWith('color');
     });
 
-    it('does not call onSort when Country header clicked', async () => {
+    it('calls onSort when Region header clicked', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const regionHeader = screen.getByText('Region').parentElement;
+      await user.click(regionHeader!);
+
+      expect(mockOnSort).toHaveBeenCalledTimes(1);
+      expect(mockOnSort).toHaveBeenCalledWith('region');
+    });
+
+    it('calls onSort when Grape header clicked', async () => {
+      const user = userEvent.setup();
+      render(<WineTable {...defaultProps} />);
+
+      const grapeHeader = screen.getByText('Grape').parentElement;
+      await user.click(grapeHeader!);
+
+      expect(mockOnSort).toHaveBeenCalledTimes(1);
+      expect(mockOnSort).toHaveBeenCalledWith('grapeVariety');
+    });
+
+    it('calls onSort when Country header clicked', async () => {
       const user = userEvent.setup();
       render(<WineTable {...defaultProps} />);
 
       const countryHeader = screen.getByText('Country').parentElement;
       await user.click(countryHeader!);
 
-      expect(mockOnSort).not.toHaveBeenCalled();
+      expect(mockOnSort).toHaveBeenCalledTimes(1);
+      expect(mockOnSort).toHaveBeenCalledWith('country');
     });
 
-    it('does not call onSort when In Cellar header clicked', async () => {
+    it('calls onSort when In Cellar header clicked', async () => {
       const user = userEvent.setup();
       render(<WineTable {...defaultProps} />);
 
       const inCellarHeader = screen.getByText('In Cellar').parentElement;
       await user.click(inCellarHeader!);
 
-      expect(mockOnSort).not.toHaveBeenCalled();
+      expect(mockOnSort).toHaveBeenCalledTimes(1);
+      expect(mockOnSort).toHaveBeenCalledWith('quantity');
     });
   });
 

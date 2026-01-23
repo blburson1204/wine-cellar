@@ -47,9 +47,18 @@ export default function Home(): React.JSX.Element {
   const [vintageRange, setVintageRange] = useState<[number, number] | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
   const [minRating, setMinRating] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<'name' | 'vintage' | 'producer' | 'price' | 'rating'>(
-    'name'
-  );
+  const [sortBy, setSortBy] = useState<
+    | 'name'
+    | 'vintage'
+    | 'producer'
+    | 'price'
+    | 'rating'
+    | 'color'
+    | 'region'
+    | 'grapeVariety'
+    | 'country'
+    | 'quantity'
+  >('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   // Derived state for filters
@@ -162,6 +171,21 @@ export default function Home(): React.JSX.Element {
           break;
         case 'rating':
           comparison = (a.rating ?? 0) - (b.rating ?? 0);
+          break;
+        case 'color':
+          comparison = a.color.localeCompare(b.color);
+          break;
+        case 'region':
+          comparison = (a.region ?? '').localeCompare(b.region ?? '');
+          break;
+        case 'grapeVariety':
+          comparison = (a.grapeVariety ?? '').localeCompare(b.grapeVariety ?? '');
+          break;
+        case 'country':
+          comparison = a.country.localeCompare(b.country);
+          break;
+        case 'quantity':
+          comparison = a.quantity - b.quantity;
           break;
       }
       return sortDirection === 'asc' ? comparison : -comparison;

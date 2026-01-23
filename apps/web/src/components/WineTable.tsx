@@ -25,13 +25,25 @@ interface Wine {
   imageUrl: string | null;
 }
 
+type SortColumn =
+  | 'name'
+  | 'vintage'
+  | 'producer'
+  | 'price'
+  | 'rating'
+  | 'color'
+  | 'region'
+  | 'grapeVariety'
+  | 'country'
+  | 'quantity';
+
 interface WineTableProps {
   wines: Wine[];
   onRowClick: (wine: Wine) => void;
   onToggleFavorite: (wine: Wine) => void;
-  sortBy: 'name' | 'vintage' | 'producer' | 'price' | 'rating';
+  sortBy: SortColumn;
   sortDirection: 'asc' | 'desc';
-  onSort: (column: 'name' | 'vintage' | 'producer' | 'price' | 'rating') => void;
+  onSort: (column: SortColumn) => void;
   maxHeight?: string;
 }
 
@@ -83,9 +95,7 @@ export default function WineTable({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [wines, focusedIndex, onRowClick]);
-  const getSortIndicator = (
-    column: 'name' | 'vintage' | 'producer' | 'price' | 'rating'
-  ): string => {
+  const getSortIndicator = (column: SortColumn): string => {
     if (sortBy !== column) return '';
     return sortDirection === 'asc' ? ' ↑' : ' ↓';
   };
@@ -198,40 +208,73 @@ export default function WineTable({
               {getSortIndicator('name')}
             </th>
             <th
+              onClick={() => onSort('color')}
               style={{
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '700',
                 color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
                 width: '80px',
               }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5a0210';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              Type
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Type</span>
+              {getSortIndicator('color')}
             </th>
             <th
+              onClick={() => onSort('region')}
               style={{
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '700',
                 color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
                 width: '120px',
               }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5a0210';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              Region
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Region</span>
+              {getSortIndicator('region')}
             </th>
             <th
+              onClick={() => onSort('grapeVariety')}
               style={{
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '700',
                 color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
                 width: '120px',
               }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5a0210';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              Grape
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Grape</span>
+              {getSortIndicator('grapeVariety')}
             </th>
             <th
               onClick={() => onSort('producer')}
@@ -257,16 +300,27 @@ export default function WineTable({
               {getSortIndicator('producer')}
             </th>
             <th
+              onClick={() => onSort('country')}
               style={{
                 padding: '10px 8px',
                 textAlign: 'left',
                 fontSize: '14px',
                 fontWeight: '700',
                 color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
                 width: '120px',
               }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5a0210';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              Country
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>Country</span>
+              {getSortIndicator('country')}
             </th>
             <th
               onClick={() => onSort('rating')}
@@ -292,16 +346,27 @@ export default function WineTable({
               {getSortIndicator('rating')}
             </th>
             <th
+              onClick={() => onSort('quantity')}
               style={{
                 padding: '10px 8px',
                 textAlign: 'center',
                 fontSize: '14px',
                 fontWeight: '700',
                 color: 'rgba(255, 255, 255, 0.7)',
+                cursor: 'pointer',
+                userSelect: 'none',
+                transition: 'background-color 0.2s',
                 width: '80px',
               }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#5a0210';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              In Cellar
+              <span style={{ borderBottom: '1px dotted rgba(255, 255, 255, 0.5)' }}>In Cellar</span>
+              {getSortIndicator('quantity')}
             </th>
             <th
               onClick={() => onSort('price')}
