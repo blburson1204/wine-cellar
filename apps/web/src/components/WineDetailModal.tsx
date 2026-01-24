@@ -936,35 +936,7 @@ export default function WineDetailModal({
                         </div>
                       )}
 
-                      {/* Expert Ratings - Full Width */}
-                      {wine.expertRatings && (
-                        <div style={{ gridColumn: '1 / -1' }}>
-                          <label
-                            style={{
-                              display: 'block',
-                              marginBottom: '4px',
-                              fontSize: '12px',
-                              fontWeight: '700',
-                              color: 'rgba(255, 255, 255, 0.5)',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.5px',
-                            }}
-                          >
-                            Expert Ratings
-                          </label>
-                          <p
-                            style={{
-                              margin: 0,
-                              fontSize: '16px',
-                              color: 'rgba(255, 255, 255, 0.7)',
-                            }}
-                          >
-                            {wine.expertRatings}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Where Purchased */}
+                      {/* Where Purchased & Expert Ratings - Side by Side */}
                       {wine.wherePurchased && (
                         <div>
                           <label
@@ -988,6 +960,34 @@ export default function WineDetailModal({
                             }}
                           >
                             {wine.wherePurchased}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Expert Ratings */}
+                      {wine.expertRatings && (
+                        <div>
+                          <label
+                            style={{
+                              display: 'block',
+                              marginBottom: '4px',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                              color: 'rgba(255, 255, 255, 0.5)',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                            }}
+                          >
+                            Expert Ratings
+                          </label>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: '16px',
+                              color: 'rgba(255, 255, 255, 0.7)',
+                            }}
+                          >
+                            {wine.expertRatings}
                           </p>
                         </div>
                       )}
@@ -1796,44 +1796,6 @@ export default function WineDetailModal({
                         )}
                       </div>
 
-                      {/* Expert Ratings (8 cols) */}
-                      <div style={{ gridColumn: 'span 8' }}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '2px',
-                            fontSize: '13px',
-                            fontWeight: '700',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                          }}
-                        >
-                          Expert Ratings
-                        </label>
-                        <input
-                          type="text"
-                          value={editForm.expertRatings || ''}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, expertRatings: e.target.value || null })
-                          }
-                          placeholder="e.g., WS 92, RP 94, JD 95"
-                          style={{
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: errors.expertRatings ? '1px solid #C73E3A' : 'none',
-                            borderRadius: '4px',
-                            width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            boxSizing: 'border-box',
-                          }}
-                        />
-                        {errors.expertRatings && (
-                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                            {errors.expertRatings}
-                          </span>
-                        )}
-                      </div>
-
                       {/* Where Purchased - Combobox (4 cols) */}
                       <div style={{ gridColumn: 'span 4' }}>
                         <label
@@ -1874,6 +1836,44 @@ export default function WineDetailModal({
                         {errors.wherePurchased && (
                           <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
                             {errors.wherePurchased}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Expert Ratings (8 cols) */}
+                      <div style={{ gridColumn: 'span 8' }}>
+                        <label
+                          style={{
+                            display: 'block',
+                            marginBottom: '2px',
+                            fontSize: '13px',
+                            fontWeight: '700',
+                            color: 'rgba(255, 255, 255, 0.7)',
+                          }}
+                        >
+                          Expert Ratings
+                        </label>
+                        <input
+                          type="text"
+                          value={editForm.expertRatings || ''}
+                          onChange={(e) =>
+                            setEditForm({ ...editForm, expertRatings: e.target.value || null })
+                          }
+                          placeholder="e.g., WS 92, RP 94, JD 95"
+                          style={{
+                            padding: '8px',
+                            fontSize: '14px',
+                            border: errors.expertRatings ? '1px solid #C73E3A' : 'none',
+                            borderRadius: '4px',
+                            width: '100%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                            color: 'rgba(0, 0, 0, 0.8)',
+                            boxSizing: 'border-box',
+                          }}
+                        />
+                        {errors.expertRatings && (
+                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
+                            {errors.expertRatings}
                           </span>
                         )}
                       </div>
