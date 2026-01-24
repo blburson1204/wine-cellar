@@ -325,6 +325,147 @@ registry.registerPath({
   },
 });
 
+// String array schema for metadata endpoints
+const StringArraySchema = z.array(z.string()).openapi({
+  description: 'Array of unique values',
+  example: ['Château Margaux', 'Opus One', 'Penfolds'],
+});
+
+// Get unique producers
+registry.registerPath({
+  method: 'get',
+  path: '/api/wines/meta/producers',
+  tags: ['Wine Metadata'],
+  summary: 'Get unique producers',
+  description: 'Retrieve a list of unique producer/winery names for autocomplete dropdowns.',
+  responses: {
+    200: {
+      description: 'List of unique producer names',
+      content: {
+        'application/json': {
+          schema: StringArraySchema,
+        },
+      },
+    },
+    500: {
+      description: 'Server error',
+      content: {
+        'application/json': {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// Get unique countries
+registry.registerPath({
+  method: 'get',
+  path: '/api/wines/meta/countries',
+  tags: ['Wine Metadata'],
+  summary: 'Get unique countries',
+  description: 'Retrieve a list of unique countries for autocomplete dropdowns.',
+  responses: {
+    200: {
+      description: 'List of unique country names',
+      content: {
+        'application/json': {
+          schema: StringArraySchema,
+        },
+      },
+    },
+    500: {
+      description: 'Server error',
+      content: {
+        'application/json': {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// Get unique regions
+registry.registerPath({
+  method: 'get',
+  path: '/api/wines/meta/regions',
+  tags: ['Wine Metadata'],
+  summary: 'Get unique regions',
+  description: 'Retrieve a list of unique wine regions for autocomplete dropdowns.',
+  responses: {
+    200: {
+      description: 'List of unique region names',
+      content: {
+        'application/json': {
+          schema: StringArraySchema,
+        },
+      },
+    },
+    500: {
+      description: 'Server error',
+      content: {
+        'application/json': {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// Get unique grape varieties
+registry.registerPath({
+  method: 'get',
+  path: '/api/wines/meta/grape-varieties',
+  tags: ['Wine Metadata'],
+  summary: 'Get unique grape varieties',
+  description: 'Retrieve a list of unique grape varieties for autocomplete dropdowns.',
+  responses: {
+    200: {
+      description: 'List of unique grape variety names',
+      content: {
+        'application/json': {
+          schema: StringArraySchema,
+        },
+      },
+    },
+    500: {
+      description: 'Server error',
+      content: {
+        'application/json': {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+// Get unique where purchased values
+registry.registerPath({
+  method: 'get',
+  path: '/api/wines/meta/where-purchased',
+  tags: ['Wine Metadata'],
+  summary: 'Get unique purchase locations',
+  description: 'Retrieve a list of unique purchase locations for autocomplete dropdowns.',
+  responses: {
+    200: {
+      description: 'List of unique purchase location names',
+      content: {
+        'application/json': {
+          schema: StringArraySchema,
+        },
+      },
+    },
+    500: {
+      description: 'Server error',
+      content: {
+        'application/json': {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
 // Generate OpenAPI document
 const generator = new OpenApiGeneratorV3(registry.definitions);
 
@@ -386,6 +527,10 @@ Valid wine colors are:
     {
       name: 'Wine Images',
       description: 'Wine label image management',
+    },
+    {
+      name: 'Wine Metadata',
+      description: 'Unique values for autocomplete dropdowns',
     },
   ],
 });
