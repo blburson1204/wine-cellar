@@ -290,7 +290,7 @@ All wine responses now include `favorite: boolean` field.
 
 - [WINE-LABEL-IMAGE-FEATURE-PLAN.md](WINE-LABEL-IMAGE-FEATURE-PLAN.md) - Image
   feature documentation
-- [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) - Project overview
+- [project-summary.md](project-summary.md) - Project overview
 - [Test-Summary.md](Test-Summary.md) - Test coverage details
 
 ---

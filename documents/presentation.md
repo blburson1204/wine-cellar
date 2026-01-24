@@ -576,9 +576,9 @@ npm run test:coverage # Coverage report
 
 **Project Documentation:**
 
-- PROJECT_SUMMARY.md - Full overview
-- ERROR-HANDLING-SUMMARY.md - Error system
-- TEST-SUMMARY.md - Test details
+- project-summary.md - Full overview
+- error-handling-summary.md - Error system
+- test-summary.md - Test details
 - TODO.md - Roadmap
 
 **Code Documentation:**
@@ -639,9 +639,9 @@ GitHub Actions ✅ Complete documentation
 
 **Documentation:**
 
-- PROJECT_SUMMARY.md
-- ERROR-HANDLING-SUMMARY.md
-- TEST-SUMMARY.md
+- project-summary.md
+- error-handling-summary.md
+- test-summary.md
 
 **Contact:** Brian Burson
 

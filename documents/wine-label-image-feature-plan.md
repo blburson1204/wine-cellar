@@ -665,7 +665,7 @@ drag-and-drop
 ## Related Documentation
 
 - [Code-Review-Standards-Summary.md](Code-Review-Standards-Summary.md)
-- [ERROR-HANDLING-SUMMARY.md](ERROR-HANDLING-SUMMARY.md)
+- [error-handling-summary.md](error-handling-summary.md)
 - [Test-Summary.md](Test-Summary.md)
 
 ---

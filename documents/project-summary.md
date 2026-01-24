@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: January 23, 2026
+**Last Updated**: January 24, 2026
 
 ## Project Overview
 
@@ -75,7 +75,7 @@ wine-cellar/
 │   │   │   ├── schemas/       # Zod validation schemas
 │   │   │   └── utils/         # Winston logger
 │   │   ├── logs/              # Log files (gitignored)
-│   │   └── __tests__/         # API test suite (49 tests)
+│   │   └── __tests__/         # API test suite (209 tests)
 │   │
 │   └── web/                    # Next.js frontend (port 3000)
 │       ├── src/
@@ -86,7 +86,7 @@ wine-cellar/
 │       │   ├── components/     # React components
 │       │   │   └── ErrorBoundary.tsx  # Error boundary
 │       │   └── utils/          # API utilities with error handling
-│       ├── __tests__/          # React component tests (11 tests)
+│       ├── __tests__/          # React component tests (270 tests)
 │       ├── jest.config.js      # Jest configuration
 │       └── jest.setup.js       # Test environment setup
 │
@@ -119,8 +119,8 @@ wine-cellar/
 ├── .prettierignore            # Prettier ignore patterns
 ├── commitlint.config.js       # Commitlint configuration
 ├── TODO.md                     # Project roadmap
-├── PROJECT_SUMMARY.md          # This file
-└── ERROR-HANDLING-SUMMARY.md   # Error handling implementation details
+├── project-summary.md          # This file
+└── error-handling-summary.md   # Error handling implementation details
 ```
 
 ## Database Schema
@@ -261,10 +261,14 @@ curl -X POST http://localhost:3001/api/wines \
 
 ### Testing
 
-- [x] **API Testing**: 144 tests passing (100% success rate)
+- [x] **API Testing**: 209 tests passing (100% success rate)
   - 18 CRUD endpoint tests
   - 31 error handling tests
   - 95 image upload tests (validation, processing, storage, integration)
+  - 34 AppError tests
+  - 22 logger tests
+  - 4 server startup tests
+  - 10 errorHandler middleware tests (Prisma errors, AppError, production mode)
   - Input validation (Zod 3.25.76)
   - Request ID tracking
   - Database operations
@@ -273,15 +277,16 @@ curl -X POST http://localhost:3001/api/wines \
   - Sequential execution to prevent race conditions
   - Isolated test database on port 5433
 
-- [x] **React Component Testing**: 204 tests with **78%+ coverage** ✅
+- [x] **React Component Testing**: 270 tests with **83%+ coverage** ✅
   - 23 API utility tests (fetchApi, ApiError, getErrorMessage)
   - 14 ErrorBoundary tests (normal rendering, error catching, Try Again)
   - 69 WineTable tests (empty state, sorting all columns, row clicks, color
     indicators, favorites, keyboard navigation)
   - 29 WineFilters tests (search, wine types, country, rating, price ranges,
     favorites)
-  - 23 page.tsx tests (loading, empty state, add/delete wine, sorting)
-  - 22 WineDetailModal tests (view/edit/add modes, validation, save/update)
+  - 36 page.tsx tests (loading, empty state, add/delete wine, sorting, filters,
+    error handling edge cases)
+  - 59 WineDetailModal tests (view/edit/add modes, validation, save/update)
   - 28 WineDetailModal image tests (upload, delete, preview, validation)
 
 **Test Configuration:**
@@ -289,10 +294,10 @@ curl -X POST http://localhost:3001/api/wines \
 - Vitest 4.0.16 with `fileParallelism: false`
 - ESM module system for compatibility
 - **Coverage targets exceeded** ✅:
-  - API: 77% branches, 89% functions, 83% lines/statements
-  - Web: **78% functions**, **69% branches**, **80% lines** (all exceed
+  - API: **90% branches**, **97% functions**, **93% lines/statements**
+  - Web: **80% functions**, **83% branches**, **89% lines** (all exceed
     targets!)
-- Test duration: ~5s for full suite (348 tests)
+- Test duration: ~8s for full suite (479 tests)
 - Database URL configurable via environment variable for CI/local
 - **Isolated test directories**: Tests use separate `uploads-test/wines`
   directory to prevent cleanup from deleting real uploaded images
@@ -310,28 +315,30 @@ curl -X POST http://localhost:3001/api/wines \
 
 **API Coverage:**
 
-- Functions: 89.94% (target: 80%) ✅ **Exceeds target**
-- Branches: 77.34% (target: 70%) ✅ **Exceeds target**
-- Lines: 83.33% (target: 80%) ✅ **Exceeds target**
-- Statements: 83.63% (target: 80%) ✅ **Exceeds target**
+- Functions: 97.50% (target: 80%) ✅ **Exceeds by 22%**
+- Branches: 89.85% (target: 70%) ✅ **Exceeds by 28%**
+- Lines: 92.78% (target: 80%) ✅ **Exceeds by 16%**
+- Statements: 92.61% (target: 80%) ✅ **Exceeds by 16%**
 
 **Web Coverage:**
 
-- Functions: 78.85% (target: 50%) ✅ **Exceeds by 58%**
-- Branches: 69.44% (target: 35%) ✅ **Exceeds by 98%**
-- Lines: 80.16% (target: 50%) ✅ **Exceeds by 60%**
-- Statements: 78.85% (target: 50%) ✅ **Exceeds by 58%**
+- Functions: 80.10% (target: 50%) ✅ **Exceeds by 60%**
+- Branches: 83.17% (target: 35%) ✅ **Exceeds by 138%**
+- Lines: 89.38% (target: 50%) ✅ **Exceeds by 79%**
+- Statements: 88.45% (target: 50%) ✅ **Exceeds by 77%**
 
 **Component Coverage Breakdown:**
 
-- page.tsx: 83.52% lines (23 tests)
-- WineTable.tsx: 88.33% lines (69 tests)
-- WineFilters.tsx: 96.96% lines (29 tests)
-- WineDetailModal.tsx: 65.34% lines (50 tests combined)
+- page.tsx: 96.66% lines, 80% branches (36 tests)
+- WineTable.tsx: 84% lines (69 tests)
+- WineFilters.tsx: 96.29% lines (29 tests)
+- WineDetailModal.tsx: 84.84% lines (59 tests combined)
 - ErrorBoundary.tsx: 100% lines (14 tests)
 - api.ts utils: 100% lines (23 tests)
+- server.ts: 100% lines (4 tests)
+- errorHandler.ts: 100% lines, 95% branches (10 tests)
 
-All coverage targets exceeded. See [TEST-SUMMARY.md](TEST-SUMMARY.md) for
+All coverage targets exceeded. See [test-summary.md](test-summary.md) for
 detailed test breakdown.
 
 ### Design & UX
@@ -542,7 +549,7 @@ detailed test breakdown.
 ## Error Handling & Logging Implementation
 
 A comprehensive error handling and logging system has been implemented. See
-[ERROR-HANDLING-SUMMARY.md](ERROR-HANDLING-SUMMARY.md) for complete details.
+[error-handling-summary.md](error-handling-summary.md) for complete details.
 
 ### Key Features
 

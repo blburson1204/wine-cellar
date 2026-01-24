@@ -168,7 +168,7 @@ Added to root `package.json`:
 - `.github/pull_request_template.md` - PR template
 - `.github/CODE_REVIEW_CHECKLIST.md` - Code review guidelines
 - `.github/workflows/code-quality.yml` - CI/CD workflow
-- `CODE-REVIEW-STANDARDS-SUMMARY.md` - This document
+- `code-review-standards-summary.md` - This document
 
 ### Modified
 

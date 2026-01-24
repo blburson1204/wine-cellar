@@ -1,6 +1,6 @@
 # Wine Cellar - Test Summary
 
-## ✅ All Tests Passing (348/348)
+## ✅ All Tests Passing (479/479)
 
 ### Test Suite Results
 
@@ -14,10 +14,13 @@
 ✓ apps/api/__tests__/utils/logger.test.ts (22 tests) - Unit
 ✓ apps/api/__tests__/services/storage/local-storage.service.test.ts (14 tests) - Unit
 ✓ apps/api/__tests__/routes/wine-image.integration.test.ts (19 tests) - Integration
+✓ apps/api/__tests__/errors/AppError.test.ts (34 tests) - Unit
+✓ apps/api/__tests__/server.test.ts (4 tests) - Unit
+✓ apps/api/__tests__/middleware/errorHandler.test.ts (10 tests) - Unit
 
-Test Files  7 passed (7)
-Tests       144 passed (144)
-Duration    ~2.3s
+Test Files  10 passed (10)
+Tests       209 passed (209)
+Duration    ~2.5s
 ```
 
 **Web Tests:**
@@ -28,28 +31,31 @@ Duration    ~2.3s
 ✓ apps/web/__tests__/WineTable.test.tsx (69 tests) - Component
 ✓ apps/web/__tests__/WineFilters.test.tsx (29 tests) - Component
 ✓ apps/web/__tests__/page.test.tsx (23 tests) - Component
+✓ apps/web/__tests__/page.additional.test.tsx (13 tests) - Component
 ✓ apps/web/__tests__/WineDetailModal.test.tsx (22 tests) - Component
+✓ apps/web/__tests__/WineDetailModal.additional.test.tsx (37 tests) - Component
 ✓ apps/web/src/__tests__/components/WineDetailModal.image.test.tsx (28 tests) - Component
+✓ apps/web/__tests__/WineTable.additional.test.tsx (32 tests) - Component
 
-Test Files  7 passed (7)
-Tests       204 passed (204)
-Duration    ~2.5s
+Test Files  10 passed (10)
+Tests       270 passed (270)
+Duration    ~5.6s
 ```
 
 ### Quick Stats
 
 - **Test Runner**: Vitest 4.0.16
-- **Total Tests**: 348 (144 API + 204 web)
+- **Total Tests**: 479 (209 API + 270 web)
 - **Pass Rate**: 100%
-- **Execution Time**: ~4.8s
-- **Test Files**: 14 (7 API + 7 web)
-- **Test Types**: Unit (76), Integration (68), Component (204)
+- **Execution Time**: ~8.1s
+- **Test Files**: 20 (10 API + 10 web)
+- **Test Types**: Unit (100), Integration (68), Component (270)
 
 ---
 
 ## Test Breakdown
 
-### API Tests (144 tests)
+### API Tests (209 tests)
 
 #### NEW: Phase 1B Image Upload Tests (95 tests)
 
@@ -113,6 +119,43 @@ DELETE /api/wines/:id/image:
 Full lifecycle:
 
 - ✓ Upload → Replace → Delete → Re-upload workflow
+
+---
+
+### Server & Middleware Tests (14 tests) - NEW January 2026
+
+#### server.test.ts (4 tests) - Unit
+
+**Server Startup**
+
+- ✓ starts server on default port 3001 when PORT env is not set
+- ✓ starts server on custom port from PORT env
+- ✓ uses NODE_ENV from environment
+- ✓ defaults to development when NODE_ENV is not set
+
+#### errorHandler.test.ts (10 tests) - Unit
+
+**Prisma Error Handling**
+
+- ✓ handles P2002 unique constraint violation (409)
+- ✓ handles P2025 record not found (404)
+- ✓ handles P2003 foreign key constraint failed (400)
+- ✓ handles generic Prisma error with unknown code (500)
+
+**AppError Handling**
+
+- ✓ handles AppError with correct status code
+- ✓ handles ValidationError with fields
+
+**Unexpected Error Handling**
+
+- ✓ hides error details in production
+- ✓ shows error details in development
+
+**notFoundHandler**
+
+- ✓ returns 404 for undefined routes
+- ✓ includes correct method and path in error message
 
 ---
 
@@ -222,7 +265,7 @@ Full lifecycle:
 
 ---
 
-### Web Tests (199 tests)
+### Web Tests (270 tests)
 
 #### api.test.ts (23 tests)
 
@@ -510,6 +553,30 @@ Full lifecycle:
 - ✓ shows plural "Bottles" for multiple wines
 - ✓ shows filtered count when filters are applied
 
+#### page.additional.test.tsx (13 tests) - NEW January 2026
+
+**Filter Functionality**
+
+- ✓ filters by grape variety
+- ✓ filters by country
+- ✓ filters by In Cellar checkbox
+- ✓ filters by Favorites checkbox
+- ✓ filters by minimum rating
+- ✓ clears all filters when Clear All Filters button is clicked
+
+**Additional Sorting**
+
+- ✓ sorts by color when Type header clicked
+- ✓ sorts by region when Region header clicked
+- ✓ sorts by grape variety when Grape header clicked
+- ✓ sorts by country when Country header clicked
+- ✓ sorts by quantity when In Cellar header clicked
+
+**Error Handling Edge Cases**
+
+- ✓ handles create wine with non-ok response
+- ✓ handles update when wine not found in fresh list
+
 #### WineDetailModal.test.tsx (22 tests)
 
 **Read-Only View Mode**
@@ -597,29 +664,37 @@ Full lifecycle:
 
 **API Tests** (`apps/api/vitest.config.ts`):
 
-- **Functions**: 89.94% (target: 80%) ✅ Exceeds target
-- **Branches**: 77.34% (target: 70%) ✅ Exceeds target
-- **Lines**: 83.33% (target: 80%) ✅ Exceeds target
-- **Statements**: 83.63% (target: 80%) ✅ Exceeds target
+- **Functions**: 97.50% (target: 80%) ✅ **Exceeds by 22%**
+- **Branches**: 89.85% (target: 70%) ✅ **Exceeds by 28%**
+- **Lines**: 92.78% (target: 80%) ✅ **Exceeds by 16%**
+- **Statements**: 92.61% (target: 80%) ✅ **Exceeds by 16%**
 
 **Web Tests** (`apps/web/vitest.config.ts`):
 
-- **Functions**: 78.85% (target: 50%) ✅ **Exceeds by 58%**
-- **Branches**: 69.44% (target: 35%) ✅ **Exceeds by 98%**
-- **Lines**: 80.16% (target: 50%) ✅ **Exceeds by 60%**
-- **Statements**: 78.85% (target: 50%) ✅ **Exceeds by 58%**
+- **Functions**: 80.10% (target: 50%) ✅ **Exceeds by 60%**
+- **Branches**: 83.17% (target: 35%) ✅ **Exceeds by 138%**
+- **Lines**: 89.38% (target: 50%) ✅ **Exceeds by 79%**
+- **Statements**: 88.45% (target: 50%) ✅ **Exceeds by 77%**
 
 ### Component Coverage Breakdown
 
+**API Components:**
+
+- server.ts: 100% lines ✅ (4 tests) - **NEW**
+- errorHandler.ts: 100% lines, 95.23% branches ✅ (10 tests) - **+38% branches**
+- app.ts: 86.89% statements, 82.5% branches ✅
+- All error classes: 100% coverage ✅
+
 **Web Components:**
 
-- page.tsx: 83.52% lines ✅ (23 tests) - **+21.65% improvement**
-- WineTable.tsx: 88.33% lines ✅ (69 tests) - **+5.73% improvement**
-- WineFilters.tsx: 96.96% lines ✅ (29 tests)
-- WineDetailModal.tsx: 65.34% lines ✅ (50 tests combined)
+- page.tsx: 96.66% lines, 80% branches ✅ (36 tests) - **+13% lines, +17%
+  branches**
+- WineTable.tsx: 84% lines ✅ (69 tests)
+- WineFilters.tsx: 96.29% lines ✅ (29 tests)
+- WineDetailModal.tsx: 84.84% lines ✅ (59 tests combined)
 - ErrorBoundary.tsx: 100% lines ✅ (14 tests)
 - api.ts utils: 100% lines ✅ (23 tests)
-- layout.tsx: 0% coverage (Next.js metadata only, not critical)
+- layout.tsx: 100% coverage ✅
 
 ---
 
@@ -750,6 +825,23 @@ export default defineConfig({
 
 ### Recent Changes
 
+- **January 24, 2026**: Coverage Improvement Sprint
+  - Added 131 new tests to improve coverage above 80% thresholds
+  - **New API test files:**
+    - `server.test.ts` (4 tests) - Server startup, PORT/NODE_ENV handling
+    - `middleware/errorHandler.test.ts` (10 tests) - Prisma errors, AppError,
+      production mode
+  - **New web test file:**
+    - `page.additional.test.tsx` (13 tests) - Filters, sorting, error edge cases
+  - **Coverage improvements:**
+    - API: 89.85% branches (was 77%), 97.5% functions (was 90%)
+    - Web: 83.17% branches (was 69%), 80.1% functions (was 79%)
+    - page.tsx: 80% branches (was 62.6%), 96.66% lines (was 79%)
+    - server.ts: 0% → 100% coverage
+    - errorHandler.ts: 57% → 95% branches
+  - Total tests: 348 → 479 (+131 tests, +38% increase)
+  - All 479 tests passing ✅
+
 - **January 23, 2026**: All Columns Sortable
   - Added 5 new WineTable sorting tests (64 → 69 tests)
   - All table columns now sortable: Type, Region, Grape, Country, In Cellar
@@ -852,4 +944,4 @@ export default defineConfig({
 
 ---
 
-**Last Updated**: January 23, 2026 (All Columns Sortable)
+**Last Updated**: January 24, 2026 (Coverage Improvement Sprint)
