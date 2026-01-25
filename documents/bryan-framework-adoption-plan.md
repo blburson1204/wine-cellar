@@ -1,6 +1,6 @@
 # Bryan's Framework Adoption Plan
 
-**Created**: January 21, 2026 **Status**: Ready for Implementation
+**Created**: January 21, 2026 **Status**: COMPLETE (Installed January 24, 2026)
 
 ## Overview
 
@@ -17,10 +17,11 @@ All components come from: `_bg_template/` directory in wine-cellar repo.
 
 ## Components to Adopt
 
-### Tier 1: Skills (7 total)
+### Tier 1: Skills (8 total)
 
 | Skill                          | Source Path                                                          | Purpose                                                                                        |
 | ------------------------------ | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| using-superpowers              | `_bg_template/claude/skills/using-superpowers/SKILL.md`              | Meta-skill: "Check for skills first" - enforces skill usage before any task                    |
 | test-driven-development        | `_bg_template/claude/skills/test-driven-development/SKILL.md`        | Enforces Red-Green-Refactor cycle. "NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST"           |
 | verification-before-completion | `_bg_template/claude/skills/verification-before-completion/SKILL.md` | Prevents "should work" claims. Forces fresh verification evidence before any completion claim. |
 | systematic-debugging           | `_bg_template/claude/skills/systematic-debugging/SKILL.md`           | Four-phase debugging: Root Cause → Pattern Analysis → Hypothesis Testing → Implementation      |
@@ -37,28 +38,46 @@ All components come from: `_bg_template/` directory in wine-cellar repo.
 | test-analyzer | `_bg_template/claude/agents/test-analyzer.md` | Categorizes test failures by severity (P1-P5), detects flaky tests, prioritizes fix order  |
 | auto-fixer    | `_bg_template/claude/agents/auto-fixer.md`    | Fixes lint/TypeScript/import errors automatically. Max 3 attempts, then escalates to user. |
 
-### Tier 1: Hooks (1 total)
+### Tier 1: SpecKit Lite (Commands + Simplified Templates)
 
-| Hook            | Source Path                                         | Purpose                                                                               |
-| --------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| pre-edit-verify | `_bg_template/claude/hooks/atom/pre-edit-verify.sh` | Prevents editing stale files - forces re-read if file content changed since last read |
+| Component  | Source Path                                 | Purpose                                       |
+| ---------- | ------------------------------------------- | --------------------------------------------- |
+| /specify   | `_bg_template/claude/commands/specify.md`   | Create feature specification from description |
+| /plan      | `_bg_template/claude/commands/plan.md`      | Generate implementation plan from spec        |
+| /tasks     | `_bg_template/claude/commands/tasks.md`     | Generate tasks.json with dependency ordering  |
+| /implement | `_bg_template/claude/commands/implement.md` | Execute tasks sequentially or in parallel     |
+
+**SpecKit Infrastructure** (from `_bg_template/specify/`):
+
+| Component                    | Purpose                         | Customization                             |
+| ---------------------------- | ------------------------------- | ----------------------------------------- |
+| `scripts/bash/*.sh`          | Workflow automation (8 scripts) | Use as-is                                 |
+| `templates/spec-template.md` | Feature specification template  | **Simplify** - remove enterprise sections |
+| `templates/plan-template.md` | Implementation plan template    | Use as-is                                 |
+| `templates/tasks-*.json`     | Task generation schemas         | Use as-is                                 |
+| `memory/constitution.md`     | Project principles              | **Customize** for wine-cellar             |
+
+**Why "Lite"**: The full SpecKit templates include enterprise sections (SAM.gov
+API limits, SOC2/GDPR compliance, data sensitivity classification, portal
+permissions) that don't apply to wine-cellar. We'll simplify these.
 
 ### Tier 2: Consider Later
 
-| Component         | Type     | Notes                                                                     |
-| ----------------- | -------- | ------------------------------------------------------------------------- |
-| SpecKit workflow  | Commands | `/specify` → `/plan` → `/tasks` → `/implement` - good for larger features |
-| using-superpowers | Skill    | Meta-skill that enforces "check for skills first"                         |
+| Component | Type    | Notes                                             |
+| --------- | ------- | ------------------------------------------------- |
+| /clarify  | Command | Socratic exploration of requirements before /plan |
+| /analyze  | Command | Review spec quality                               |
 
 ### Tier 3: Skip (Enterprise Overhead)
 
-- Data sensitivity classification
-- Portal/permission layers
+- Data sensitivity classification sections in templates
+- Portal/permission layer sections in templates
 - compliance-auditor agent
 - ship-jobs, ship-app skills
 - AWS-specific skills
-- phase-executor agent
+- phase-executor agent (parallel execution - overkill for solo dev)
 - Ralph looping / compaction hooks
+- pre-edit-verify hook (adds friction without significant benefit)
 
 ---
 
@@ -80,16 +99,15 @@ All components come from: `_bg_template/` directory in wine-cellar repo.
 ### Step 1: Rename Existing Skill
 
 ```bash
-cd /Users/brian/Documents/BLB Coding/wine-cellar
+cd /Users/brian/Documents/BLB\ Coding/wine-cellar
 mv .claude/skills/code-review-standards .claude/skills/coding-standards
 ```
 
-Update the filename inside if needed (SKILL.md stays the same).
-
-### Step 2: Copy Skills
+### Step 2: Copy Skills (8 skills)
 
 ```bash
-# Create directories and copy skills
+# Copy all Tier 1 skills
+cp -r _bg_template/claude/skills/using-superpowers .claude/skills/
 cp -r _bg_template/claude/skills/test-driven-development .claude/skills/
 cp -r _bg_template/claude/skills/verification-before-completion .claude/skills/
 cp -r _bg_template/claude/skills/systematic-debugging .claude/skills/
@@ -99,7 +117,7 @@ cp -r _bg_template/claude/skills/accessibility .claude/skills/
 cp -r _bg_template/claude/skills/security-review .claude/skills/
 ```
 
-### Step 3: Copy Agents
+### Step 3: Copy Agents (3 agents)
 
 ```bash
 # Create agents directory if it doesn't exist
@@ -111,42 +129,49 @@ cp _bg_template/claude/agents/test-analyzer.md .claude/agents/
 cp _bg_template/claude/agents/auto-fixer.md .claude/agents/
 ```
 
-### Step 4: Set Up Hook (Optional)
-
-The pre-edit-verify hook prevents editing files with stale content.
+### Step 4: Install SpecKit Lite
 
 ```bash
-# Create hooks directory
-mkdir -p .claude/hooks
+# Copy SpecKit commands
+mkdir -p .claude/commands
+cp _bg_template/claude/commands/specify.md .claude/commands/
+cp _bg_template/claude/commands/plan.md .claude/commands/
+cp _bg_template/claude/commands/tasks.md .claude/commands/
+cp _bg_template/claude/commands/implement.md .claude/commands/
 
-# Copy hook script
-cp _bg_template/claude/hooks/atom/pre-edit-verify.sh .claude/hooks/
+# Copy SpecKit infrastructure (note: install as .specify with dot prefix)
+cp -r _bg_template/specify .specify
+
+# Create specs directory for feature specifications
+mkdir -p specs
 ```
 
-Then update `.claude/settings.json` (create if doesn't exist):
+### Step 5: Customize SpecKit Templates
 
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit",
-        "command": "bash .claude/hooks/pre-edit-verify.sh",
-        "timeout": 3
-      }
-    ]
-  }
-}
-```
+After copying, simplify the templates for wine-cellar:
 
-### Step 5: Verify Installation
+**`.specify/templates/spec-template.md`** - Remove these enterprise sections:
+
+- Data Sensitivity Classification
+- Portal Placement (superadmin/admin/app)
+- Permissions & Access Control (complex role tables)
+- Audit & Compliance Requirements (SOC2, GDPR)
+- External Dependencies table (SAM.gov, FPDS references)
+
+**`.specify/memory/constitution.md`** - Customize for wine-cellar:
+
+- Keep TDD, Verification, Skills Before Action principles
+- Remove references to Retryvr platform
+- Simplify quality gates to match our npm scripts
+
+### Step 6: Verify Installation
 
 After copying, verify structure:
 
 ```
 .claude/
 ├── skills/
-│   ├── coding-standards/          # Renamed from code-review-standards
+│   ├── coding-standards/              # Renamed from code-review-standards
 │   │   └── SKILL.md
 │   ├── error-handling/
 │   │   └── SKILL.md
@@ -154,30 +179,51 @@ After copying, verify structure:
 │   │   └── SKILL.md
 │   ├── ui-design/
 │   │   └── SKILL.md
-│   ├── test-driven-development/   # NEW
+│   ├── using-superpowers/             # NEW - meta-skill
 │   │   └── SKILL.md
-│   ├── verification-before-completion/  # NEW
+│   ├── test-driven-development/       # NEW
 │   │   └── SKILL.md
-│   ├── systematic-debugging/      # NEW
+│   ├── verification-before-completion/# NEW
 │   │   └── SKILL.md
-│   ├── code-review-quality/       # NEW
+│   ├── systematic-debugging/          # NEW
+│   │   └── SKILL.md
+│   ├── code-review-quality/           # NEW
 │   │   └── skill.md
-│   ├── rca/                       # NEW
+│   ├── rca/                           # NEW
 │   │   └── SKILL.md
-│   ├── accessibility/             # NEW
+│   ├── accessibility/                 # NEW
 │   │   └── SKILL.md
-│   └── security-review/           # NEW
+│   └── security-review/               # NEW
 │       └── SKILL.md
-├── agents/                        # NEW directory
+├── agents/                            # NEW directory
 │   ├── code-reviewer.md
 │   ├── test-analyzer.md
 │   └── auto-fixer.md
-├── hooks/                         # NEW directory (optional)
-│   └── pre-edit-verify.sh
-└── settings.json                  # Updated for hook (optional)
+└── commands/                          # NEW directory
+    ├── specify.md
+    ├── plan.md
+    ├── tasks.md
+    └── implement.md
+
+.specify/                              # NEW - SpecKit infrastructure
+├── memory/
+│   └── constitution.md                # Customized for wine-cellar
+├── scripts/bash/
+│   ├── create-new-feature.sh
+│   ├── setup-plan.sh
+│   ├── check-prerequisites.sh
+│   └── ... (other scripts)
+└── templates/
+    ├── spec-template.md               # Simplified for wine-cellar
+    ├── plan-template.md
+    ├── tasks-template.json
+    └── tasks-verify-templates.json
+
+specs/                                 # NEW - feature specifications go here
+└── (created per feature)
 ```
 
-### Step 6: Clean Up Template
+### Step 7: Clean Up Template
 
 After successful installation, optionally remove the template:
 
@@ -215,8 +261,11 @@ failures.
 ### Development Flow
 
 ```
-1. Start feature
-   └── Consider: Does this need /specify? (SpecKit - Tier 2)
+0. ANY task
+   └── using-superpowers Skill: "Check for skills first" before doing anything
+
+1. Start feature (larger features)
+   └── /specify → /plan → /tasks → /implement (SpecKit workflow)
 
 2. Write code
    └── TDD Skill: Write failing test FIRST, then make it pass
@@ -246,9 +295,25 @@ failures.
 
 | Skill        | Iron Law                                                   |
 | ------------ | ---------------------------------------------------------- |
+| Superpowers  | "CHECK FOR SKILLS FIRST - EVEN 1% CHANCE MEANS USE IT"     |
 | TDD          | "NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST"          |
 | Verification | "NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE" |
 | Debugging    | "NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST"          |
+
+### SpecKit Workflow
+
+For larger features, use the structured workflow:
+
+```
+/specify "mobile responsive design"
+    ↓ Creates specs/001-mobile-responsive/spec.md
+/plan
+    ↓ Creates plan.md with architecture decisions
+/tasks
+    ↓ Creates tasks.json with dependency ordering
+/implement
+    ↓ Executes tasks sequentially with verification
+```
 
 ---
 
@@ -272,11 +337,27 @@ use.
 
 After installation, test each component:
 
-1. **TDD Skill**: Start a small feature, verify Claude enforces test-first
-2. **Verification Skill**: Complete something, verify Claude demands evidence
-3. **Code Review**: Make changes, trigger `/review` or ask for code review
-4. **Auto-fixer**: Introduce a lint error, verify agent fixes it
-5. **Test Analyzer**: Break a test, verify agent categorizes the failure
+1. **using-superpowers**: Start any task, verify Claude checks for skills first
+2. **TDD Skill**: Start a small feature, verify Claude enforces test-first
+3. **Verification Skill**: Complete something, verify Claude demands evidence
+4. **Code Review**: Make changes, trigger `/review` or ask for code review
+5. **Auto-fixer**: Introduce a lint error, verify agent fixes it
+6. **Test Analyzer**: Break a test, verify agent categorizes the failure
+7. **SpecKit**: Run `/specify "test feature"` to verify workflow works
+
+---
+
+## Test Case: Mobile Responsive Feature
+
+After installation, use the mobile-responsive feature as a SpecKit test case:
+
+1. Run `/specify mobile responsive design for wine cellar`
+2. Compare generated spec with existing `documents/mobile-responsive-plan.md`
+3. Proceed through `/plan` → `/tasks` → `/implement`
+4. Evaluate whether SpecKit adds value for this project's scale
+
+This will validate whether the "Lite" installation provides benefit without
+excessive overhead.
 
 ---
 
@@ -288,4 +369,4 @@ After installation, test each component:
 
 ---
 
-**Last Updated**: January 21, 2026
+**Last Updated**: January 24, 2026
