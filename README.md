@@ -5,22 +5,67 @@ PostgreSQL, and Prisma.
 
 ## Features
 
-- Add, view, edit, and delete wines
-- Track vintage, producer, country, color, quantity, and more
-- Search and filter wines (by type, variety, country, vintage, price)
-- Sortable table columns (name, vintage, producer, price)
-- Full keyboard navigation with arrow keys and Enter
-- Auto-focus for efficient data entry
-- Clean, wine-themed UI with consistent interactions
-- RESTful API
+- **Collection Management**: Add, view, edit, and delete wines with full CRUD
+- **Wine Label Images**: Upload and display wine label photos
+- **Favorites**: Mark wines as favorites with star toggle
+- **Search & Filter**: Filter by type, country, vintage, price, rating,
+  favorites
+- **Sortable Columns**: Sort by any column (name, vintage, producer, price,
+  etc.)
+- **Keyboard Navigation**: Arrow keys and Enter for efficient browsing
+- **Accessibility**: WCAG-compliant with focus indicators, ARIA labels, screen
+  reader support
+- **API Documentation**: Interactive Swagger UI at `/api/docs`
 
 ## Tech Stack
 
-- **Frontend**: Next.js 13, React, TypeScript
-- **Backend**: Express, TypeScript
+- **Frontend**: Next.js 15, React 18, TypeScript
+- **Backend**: Express, TypeScript, Zod validation
 - **Database**: PostgreSQL with Prisma ORM
-- **Code Quality**: ESLint, Prettier, Husky, lint-staged, commitlint
-- **Dev Tools**: Docker Compose, tsx (hot reload)
+- **Testing**: Vitest, React Testing Library, Supertest (479 tests, 80%+
+  coverage)
+- **Code Quality**: ESLint, Prettier, Husky, commitlint
+- **CI/CD**: GitHub Actions
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 20+
+- Docker Desktop
+- npm
+
+### Installation
+
+```bash
+# Clone and install
+git clone https://github.com/blburson1204/wine-cellar.git
+cd wine-cellar
+npm install
+
+# Create environment file
+cat > .env << 'EOF'
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/wine_cellar"
+EOF
+
+# Copy to subdirectories
+cp .env packages/database/.env
+cp .env apps/api/.env
+
+# Start database and initialize
+docker-compose up -d
+npm run db:generate
+npm run db:push
+
+# Start development servers
+npm run dev
+```
+
+The app will be available at:
+
+- **Web**: http://localhost:3000
+- **API**: http://localhost:3001
+- **API Docs**: http://localhost:3001/api/docs
 
 ## Project Structure
 
@@ -31,227 +76,86 @@ wine-cellar/
 │   └── web/          # Next.js frontend (port 3000)
 ├── packages/
 │   └── database/     # Prisma schema and client
-├── docker-compose.yml
-└── package.json
+├── documents/        # Project documentation
+└── .claude/          # AI assistant skills and agents
 ```
-
-## Setup
-
-### Prerequisites
-
-- Node.js 20+ (required for test runner compatibility)
-- Docker Desktop
-- npm
-
-### Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/blburson1204/wine-cellar.git
-cd wine-cellar
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Create environment file:
-
-```bash
-cat > .env << 'EOF'
-DATABASE_URL="postgresql://postgres:postgres@localhost:5433/wine_cellar"
-EOF
-```
-
-4. Copy .env to subdirectories:
-
-```bash
-cp .env packages/database/.env
-cp .env apps/api/.env
-```
-
-5. Start PostgreSQL:
-
-```bash
-docker-compose up -d
-```
-
-6. Set up the database:
-
-```bash
-npm run db:generate
-npm run db:push
-```
-
-7. Start the development servers:
-
-```bash
-npm run dev
-```
-
-The app will be available at:
-
-- **Web**: http://localhost:3000
-- **API**: http://localhost:3001
 
 ## Available Scripts
 
-### Development
-
-| Command           | Description                    |
-| ----------------- | ------------------------------ |
-| `npm run dev`     | Start both API and web servers |
-| `npm run dev:api` | Start API server only          |
-| `npm run dev:web` | Start web server only          |
-
-### Database
-
-| Command               | Description                           |
-| --------------------- | ------------------------------------- |
-| `npm run db:generate` | Generate Prisma client                |
-| `npm run db:push`     | Push schema changes to database       |
-| `npm run db:studio`   | Open Prisma Studio (visual DB editor) |
-
-### Code Quality
-
-| Command                | Description                      |
-| ---------------------- | -------------------------------- |
-| `npm run lint`         | Run ESLint to check code quality |
-| `npm run lint:fix`     | Auto-fix ESLint issues           |
-| `npm run format`       | Format code with Prettier        |
-| `npm run format:check` | Check code formatting            |
-| `npm run type-check`   | Run TypeScript type checking     |
-
-### Testing
-
-| Command                 | Description                   |
-| ----------------------- | ----------------------------- |
-| `npm test`              | Run all tests                 |
-| `npm run test:watch`    | Run tests in watch mode       |
-| `npm run test:coverage` | Generate test coverage report |
-
-**Test Stats:**
-
-- **Total Tests**: 175 (49 API + 126 web)
-- **Pass Rate**: 100%
-- **Coverage**: 70%+ on all metrics (exceeds all targets!)
-
-See [Test-Summary.md](Test-Summary.md) for detailed test breakdown.
+| Command              | Description               |
+| -------------------- | ------------------------- |
+| `npm run dev`        | Start API and web servers |
+| `npm test`           | Run all tests (479 tests) |
+| `npm run lint`       | Run ESLint                |
+| `npm run type-check` | TypeScript checking       |
+| `npm run db:studio`  | Open Prisma Studio        |
 
 ## API Endpoints
 
-| Method | Endpoint         | Description                                |
-| ------ | ---------------- | ------------------------------------------ |
-| GET    | `/api/docs`      | Interactive API documentation (Swagger UI) |
-| GET    | `/api/docs.json` | OpenAPI 3.0 specification (JSON)           |
-| GET    | `/api/wines`     | List all wines                             |
-| GET    | `/api/wines/:id` | Get a single wine                          |
-| POST   | `/api/wines`     | Create a wine                              |
-| PUT    | `/api/wines/:id` | Update a wine                              |
-| DELETE | `/api/wines/:id` | Delete a wine                              |
-
-### API Documentation
-
-Interactive API documentation is available at http://localhost:3001/api/docs
-when the server is running. The documentation includes:
-
-- All endpoint descriptions with request/response schemas
-- "Try it out" functionality to test endpoints directly
-- Example requests and responses
-
-### Example API Request
-
-```bash
-curl -X POST http://localhost:3001/api/wines \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Chateau Margaux",
-    "vintage": 2015,
-    "producer": "Chateau Margaux",
-    "country": "France",
-    "color": "RED",
-    "quantity": 2
-  }'
-```
+| Method | Endpoint               | Description                   |
+| ------ | ---------------------- | ----------------------------- |
+| GET    | `/api/docs`            | Interactive API documentation |
+| GET    | `/api/health`          | Health check with DB status   |
+| GET    | `/api/wines`           | List all wines                |
+| GET    | `/api/wines/:id`       | Get a single wine             |
+| POST   | `/api/wines`           | Create a wine                 |
+| PUT    | `/api/wines/:id`       | Update a wine                 |
+| DELETE | `/api/wines/:id`       | Delete a wine                 |
+| GET    | `/api/wines/:id/image` | Get wine label image          |
+| POST   | `/api/wines/:id/image` | Upload wine label image       |
+| DELETE | `/api/wines/:id/image` | Delete wine label image       |
 
 ## Database Schema
 
 ```prisma
 model Wine {
-  id            String    @id @default(cuid())
-  name          String
-  vintage       Int
-  producer      String
-  region        String?
-  country       String
-  grapeVariety  String?
-  color         WineColor
-  quantity      Int       @default(1)
-  purchasePrice Float?
-  purchaseDate  DateTime?
-  drinkByDate   DateTime?
-  rating        Int?
-  notes         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String
+  vintage        Int
+  producer       String
+  region         String?
+  country        String
+  grapeVariety   String?
+  blendDetail    String?
+  color          WineColor
+  quantity       Int       @default(1)
+  purchasePrice  Float?
+  purchaseDate   DateTime?
+  drinkByDate    DateTime?
+  rating         Float?
+  expertRatings  String?
+  wherePurchased String?
+  notes          String?
+  wineLink       String?
+  imageUrl       String?
+  favorite       Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 enum WineColor {
-  RED
-  WHITE
-  ROSE
-  SPARKLING
-  DESSERT
-  FORTIFIED
+  RED | WHITE | ROSE | SPARKLING | DESSERT | FORTIFIED
 }
 ```
 
-## Stopping the App
+## Documentation
 
-Stop the development servers with `Ctrl+C`, then stop the database:
+For detailed documentation, see:
 
-```bash
-docker-compose down
-```
-
-Your data is preserved in a Docker volume and will be there when you start up
-again.
+- [Project Summary](documents/project-summary.md) - Full architecture and
+  features
+- [TODO](TODO.md) - Project roadmap and backlog
+- [Error Handling](documents/error-handling-summary.md) - Error patterns and
+  logging
+- [Test Summary](documents/test-summary.md) - Test coverage details
 
 ## Code Quality
 
-This project maintains high code quality standards with automated tooling:
-
-### Tools
-
-- **ESLint 9.39.2**: Strict linting rules for TypeScript and React
-- **Prettier 3.7.4**: Automatic code formatting with consistent style
-- **Husky**: Git hooks for pre-commit quality checks
-- **lint-staged**: Run linters on staged files only
-- **commitlint**: Enforce conventional commit messages
-
-### Pre-commit Checks
-
-Every commit automatically runs:
-
-- ESLint to catch code issues
-- Prettier to ensure consistent formatting
-- TypeScript type checking
-- Conventional commit message validation
-
-### Conventional Commits
-
-We follow the [Conventional Commits](https://www.conventionalcommits.org/)
-specification:
-
-```
-feat: add wine rating feature
-fix: resolve wine deletion bug
-docs: update README with new scripts
-chore: upgrade dependencies
-```
+- **ESLint**: Strict TypeScript and React rules
+- **Prettier**: Consistent code formatting
+- **Husky**: Pre-commit hooks for quality checks
+- **commitlint**: Conventional commit messages
+- **GitHub Actions**: Automated CI/CD pipeline
 
 ## License
 
