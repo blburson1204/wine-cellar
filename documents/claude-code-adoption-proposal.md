@@ -200,6 +200,73 @@ task.
 
 ---
 
+## Accelerated Timeline Option
+
+For organizations needing faster results, a compressed 6-week timeline is
+possible with adjusted expectations.
+
+### Comparison
+
+| Aspect          | Standard (9+ weeks) | Accelerated (6 weeks) |
+| --------------- | ------------------- | --------------------- |
+| Pilot duration  | 4 weeks             | 2 weeks               |
+| Standardization | 4 weeks             | 2 weeks               |
+| Full rollout    | Week 9+             | Week 5+               |
+| Learning depth  | High                | Moderate              |
+| Risk level      | Lower               | Higher                |
+
+### Accelerated Timeline
+
+**Weeks 1-2: Rapid Pilot**
+
+- 3-4 developers (slightly larger group for faster learning)
+- Focus on bug fixes and test writing only (highest-confidence tasks)
+- Daily standups to share learnings
+- End of week 2: Go/no-go decision on expansion
+
+**Weeks 3-4: Parallel Standardization + Expansion**
+
+- Define mandatory skills while expanding to more developers
+- Train team in small groups rather than waiting
+- Establish guidelines based on pilot learnings
+
+**Weeks 5-6: Full Team Rollout**
+
+- All developers onboarded
+- New feature development enabled (with planning mode)
+- Continued refinement of practices
+
+### When to Use Accelerated Timeline
+
+**Good candidates:**
+
+- Teams with strong existing test coverage
+- Codebases with clear patterns and conventions
+- Developers experienced with AI tools
+- Low-risk projects or internal tools
+
+**Poor candidates:**
+
+- Legacy codebases with limited documentation
+- Teams new to AI-assisted development
+- Customer-facing critical systems
+- Regulated industries requiring audit trails
+
+### Quick Wins to Demonstrate Value Early
+
+Even in week 1, track and communicate:
+
+- Specific bugs fixed with AI assistance (before/after comparison)
+- Test coverage increases
+- Time saved on documentation tasks
+- Developer feedback and satisfaction
+
+**Key principle:** A compressed timeline can work, but requires stricter scope
+control and more active monitoring. The risk of a quality incident
+increases—ensure stakeholders understand this tradeoff.
+
+---
+
 ## Success Metrics
 
 ### Productivity

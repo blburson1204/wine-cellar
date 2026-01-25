@@ -191,7 +191,48 @@ _The right choice depends on the task._
 
 ---
 
-# Slide 15: Success Metrics
+# Slide 15: Accelerated Timeline Option
+
+**Need faster results? A 6-week timeline is possible.**
+
+| Aspect          | Standard (9+ wks) | Accelerated (6 wks) |
+| --------------- | ----------------- | ------------------- |
+| Pilot           | 4 weeks           | 2 weeks             |
+| Standardization | 4 weeks           | 2 weeks             |
+| Full rollout    | Week 9+           | Week 5+             |
+| Risk level      | Lower             | Higher              |
+
+---
+
+# Slide 16: Accelerated Timeline Details
+
+**Weeks 1-2:** Rapid pilot with 3-4 devs, daily standups, bug fixes only
+
+**Weeks 3-4:** Parallel standardization + expansion
+
+**Weeks 5-6:** Full team rollout
+
+**Good for:** Strong test coverage, clear codebase patterns, AI-experienced team
+
+**Not for:** Legacy code, regulated industries, teams new to AI tools
+
+---
+
+# Slide 17: Quick Wins (Week 1)
+
+**Demonstrate value immediately:**
+
+- Track specific bugs fixed (before/after comparison)
+- Measure test coverage increases
+- Document time saved on documentation
+- Capture developer feedback
+
+**Key question for stakeholders:** "What's the cost of a failed rollout vs. a
+slower successful one?"
+
+---
+
+# Slide 18: Success Metrics
 
 **What we measure:**
 
@@ -208,7 +249,7 @@ _The right choice depends on the task._
 
 ---
 
-# Slide 16: When NOT to Use AI
+# Slide 19: When NOT to Use AI
 
 | Scenario                       | Why                     |
 | ------------------------------ | ----------------------- |
@@ -219,7 +260,7 @@ _The right choice depends on the task._
 
 ---
 
-# Slide 17: Risk Mitigation
+# Slide 20: Risk Mitigation
 
 | Risk                     | Mitigation                                       |
 | ------------------------ | ------------------------------------------------ |
@@ -230,7 +271,7 @@ _The right choice depends on the task._
 
 ---
 
-# Slide 18: Next Steps
+# Slide 21: Next Steps
 
 1. Identify 2-3 pilot participants
 2. Define initial task scope
@@ -240,7 +281,7 @@ _The right choice depends on the task._
 
 ---
 
-# Slide 19: Key Takeaway
+# Slide 22: Key Takeaway
 
 **Start controlled. Expand gradually. Match mode to task.**
 
@@ -249,7 +290,115 @@ universally.
 
 ---
 
-# Slide 20: Questions?
+# Wine-Cellar: Engineering Rigor in Action
+
+_A proof-of-concept demonstrating AI-assisted development with discipline_
+
+---
+
+# Slide 23: Wine-Cellar Overview
+
+**A real project built with Claude Code + engineering rigor**
+
+| Metric             | Value                        |
+| ------------------ | ---------------------------- |
+| **Total Tests**    | 479 (209 API + 270 Web)      |
+| **Test Pass Rate** | 100%                         |
+| **Code Coverage**  | 88% statements, 83% branches |
+| **Skills Adopted** | 12                           |
+| **Commits (2025)** | 93+                          |
+
+---
+
+# Slide 24: The 5 Pillars Implemented
+
+| Pillar           | Skill                             | Key Rule                           |
+| ---------------- | --------------------------------- | ---------------------------------- |
+| **TDD**          | `/test-driven-development`        | No code without failing test first |
+| **Verification** | `/verification-before-completion` | Evidence before claims             |
+| **Code Review**  | `/code-review-quality`            | Automated + agent + human          |
+| **Security**     | `/security-review`                | OWASP-based checks                 |
+| **Debugging**    | `/systematic-debugging`           | 4-phase root cause analysis        |
+
+---
+
+# Slide 25: Test Coverage Breakdown
+
+**API Tests (209)**
+
+- Wines CRUD, error handling, validation
+- Image processing, logging, storage
+- Custom error classes, middleware
+
+**Web Tests (270)**
+
+- WineTable, WineFilters, WineDetailModal
+- Form validation, edge cases
+- Error boundaries, accessibility
+
+**All tests passing. All the time.**
+
+---
+
+# Slide 26: Skills Enforce Discipline
+
+**12 skills encoding best practices:**
+
+- `test-driven-development` - TDD cycle
+- `verification-before-completion` - Evidence required
+- `code-review-quality` - Structured reviews
+- `security-review` - OWASP audits
+- `systematic-debugging` - No guessing
+- `rca` - Root cause analysis
+- `using-superpowers` - Meta-discipline
+- `error-handling`, `testing`, `coding-standards`, `ui-design`, `accessibility`
+
+**Key insight:** Skills enforce discipline automatically—not dependent on
+individual willpower.
+
+---
+
+# Slide 27: Automation Layer
+
+**Pre-commit hooks run automatically:**
+
+- ESLint (strict mode)
+- Prettier formatting
+- TypeScript type-check
+- Conventional commit format
+
+**Result:** Bad code can't be committed.
+
+---
+
+# Slide 28: What This Proves
+
+**AI-assisted development can be MORE rigorous, not less.**
+
+| Traditional                     | With Claude Code + Skills           |
+| ------------------------------- | ----------------------------------- |
+| Discipline depends on developer | Skills enforce discipline           |
+| "Trust me, it works"            | Evidence required                   |
+| Knowledge in heads              | Patterns documented                 |
+| Manual checks                   | Automation catches mistakes         |
+| Variable quality                | Measurable: 479 tests, 88% coverage |
+
+---
+
+# Slide 29: The Core Philosophy
+
+**"Evidence over confidence, discipline over speed"**
+
+- You cannot claim something works without proof
+- Rationalizations are explicitly forbidden
+- Skills encode hard-won lessons
+- Skipping skills = repeating mistakes
+
+**This is transferable to any team.**
+
+---
+
+# Slide 30: Questions?
 
 ---
 
