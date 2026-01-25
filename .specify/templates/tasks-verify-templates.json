@@ -1,0 +1,458 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "retryvr-tasks-verify-templates-v1",
+  "title": "T-VERIFY Gate Templates",
+  "description": "Standard and conditional gate definitions for auto-generating T-VERIFY tasks",
+  "version": "1.0.0",
+
+  "standard_gates": [
+    {
+      "id": "T-VERIFY-TYPECHECK",
+      "description": "TypeScript type check passes",
+      "gate_check": "npm run type-check",
+      "gate_type": "typecheck",
+      "block_on": "Any TypeScript error",
+      "always_include": true,
+      "parallel": true,
+      "parallel_group": "static",
+      "timeout_ms": 120000,
+      "retry_policy": "none",
+      "requires_containers": false
+    },
+    {
+      "id": "T-VERIFY-LINT",
+      "description": "ESLint code quality check passes",
+      "gate_check": "npm run lint",
+      "gate_type": "lint",
+      "block_on": "Any lint error",
+      "always_include": true,
+      "parallel": true,
+      "parallel_group": "static",
+      "timeout_ms": 120000,
+      "retry_policy": "none",
+      "requires_containers": false
+    },
+    {
+      "id": "T-VERIFY-UNIT",
+      "description": "Unit test suite passes",
+      "gate_check": "npm run test:unit",
+      "gate_type": "unit",
+      "block_on": "Any test failure",
+      "always_include": true,
+      "parallel": false,
+      "timeout_ms": 300000,
+      "retry_policy": "none",
+      "requires_containers": false,
+      "depends_on": ["T-VERIFY-TYPECHECK", "T-VERIFY-LINT"]
+    },
+    {
+      "id": "T-VERIFY-INTEGRATION",
+      "description": "Integration test suite passes",
+      "gate_check": "npm run test:integration",
+      "gate_type": "integration",
+      "block_on": "Any test failure",
+      "always_include": true,
+      "parallel": false,
+      "timeout_ms": 300000,
+      "retry_policy": "transient",
+      "requires_containers": true,
+      "depends_on": ["T-VERIFY-UNIT"]
+    },
+    {
+      "id": "T-VERIFY-SMOKE",
+      "description": "UI smoke tests pass",
+      "gate_check": "npm run test:smoke",
+      "gate_type": "smoke",
+      "block_on": "Any smoke test failure",
+      "always_include": true,
+      "parallel": false,
+      "timeout_ms": 90000,
+      "retry_policy": "transient",
+      "requires_containers": true,
+      "depends_on": ["T-VERIFY-INTEGRATION"]
+    }
+  ],
+
+  "conditional_gates": [
+    {
+      "id": "T-VERIFY-MIGRATION",
+      "description": "Database migrations are valid (no drift)",
+      "gate_check": "npm run db:validate-complete",
+      "gate_type": "migration",
+      "block_on": "Drift detected (schema has changes not in migrations)",
+      "condition": {
+        "keywords": [
+          "schema",
+          "database",
+          "prisma",
+          "migration",
+          "model",
+          "db"
+        ],
+        "files": ["packages/database/schema.prisma"],
+        "frontmatter": [
+          "data_model_exists",
+          "mentions_migration",
+          "schema_changed"
+        ]
+      },
+      "parallel": false,
+      "timeout_ms": 60000,
+      "retry_policy": "none",
+      "requires_containers": false,
+      "depends_on": ["T-VERIFY-SMOKE"]
+    },
+    {
+      "id": "T-VERIFY-CONTRACT",
+      "description": "API contract tests pass",
+      "gate_check": "npm run test:contract",
+      "gate_type": "contract",
+      "block_on": "Any contract violation",
+      "condition": {
+        "keywords": ["API", "endpoint", "route", "REST", "request", "response"],
+        "files": ["apps/api/src/routes/"],
+        "frontmatter": ["routes", "contracts_dir_exists"]
+      },
+      "parallel": false,
+      "timeout_ms": 300000,
+      "retry_policy": "transient",
+      "requires_containers": true,
+      "depends_on": ["T-VERIFY-UNIT"]
+    },
+    {
+      "id": "T-VERIFY-E2E",
+      "description": "End-to-end browser tests pass",
+      "gate_check": "npm run test:e2e",
+      "gate_type": "e2e",
+      "block_on": "Any test failure",
+      "condition": {
+        "keywords": [
+          "UI",
+          "page",
+          "component",
+          "form",
+          "modal",
+          "button",
+          "frontend"
+        ],
+        "files": ["apps/web/src/"],
+        "frontmatter": ["ui_complexity"]
+      },
+      "parallel": false,
+      "timeout_ms": 600000,
+      "retry_policy": "transient",
+      "requires_containers": true,
+      "depends_on": ["T-VERIFY-SMOKE"]
+    },
+    {
+      "id": "T-VERIFY-A11Y",
+      "description": "Accessibility audit passes (score >= 95%)",
+      "gate_check": "npm run a11y:lighthouse",
+      "gate_type": "a11y",
+      "block_on": "Score < 95%",
+      "condition": {
+        "keywords": [
+          "accessibility",
+          "a11y",
+          "WCAG",
+          "screen reader",
+          "keyboard"
+        ],
+        "frontmatter_values": {
+          "ui_complexity": ["moderate", "major"]
+        }
+      },
+      "parallel": false,
+      "timeout_ms": 300000,
+      "retry_policy": "transient",
+      "requires_containers": true,
+      "depends_on": ["T-VERIFY-E2E"]
+    },
+    {
+      "id": "T-VERIFY-VISUAL",
+      "description": "Visual regression tests pass (screenshot baselines match)",
+      "gate_check": "npx playwright test tests/e2e/visual/ --config=tests/config/playwright.primary.config.ts --project=visual --workers=1",
+      "gate_type": "visual",
+      "block_on": "Visual diff > 2% threshold",
+      "condition": {
+        "keywords": [
+          "UI",
+          "page",
+          "component",
+          "visual",
+          "screenshot",
+          "baseline",
+          "styling",
+          "CSS",
+          "layout",
+          "design"
+        ],
+        "files": [
+          "apps/web/src/app/",
+          "apps/web/src/components/",
+          "packages/ui/"
+        ],
+        "frontmatter": ["ui_complexity"],
+        "frontmatter_values": {
+          "ui_complexity": ["minor", "moderate", "major"]
+        }
+      },
+      "parallel": false,
+      "timeout_ms": 180000,
+      "retry_policy": "transient",
+      "requires_containers": true,
+      "depends_on": ["T-VERIFY-SMOKE"],
+      "on_failure": {
+        "message": "If UI changes were intentional, update baselines with: npx playwright test tests/e2e/visual/ --update-snapshots",
+        "action": "Update and commit visual baselines"
+      }
+    }
+  ],
+
+  "optional_gates": [
+    {
+      "id": "T-VERIFY-SAST",
+      "description": "Static Application Security Testing (Semgrep)",
+      "gate_check": "semgrep --config=auto --severity ERROR,WARNING .",
+      "gate_type": "sast",
+      "block_on": "Any ERROR or WARNING finding",
+      "optional": true,
+      "parallel": true,
+      "parallel_group": "static",
+      "timeout_ms": 120000,
+      "retry_policy": "none",
+      "requires_containers": false
+    },
+    {
+      "id": "T-VERIFY-DEPS",
+      "description": "Dependency vulnerability scan (Trivy)",
+      "gate_check": "trivy fs . --severity CRITICAL",
+      "gate_type": "deps",
+      "block_on": "Any CRITICAL vulnerability",
+      "optional": true,
+      "parallel": true,
+      "parallel_group": "static",
+      "timeout_ms": 120000,
+      "retry_policy": "none",
+      "requires_containers": false
+    }
+  ],
+
+  "agent_gates": [
+    {
+      "id": "T-VERIFY-SECURITY",
+      "description": "Security audit passes (no P1/P2 findings)",
+      "auto_agent": "security-audit",
+      "gate_type": "security",
+      "scope": "changed",
+      "block_on": "Any P1 or P2 finding",
+      "always_include": true,
+      "parallel": false,
+      "depends_on": ["T-VERIFY-SMOKE"]
+    },
+    {
+      "id": "T-VERIFY-CODE",
+      "description": "Code review passes (no Critical issues)",
+      "auto_agent": "code-reviewer",
+      "gate_type": "review",
+      "scope": "changed",
+      "block_on": "Any Critical issue",
+      "always_include": true,
+      "parallel": false,
+      "depends_on": ["T-VERIFY-SECURITY"]
+    }
+  ],
+
+  "final_gate": {
+    "id": "T-FINAL",
+    "description": "All verification gates passed - spec complete",
+    "phase": "verify",
+    "composed_of": [
+      {
+        "check": "typecheck",
+        "command": "npm run type-check",
+        "required": true,
+        "parallel": true,
+        "parallel_group": "static",
+        "timeout_ms": 120000
+      },
+      {
+        "check": "lint",
+        "command": "npm run lint",
+        "required": true,
+        "parallel": true,
+        "parallel_group": "static",
+        "timeout_ms": 120000
+      },
+      {
+        "check": "unit",
+        "command": "npm run test:unit",
+        "required": true,
+        "depends_on": ["typecheck", "lint"],
+        "timeout_ms": 300000
+      },
+      {
+        "check": "integration",
+        "command": "npm run test:integration",
+        "required": true,
+        "depends_on": ["unit"],
+        "timeout_ms": 300000,
+        "requires_containers": true,
+        "retry_policy": "transient"
+      },
+      {
+        "check": "smoke",
+        "command": "npm run test:smoke",
+        "required": true,
+        "depends_on": ["integration"],
+        "timeout_ms": 90000,
+        "requires_containers": true,
+        "retry_policy": "transient"
+      },
+      {
+        "check": "db-validate",
+        "command": "npm run db:validate-complete",
+        "required": true,
+        "condition": {
+          "keywords": [
+            "schema",
+            "database",
+            "prisma",
+            "migration",
+            "model",
+            "db"
+          ],
+          "files": ["packages/database/schema.prisma"]
+        },
+        "depends_on": ["smoke"],
+        "timeout_ms": 60000
+      },
+      {
+        "check": "contract",
+        "command": "npm run test:contract",
+        "required": false,
+        "condition": {
+          "keywords": [
+            "API",
+            "endpoint",
+            "route",
+            "REST",
+            "request",
+            "response"
+          ],
+          "files": ["apps/api/src/routes/"]
+        },
+        "depends_on": ["unit"],
+        "timeout_ms": 300000,
+        "requires_containers": true,
+        "retry_policy": "transient"
+      },
+      {
+        "check": "visual",
+        "command": "npx playwright test tests/e2e/visual/ --config=tests/config/playwright.primary.config.ts --project=visual --workers=1",
+        "required": false,
+        "condition": {
+          "keywords": [
+            "UI",
+            "page",
+            "component",
+            "visual",
+            "screenshot",
+            "baseline",
+            "styling",
+            "CSS",
+            "layout",
+            "design"
+          ],
+          "frontmatter_values": {
+            "ui_changes": ["minor", "moderate", "major"]
+          }
+        },
+        "depends_on": ["smoke"],
+        "timeout_ms": 180000,
+        "requires_containers": true,
+        "retry_policy": "transient",
+        "on_failure": {
+          "message": "If UI changes were intentional, update baselines with: npx playwright test tests/e2e/visual/ --update-snapshots",
+          "action": "Update and commit visual baselines"
+        }
+      },
+      {
+        "check": "e2e",
+        "command": "npm run test:e2e",
+        "required": false,
+        "condition": {
+          "keywords": [
+            "UI",
+            "page",
+            "component",
+            "form",
+            "modal",
+            "button",
+            "frontend"
+          ],
+          "frontmatter": ["ui_complexity"]
+        },
+        "depends_on": ["smoke"],
+        "timeout_ms": 600000,
+        "requires_containers": true,
+        "retry_policy": "transient"
+      },
+      {
+        "check": "a11y",
+        "command": "npm run a11y:lighthouse",
+        "required": false,
+        "condition": {
+          "keywords": [
+            "accessibility",
+            "a11y",
+            "WCAG",
+            "screen reader",
+            "keyboard"
+          ],
+          "frontmatter_values": {
+            "ui_complexity": ["moderate", "major"]
+          }
+        },
+        "depends_on": ["e2e"],
+        "timeout_ms": 300000,
+        "requires_containers": true,
+        "retry_policy": "transient"
+      },
+      {
+        "check": "security",
+        "agent": "security-audit",
+        "required": true,
+        "depends_on": ["smoke"],
+        "scope": "changed",
+        "block_on": "Any P1 or P2 finding"
+      },
+      {
+        "check": "code-review",
+        "agent": "code-reviewer",
+        "required": true,
+        "depends_on": ["security"],
+        "scope": "changed",
+        "block_on": "Any Critical issue"
+      }
+    ],
+    "block_on": "Any check failure",
+    "timeout_ms": 600000
+  },
+
+  "condition_evaluation": {
+    "description": "How to evaluate gate conditions against spec content",
+    "rules": [
+      "Scan spec.md content for keywords (case-insensitive)",
+      "Check if mentioned files exist in codebase",
+      "Check frontmatter fields for truthy values",
+      "Check frontmatter_values for specific field values",
+      "Gate is included if ANY condition matches"
+    ],
+    "detection_helpers": {
+      "schema_changed": "git diff --name-only origin/main -- packages/database/schema.prisma | grep -q .",
+      "contracts_dir_exists": "[ -d specs/{SPEC_ID}-{SPEC_NAME}/contracts ]",
+      "data_model_exists": "[ -f specs/{SPEC_ID}-{SPEC_NAME}/data-model.md ]"
+    }
+  }
+}

@@ -1,0 +1,494 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "retryvr-tasks-schema-v1",
+  "title": "Retryvr Tasks Schema",
+  "description": "JSON schema for ATOM framework task files (tasks.json)",
+
+  "schema_version": "1.0.0",
+
+  "root_template": {
+    "spec_id": "{SPEC_ID}",
+    "spec_name": "{SPEC_NAME}",
+    "updated": "{ISO_TIMESTAMP}",
+    "anthropic_patterns": ["Ralph looping", "JSON task state"],
+    "completion_promise": "<promise>SPEC-{SPEC_ID}-COMPLETE</promise>",
+    "tasks": []
+  },
+
+  "task_template": {
+    "id": "T{NUMBER}",
+    "phase": "{PHASE}",
+    "description": "{DESCRIPTION}",
+    "status": "pending",
+    "parallel": false,
+    "target_file": null,
+    "gate": null,
+    "gate_check": null,
+    "verify": null,
+    "auto_agent": null,
+    "gate_type": null,
+    "scope": null,
+    "block_on": null,
+    "completed_at": null,
+    "evidence": null,
+    "evidence_type": null,
+    "reconciled": false,
+    "reconciled_reason": null
+  },
+
+  "t_verify_template": {
+    "id": "T-VERIFY-{TYPE}",
+    "phase": "verify",
+    "description": "{DESCRIPTION}",
+    "status": "pending",
+    "parallel": false,
+    "target_file": null,
+    "gate": "{DEPENDS_ON_TASK}",
+    "gate_check": null,
+    "verify": "{VERIFY_CONDITION}",
+    "auto_agent": "{AGENT_NAME}",
+    "gate_type": "{tests|security|review}",
+    "scope": "{changed|full}",
+    "block_on": "{BLOCKING_CONDITION}",
+    "completed_at": null,
+    "evidence": null
+  },
+
+  "status_values": ["pending", "in_progress", "completed", "blocked"],
+
+  "gate_types": {
+    "typecheck": {
+      "description": "TypeScript type checking",
+      "auto_agent": null,
+      "command": "npm run type-check",
+      "block_on": "Any TypeScript error",
+      "retry_policy": "none",
+      "timeout_ms": 120000,
+      "requires_containers": false,
+      "parallel_group": "static"
+    },
+    "lint": {
+      "description": "ESLint code quality",
+      "auto_agent": null,
+      "command": "npm run lint",
+      "block_on": "Any lint error",
+      "retry_policy": "none",
+      "timeout_ms": 120000,
+      "requires_containers": false,
+      "parallel_group": "static"
+    },
+    "unit": {
+      "description": "Unit test suite",
+      "auto_agent": null,
+      "command": "npm run test:unit",
+      "block_on": "Any test failure",
+      "retry_policy": "none",
+      "timeout_ms": 300000,
+      "requires_containers": false,
+      "parallel_group": null
+    },
+    "contract": {
+      "description": "API contract tests",
+      "auto_agent": null,
+      "command": "npm run test:contract",
+      "block_on": "Any contract violation",
+      "retry_policy": "transient",
+      "timeout_ms": 300000,
+      "requires_containers": true,
+      "parallel_group": null,
+      "condition": "spec.routes.length > 0 || spec.contracts_dir_exists"
+    },
+    "integration": {
+      "description": "Integration tests with real database",
+      "auto_agent": null,
+      "command": "npm run test:integration",
+      "block_on": "Any test failure",
+      "retry_policy": "transient",
+      "timeout_ms": 300000,
+      "requires_containers": true,
+      "parallel_group": null
+    },
+    "smoke": {
+      "description": "UI smoke tests (Playwright @smoke tag)",
+      "auto_agent": null,
+      "command": "npm run test:smoke",
+      "block_on": "Any smoke test failure",
+      "retry_policy": "transient",
+      "timeout_ms": 90000,
+      "requires_containers": true,
+      "parallel_group": null
+    },
+    "e2e": {
+      "description": "End-to-end browser tests",
+      "auto_agent": null,
+      "command": "npm run test:e2e",
+      "block_on": "Any test failure",
+      "retry_policy": "transient",
+      "timeout_ms": 600000,
+      "requires_containers": true,
+      "parallel_group": null,
+      "condition": "spec.ui_complexity && spec.ui_complexity !== 'backend-only'"
+    },
+    "a11y": {
+      "description": "Accessibility audit (Lighthouse)",
+      "auto_agent": null,
+      "command": "npm run a11y:lighthouse",
+      "block_on": "Score < 95%",
+      "retry_policy": "transient",
+      "timeout_ms": 300000,
+      "requires_containers": true,
+      "parallel_group": null,
+      "condition": "['moderate', 'major'].includes(spec.ui_complexity)"
+    },
+    "migration": {
+      "description": "Database migration completeness validation",
+      "auto_agent": null,
+      "command": "npm run db:validate-complete",
+      "block_on": "Drift detected (schema has changes not in migrations)",
+      "retry_policy": "none",
+      "timeout_ms": 60000,
+      "requires_containers": false,
+      "parallel_group": null,
+      "condition": "spec.data_model_exists || spec.mentions_migration || spec.schema_changed"
+    },
+    "sast": {
+      "description": "Static Application Security Testing (Semgrep)",
+      "auto_agent": null,
+      "command": "semgrep --config=auto --severity ERROR,WARNING .",
+      "block_on": "Any ERROR or WARNING finding",
+      "retry_policy": "none",
+      "timeout_ms": 120000,
+      "requires_containers": false,
+      "parallel_group": "static",
+      "optional": true
+    },
+    "deps": {
+      "description": "Dependency vulnerability scan (Trivy)",
+      "auto_agent": null,
+      "command": "trivy fs . --severity CRITICAL",
+      "block_on": "Any CRITICAL vulnerability",
+      "retry_policy": "none",
+      "timeout_ms": 120000,
+      "requires_containers": false,
+      "parallel_group": "static",
+      "optional": true
+    },
+    "tests": {
+      "description": "Run test suite (legacy)",
+      "auto_agent": null,
+      "command": "npm test",
+      "block_on": "Any test failure",
+      "retry_policy": "none",
+      "timeout_ms": 300000,
+      "requires_containers": false,
+      "parallel_group": null
+    },
+    "security": {
+      "description": "Security audit (agent-based)",
+      "auto_agent": "security-audit",
+      "block_on": "Any P1 or P2 finding"
+    },
+    "review": {
+      "description": "Code review (agent-based)",
+      "auto_agent": "code-reviewer",
+      "block_on": "Any Critical issue"
+    }
+  },
+
+  "examples": {
+    "minimal_root": {
+      "spec_id": 134,
+      "spec_name": "atom-gates",
+      "updated": "2026-01-01T00:00:00Z",
+      "anthropic_patterns": [],
+      "completion_promise": "<promise>SPEC-134-COMPLETE</promise>",
+      "tasks": []
+    },
+
+    "standard_task": {
+      "id": "T001",
+      "phase": "3.1",
+      "description": "Implement feature X",
+      "status": "pending",
+      "parallel": false,
+      "target_file": "path/to/file.ts",
+      "gate": null,
+      "gate_check": null,
+      "verify": "npm test passes",
+      "auto_agent": null,
+      "gate_type": null,
+      "scope": null,
+      "block_on": null,
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "parallel_task": {
+      "id": "T002",
+      "phase": "3.1",
+      "description": "Write unit tests for feature X",
+      "status": "pending",
+      "parallel": true,
+      "target_file": "tests/unit/feature-x.test.ts",
+      "gate": null,
+      "gate_check": null,
+      "verify": "Test file created and runs",
+      "auto_agent": null,
+      "gate_type": null,
+      "scope": null,
+      "block_on": null,
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "t_verify_typecheck": {
+      "id": "T-VERIFY-TYPECHECK",
+      "phase": "verify",
+      "description": "Run TypeScript type-check (must pass)",
+      "status": "pending",
+      "parallel": true,
+      "target_file": null,
+      "gate": null,
+      "gate_check": "npm run type-check",
+      "verify": "Exit code 0",
+      "auto_agent": null,
+      "gate_type": "typecheck",
+      "scope": null,
+      "block_on": "Any TypeScript error",
+      "timeout_ms": 120000,
+      "retry_policy": "none",
+      "requires_containers": false,
+      "parallel_group": "static",
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "t_verify_lint": {
+      "id": "T-VERIFY-LINT",
+      "phase": "verify",
+      "description": "Run ESLint (errors must pass)",
+      "status": "pending",
+      "parallel": true,
+      "target_file": null,
+      "gate": null,
+      "gate_check": "npm run lint",
+      "verify": "Exit code 0 (no errors)",
+      "auto_agent": null,
+      "gate_type": "lint",
+      "scope": null,
+      "block_on": "Any lint error",
+      "timeout_ms": 120000,
+      "retry_policy": "none",
+      "requires_containers": false,
+      "parallel_group": "static",
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "t_verify_unit": {
+      "id": "T-VERIFY-UNIT",
+      "phase": "verify",
+      "description": "Run unit test suite (all must pass)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T-VERIFY-LINT",
+      "gate_check": "npm run test:unit",
+      "verify": "All unit tests pass",
+      "auto_agent": null,
+      "gate_type": "unit",
+      "scope": null,
+      "block_on": "Any test failure",
+      "timeout_ms": 300000,
+      "retry_policy": "none",
+      "requires_containers": false,
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "t_verify_integration": {
+      "id": "T-VERIFY-INTEGRATION",
+      "phase": "verify",
+      "description": "Run integration test suite (all must pass)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T-VERIFY-UNIT",
+      "gate_check": "npm run test:integration",
+      "verify": "All integration tests pass",
+      "auto_agent": null,
+      "gate_type": "integration",
+      "scope": null,
+      "block_on": "Any test failure",
+      "timeout_ms": 300000,
+      "retry_policy": "transient",
+      "requires_containers": true,
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "t_verify_smoke": {
+      "id": "T-VERIFY-SMOKE",
+      "phase": "verify",
+      "description": "Run UI smoke tests (critical paths must pass)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T-VERIFY-INTEGRATION",
+      "gate_check": "npm run test:smoke",
+      "verify": "All smoke tests pass",
+      "auto_agent": null,
+      "gate_type": "smoke",
+      "scope": null,
+      "block_on": "Any smoke test failure",
+      "timeout_ms": 90000,
+      "retry_policy": "transient",
+      "requires_containers": true,
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "t_verify_tests": {
+      "id": "T-VERIFY-TESTS",
+      "phase": "verify",
+      "description": "Run test suite and verify all pass (legacy)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T030",
+      "gate_check": null,
+      "verify": "npm test exits with code 0",
+      "auto_agent": null,
+      "gate_type": "tests",
+      "scope": null,
+      "block_on": "Any test failure",
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "t_verify_security": {
+      "id": "T-VERIFY-SECURITY",
+      "phase": "verify",
+      "description": "Run security audit (P1/P2 must pass)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T030",
+      "gate_check": null,
+      "verify": "Agent returns PASS verdict",
+      "auto_agent": "security-audit",
+      "gate_type": "security",
+      "scope": "changed",
+      "block_on": "Any P1 or P2 finding",
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "t_verify_code": {
+      "id": "T-VERIFY-CODE",
+      "phase": "verify",
+      "description": "Run code review (no Critical issues)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T030",
+      "gate_check": null,
+      "verify": "Agent returns Ready to merge verdict",
+      "auto_agent": "code-reviewer",
+      "gate_type": "review",
+      "scope": "changed",
+      "block_on": "Any Critical issue",
+      "completed_at": null,
+      "evidence": null
+    },
+
+    "completed_task": {
+      "id": "T001",
+      "phase": "3.1",
+      "description": "Implement feature X",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "path/to/file.ts",
+      "gate": null,
+      "gate_check": null,
+      "verify": "npm test passes",
+      "auto_agent": null,
+      "gate_type": null,
+      "scope": null,
+      "block_on": null,
+      "completed_at": "2026-01-01T12:00:00Z",
+      "evidence": "All tests passing, implementation verified"
+    }
+  },
+
+  "validation_rules": {
+    "required_root_fields": [
+      "spec_id",
+      "spec_name",
+      "updated",
+      "anthropic_patterns",
+      "completion_promise",
+      "tasks"
+    ],
+    "required_task_fields": ["id", "phase", "description", "status"],
+    "timestamp_format": "ISO 8601 (e.g., 2026-01-01T00:00:00Z)",
+    "promise_format": "<promise>SPEC-{ID}-COMPLETE</promise>",
+    "id_format": {
+      "standard": "T followed by number (T001, T002, T003)",
+      "verify": "T-VERIFY- followed by type (T-VERIFY-TESTS, T-VERIFY-SECURITY)",
+      "final": "T-FINAL"
+    }
+  },
+
+  "field_descriptions": {
+    "spec_id": "Numeric identifier from spec filename (e.g., 134 from 134-atom-gates)",
+    "spec_name": "Hyphenated name from spec filename (e.g., atom-gates)",
+    "updated": "Last update timestamp in ISO 8601 format",
+    "anthropic_patterns": "List of Claude/Anthropic patterns used (e.g., Ralph looping)",
+    "completion_promise": "Token that signals spec completion to stop hook",
+    "tasks": "Array of task objects",
+
+    "id": "Unique task identifier (T001, T-VERIFY-SECURITY, etc.)",
+    "phase": "Phase number or category (3.1, 3.2, verify)",
+    "description": "Human-readable task description",
+    "status": "Current status: pending, in_progress, completed, blocked",
+    "parallel": "True if task can run in parallel with siblings",
+    "target_file": "Primary file this task creates/modifies (null if N/A)",
+    "gate": "Task ID that must complete before this task can start",
+    "gate_check": "Command to run for gate verification (e.g., npm run type-check)",
+    "verify": "How to verify task completion",
+    "auto_agent": "Agent to dispatch automatically for T-VERIFY tasks",
+    "gate_type": "Type of gate: typecheck, lint, unit, contract, integration, e2e, a11y, migration, sast, deps, tests, security, review",
+    "scope": "Scope for agent: changed (files since main), full (all files)",
+    "block_on": "Condition that blocks completion (for T-VERIFY tasks)",
+    "timeout_ms": "Maximum execution time in milliseconds (default 120000 for static, 300000 for tests)",
+    "retry_policy": "Retry strategy: 'none' (fail immediately) or 'transient' (retry once with 2s delay)",
+    "requires_containers": "Whether Docker containers must be running for this gate",
+    "parallel_group": "Group ID for parallel execution (e.g., 'static' for typecheck/lint/sast/deps)",
+    "condition": "JavaScript expression evaluated against spec frontmatter to determine if gate should be generated",
+    "optional": "If true, gate is skipped if command not available (e.g., semgrep not installed)",
+    "completed_at": "ISO timestamp when task was completed (null until done)",
+    "evidence": "Evidence/output captured when task completed (null until done)",
+    "evidence_type": "Classification of evidence: artifact (file/code), execution (command output), inspection (manual verification)",
+    "reconciled": "True if task was marked complete during post-compaction recovery (default false)",
+    "reconciled_reason": "Reason for reconciliation (required when reconciled is true)"
+  },
+
+  "evidence_types": {
+    "artifact": {
+      "description": "File or code artifact that can be verified to exist",
+      "example": "Created tests/unit/feature.test.ts",
+      "validation": "File path must exist on filesystem"
+    },
+    "execution": {
+      "description": "Output from running a command or test",
+      "example": "Tests passed: 5/5",
+      "validation": "Must contain command output patterns"
+    },
+    "inspection": {
+      "description": "Manual verification or observation (most permissive)",
+      "example": "Reviewed code at line 45",
+      "validation": "No automated verification"
+    }
+  }
+}
