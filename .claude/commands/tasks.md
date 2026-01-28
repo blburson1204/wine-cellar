@@ -94,9 +94,30 @@ Generates `tasks.json` using schema from
    - Different files = parallel, Same file = sequential
    - Order: Setup → Tests (TDD) → Models → Services → Endpoints → Polish
 
-5. **Generate T-FINAL composite gate** using
+5. **Generate T-DOC-GATE** (documentation reconciliation):
+   - Position: After last implementation task, before T-FINAL
+   - Gate: Depends on last implementation task completing
+   - Agent: `documentation-reconciliation`
+   - Purpose: Identifies and updates affected documentation
+
+   ```json
+   {
+     "id": "T-DOC-GATE",
+     "phase": "verify",
+     "description": "Documentation reconciliation - identify and update affected docs",
+     "status": "pending",
+     "parallel": false,
+     "agent": "documentation-reconciliation",
+     "gate": "{LAST_IMPL_TASK_ID}",
+     "verify": "documentation-update-report.md generated with Status: PASS",
+     "block_on": "Status: DRIFT_DETECTED in report"
+   }
+   ```
+
+6. **Generate T-FINAL composite gate** using
    `.specify/templates/tasks-verify-templates.json`:
    - Generate single T-FINAL task from `final_gate` definition
+   - Gate: Depends on T-DOC-GATE completing
    - T-FINAL contains `composed_of` array with all verification checks:
      - Always-required checks: typecheck, lint, unit, integration, smoke,
        security agent, code-review agent
@@ -110,7 +131,7 @@ Generates `tasks.json` using schema from
      T-FINAL)
    - T-FINAL orchestrates all checks with proper dependency ordering
 
-6. Generate documentation tasks via `Skill: documentation-gate`
+7. Apply `Skill: doc-gate` criteria during T-DOC-GATE execution
 
 ---
 
@@ -125,6 +146,12 @@ with proper dependency ordering. It replaces the previous approach of generating
 ### Execution Flow
 
 ```
+Implementation tasks complete
+    ↓
+T-DOC-GATE (documentation-reconciliation agent)
+    ↓ (blocks if DRIFT_DETECTED)
+T-FINAL begins:
+    ↓
 PARALLEL: typecheck, lint
     ↓
 unit tests

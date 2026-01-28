@@ -53,11 +53,11 @@ $ARGUMENTS
 
 Before starting, which optional skills apply?
 
-- [ ] UI changes? → design-system, figma
-- [ ] Debugging? → systematic-debugging
-- [ ] Architecture decisions? → arch
-- [ ] Database changes? → prisma
-- [ ] Need to find existing docs? → search-documentation (discovery phase)
+- [ ] UI changes? → ui-design-system, figma
+- [ ] Debugging? → debug-systematic
+- [ ] Architecture decisions? → arch-decisions
+- [ ] Database changes? → db-prisma
+- [ ] Need to find existing docs? → doc-search (discovery phase)
 
 Given the implementation details provided as an argument, do this:
 
