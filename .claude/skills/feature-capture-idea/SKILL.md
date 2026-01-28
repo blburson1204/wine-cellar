@@ -41,6 +41,7 @@ Prevents idea loss while maintaining concentration on active feature.
 
 - Get current date
 - Append formatted entry to `.claude/session-context/future-work.md`:
+
   ```markdown
   ## Feature NNN - Description
 
