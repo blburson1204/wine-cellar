@@ -1,7 +1,7 @@
-# SpecKit Lite Conversion: Wine Label Image Feature
+# SpecKit Conversion: Wine Label Image Feature
 
 **Purpose**: Retrospective example showing what the Wine Label Image feature
-planning documents would look like using SpecKit Lite methodology.
+planning documents would look like using the SpecKit v2 methodology.
 
 **Original Document**:
 [wine-label-image-feature-plan.md](wine-label-image-feature-plan.md)
@@ -10,28 +10,73 @@ planning documents would look like using SpecKit Lite methodology.
 
 # Part 1: Feature Specification (spec.md)
 
+```yaml
 ---
+meta:
+  spec_id: 002
+  spec_name: wine-label-images
+  status: completed
+  phase: completed
+  created: 2025-12-31
+  updated: 2026-01-20
 
-meta: spec_id: 002 spec_name: wine-label-images status: completed phase:
-completed created: 2025-12-31 updated: 2026-01-20
+summary:
+  goals:
+    - {
+        id: G1,
+        description: 'Display wine label images in detail modal',
+        priority: HIGH,
+      }
+    - {
+        id: G2,
+        description: 'Upload images during wine creation',
+        priority: HIGH,
+      }
+    - {
+        id: G3,
+        description: 'Upload/replace/delete images for existing wines',
+        priority: HIGH,
+      }
+    - { id: G4, description: 'Preview images before saving', priority: MEDIUM }
+  constraints:
+    - { id: C1, description: 'File size limit 5MB', type: TECHNICAL }
+    - {
+        id: C2,
+        description: 'Supported formats: JPEG, PNG, WebP',
+        type: TECHNICAL,
+      }
+    - {
+        id: C3,
+        description: 'Local storage for development phase',
+        type: INFRASTRUCTURE,
+      }
+  decisions:
+    - {
+        id: D1,
+        decision: 'Sharp library for image processing',
+        rationale: 'Fast, efficient, well-maintained',
+      }
+    - {
+        id: D2,
+        decision: 'Staged upload pattern for new wines',
+        rationale: 'Preview before wine exists',
+      }
+    - {
+        id: D3,
+        decision: 'Defer thumbnails to Phase 2',
+        rationale: 'Faster MVP delivery',
+      }
+    - {
+        id: D4,
+        decision: 'Defer S3 to Phase 3',
+        rationale: 'Local storage sufficient for dev',
+      }
 
-summary: goals: - {id: G1, description: "Display wine label images in detail
-modal", priority: HIGH} - {id: G2, description: "Upload images during wine
-creation", priority: HIGH} - {id: G3, description: "Upload/replace/delete images
-for existing wines", priority: HIGH} - {id: G4, description: "Preview images
-before saving", priority: MEDIUM} constraints: - {id: C1, description: "File
-size limit 5MB", type: TECHNICAL} - {id: C2, description: "Supported formats:
-JPEG, PNG, WebP", type: TECHNICAL} - {id: C3, description: "Local storage for
-development phase", type: INFRASTRUCTURE} decisions: - {id: D1, decision: "Sharp
-library for image processing", rationale: "Fast, efficient, well-maintained"} -
-{id: D2, decision: "Staged upload pattern for new wines", rationale: "Preview
-before wine exists"} - {id: D3, decision: "Defer thumbnails to Phase 2",
-rationale: "Faster MVP delivery"} - {id: D4, decision: "Defer S3 to Phase 3",
-rationale: "Local storage sufficient for dev"}
-
-critical_requirements: type: feature-major ui_changes: moderate
-
+critical_requirements:
+  type: feature-major
+  ui_changes: moderate
 ---
+```
 
 # Feature Specification: Wine Label Images
 
@@ -164,6 +209,24 @@ when browsing their collection.
 
 ---
 
+## Clarifications
+
+_Required for feature-major specs before /plan_
+
+### Session 1
+
+**Q**: Should image upload be synchronous (blocking) or asynchronous? **A**:
+Synchronous for simplicity — user waits for upload to complete before
+proceeding.
+
+**Q**: Should images be served directly or via presigned URLs? **A**: Direct
+serving for Phase 1 (local storage). Presigned URLs deferred to Phase 3 (S3).
+
+**Q**: Should we support image editing (crop/rotate) in Phase 1? **A**: No —
+defer to Phase 4. Phase 1 focuses on upload/display/delete only.
+
+---
+
 ## Review Checklist (Gate)
 
 - [x] No [NEEDS CLARIFICATION] markers remain
@@ -176,23 +239,26 @@ when browsing their collection.
 
 # Part 2: Implementation Plan (plan.md)
 
+```yaml
 ---
+meta:
+  spec_id: 002
+  spec_name: wine-label-images
+  phase: completed
+  updated: 2026-01-20
 
-meta: spec_id: 002 spec_name: wine-label-images phase: completed updated:
-2026-01-20
-
-summary: tech_stack: [TypeScript, React, Express, Prisma, Sharp, Multer]
-external_deps: [] test_strategy: {unit: 40, integration: 60, e2e: 0} deployment:
-immediate
-
+summary:
+  tech_stack: [TypeScript, React, Express, Prisma, Sharp, Multer]
+  external_deps: []
+  test_strategy: { unit: 40, integration: 60, e2e: 0 }
+  deployment: immediate
 ---
+```
 
 # Implementation Plan: Wine Label Images
 
 **Branch**: `002-wine-label-images` | **Date**: 2025-12-31 | **Spec**:
 specs/002-wine-label-images/spec.md
-
----
 
 ## Summary
 
@@ -219,6 +285,8 @@ optimized images **Constraints**: 5MB upload limit, JPEG/PNG/WebP only
 ---
 
 ## Phase 0.1: Research & Testing Strategy
+
+_MANDATORY_
 
 ### Research
 
@@ -251,6 +319,8 @@ Distribution: Unit 40%, Integration 60%
 
 ## Phase 0.3: Integration Analysis
 
+_MANDATORY_
+
 ### Codebase Pattern Discovery
 
 | Pattern Area    | Finding                                 |
@@ -260,15 +330,9 @@ Distribution: Unit 40%, Integration 60%
 | Error handling  | AppError class, specific error types    |
 | Response format | `{ success, data, error }`              |
 
-### Architecture Decisions
-
-| Decision             | Rationale                              |
-| -------------------- | -------------------------------------- |
-| Storage abstraction  | Interface for local/S3 swap in Phase 3 |
-| Validation utilities | Reusable for future upload features    |
-| Processing utilities | Sharp pipeline as separate module      |
-
 ### Code Reuse
+
+**Skill**: `code-reuse-analysis`
 
 | Pattern Needed   | Existing Code | Decision |
 | ---------------- | ------------- | -------- |
@@ -277,11 +341,71 @@ Distribution: Unit 40%, Integration 60%
 | Image processing | None          | NEW      |
 | Error classes    | AppError      | EXTEND   |
 
+### Architecture Decisions
+
+**Skill**: `arch-decisions`
+
+| Decision             | Rationale                              |
+| -------------------- | -------------------------------------- |
+| Storage abstraction  | Interface for local/S3 swap in Phase 3 |
+| Validation utilities | Reusable for future upload features    |
+| Processing utilities | Sharp pipeline as separate module      |
+
+---
+
+## Phase 0.4: Design Pre-flight
+
+_CONDITIONAL — Included because UI is classified as Moderate_
+
+### Component Inventory
+
+| FR     | UI Element          | Existing?     | Strategy |
+| ------ | ------------------- | ------------- | -------- |
+| FR-001 | Image display       | No            | BUILD    |
+| FR-002 | Placeholder         | No            | BUILD    |
+| FR-003 | Staged upload       | No            | BUILD    |
+| FR-006 | Preview display     | No            | BUILD    |
+| FR-004 | Upload/replace UI   | No            | BUILD    |
+| FR-005 | Delete confirmation | Dialog exists | REUSE    |
+
+### Design Token Compliance
+
+- [x] All colors use design tokens
+- [x] All spacing uses Tailwind standards
+- [x] All typography uses text scale
+
 ---
 
 ## Phase 0.5: Infrastructure & Migrations
 
-### Database Migration
+_CONDITIONAL — Included because this feature adds a database field and new
+dependencies_
+
+### Migrations
+
+| Migration      | Type     | Risk | Rollback      |
+| -------------- | -------- | ---- | ------------- |
+| Add `imageUrl` | Additive | LOW  | Remove column |
+
+**Migration Risk**: LOW (additive, nullable string)
+
+### New Dependencies
+
+| Package | Purpose              | Risk |
+| ------- | -------------------- | ---- |
+| Sharp   | Image processing     | LOW  |
+| Multer  | File upload handling | LOW  |
+
+### File Storage
+
+**Location**: `uploads/wines/{wineId}.jpg` **Directory creation**: Automatic on
+first upload
+
+---
+
+## Phase 1: Design & Contracts
+
+### Data Model
 
 ```prisma
 model Wine {
@@ -289,18 +413,6 @@ model Wine {
   imageUrl String?  // NEW - path to wine label image
 }
 ```
-
-**Migration Risk**: LOW (additive, nullable field)
-
-### File Storage
-
-**Location**: `uploads/wines/{wineId}.jpg`
-
-**Directory creation**: Automatic on first upload
-
----
-
-## Phase 1: Design & Contracts
 
 ### API Contracts
 
@@ -342,59 +454,220 @@ Response: { success: true }
 
 ---
 
-## Phase 2: Tasks
+## Phase 2: Task Planning Approach
 
-### Phase 1A: Display Existing Images
+_Executed by /tasks command, NOT /plan_
 
-1. Add imageUrl field to Prisma schema, run migration
-2. Create GET /api/wines/:id/image endpoint
-3. Add image display to WineDetailModal
-4. Add placeholder for missing images
-5. Populate existing 217 wines with pre-downloaded images
+**Strategy**: Generate from Phase 1 contracts, split into Phase 1A (display) and
+Phase 1B (upload)
 
-### Phase 1B: Upload & Edit
-
-1. Create storage service interface and local implementation
-2. Create image validation utilities (type, size, magic numbers)
-3. Create image processing utilities (Sharp pipeline)
-4. Create POST /api/wines/:id/image endpoint
-5. Create DELETE /api/wines/:id/image endpoint
-6. Add image cascade deletion to wine delete
-7. Add upload UI to WineDetailModal (edit mode)
-8. Add staged upload to WineDetailModal (add mode)
-9. Add client-side validation
-10. Write comprehensive integration tests
+| From       | Task Type                             | Order |
+| ---------- | ------------------------------------- | ----- |
+| Data model | Schema migration                      | 1st   |
+| Contracts  | API endpoints (GET, POST, DELETE)     | 2nd   |
+| Components | Display UI (modal image, placeholder) | 3rd   |
+| Components | Upload UI (picker, preview, delete)   | 4th   |
+| Stories    | Integration (staged upload, cascade)  | 5th   |
 
 ---
 
-## Files Created/Modified (Actual)
+## Progress Tracking
 
-### Backend - New Files
+| Phase                  | Status | Skip If                        |
+| ---------------------- | ------ | ------------------------------ |
+| 0.1 Research + Testing | [x]    | Never                          |
+| 0.2 Permissions        | SKIP   | No roles in spec               |
+| 0.3 Integration        | [x]    | Never                          |
+| 0.4 Design Pre-flight  | [x]    | Backend-only/Minor UI          |
+| 0.5 Infrastructure     | [x]    | No env/migrations/deprecations |
+| 1 Design & Contracts   | [x]    | —                              |
+| 2 Task Planning        | [x]    | —                              |
 
-- `apps/api/src/services/storage/storage.interface.ts`
-- `apps/api/src/services/storage/local-storage.service.ts`
-- `apps/api/src/utils/image-validation.ts`
-- `apps/api/src/utils/image-processing.ts`
+---
 
-### Backend - Modified
+# Part 3: Tasks (tasks.json)
 
-- `apps/api/package.json` (added Sharp, Multer)
-- `apps/api/src/app.ts` (new routes)
-- `apps/api/src/errors/AppError.ts` (new error types)
+```json
+{
+  "spec_id": "002",
+  "spec_name": "wine-label-images",
+  "generated": "2025-12-31",
+  "tasks": [
+    {
+      "id": "T001",
+      "phase": "setup",
+      "description": "Add imageUrl field to Prisma schema and run migration",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "packages/database/prisma/schema.prisma"
+    },
+    {
+      "id": "T002",
+      "phase": "setup",
+      "description": "Add Sharp and Multer dependencies to API package",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/api/package.json"
+    },
+    {
+      "id": "T003",
+      "phase": "core",
+      "description": "Create storage service interface and local implementation",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/api/src/services/storage/local-storage.service.ts"
+    },
+    {
+      "id": "T004",
+      "phase": "core",
+      "description": "Create image validation utilities (type, size, magic numbers)",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/api/src/utils/image-validation.ts"
+    },
+    {
+      "id": "T005",
+      "phase": "core",
+      "description": "Create image processing utilities (Sharp resize/compress pipeline)",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/api/src/utils/image-processing.ts"
+    },
+    {
+      "id": "T006",
+      "phase": "core",
+      "description": "Create GET /api/wines/:id/image endpoint with cache headers",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/api/src/app.ts"
+    },
+    {
+      "id": "T007",
+      "phase": "core",
+      "description": "Create POST /api/wines/:id/image endpoint with Multer upload",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/api/src/app.ts"
+    },
+    {
+      "id": "T008",
+      "phase": "core",
+      "description": "Create DELETE /api/wines/:id/image endpoint with file cleanup",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/api/src/app.ts"
+    },
+    {
+      "id": "T009",
+      "phase": "core",
+      "description": "Add image cascade deletion to wine delete handler",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/api/src/app.ts"
+    },
+    {
+      "id": "T010",
+      "phase": "core",
+      "description": "Add image display to WineDetailModal (view mode, 300px, placeholder)",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/components/WineDetailModal.tsx"
+    },
+    {
+      "id": "T011",
+      "phase": "core",
+      "description": "Add upload/replace/delete UI to WineDetailModal (edit mode)",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/WineDetailModal.tsx"
+    },
+    {
+      "id": "T012",
+      "phase": "integration",
+      "description": "Add staged image upload flow to WineDetailModal (add mode)",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/WineDetailModal.tsx"
+    },
+    {
+      "id": "T013",
+      "phase": "integration",
+      "description": "Wire image upload into page.tsx wine creation and edit flows",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/app/page.tsx"
+    },
+    {
+      "id": "T014",
+      "phase": "polish",
+      "description": "Write comprehensive integration tests for image API endpoints",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/api/__tests__/routes/wine-image.integration.test.ts"
+    },
+    {
+      "id": "T015",
+      "phase": "polish",
+      "description": "Write component tests for image display, upload, and validation",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/WineDetailModal.image.test.tsx"
+    },
+    {
+      "id": "T-DOC-GATE",
+      "phase": "verify",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "completed",
+      "parallel": false,
+      "agent": "documentation-reconciliation",
+      "gate": "T015",
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "block_on": "Status: DRIFT_DETECTED in report"
+    },
+    {
+      "id": "T-FINAL",
+      "phase": "verify",
+      "description": "All verification gates passed",
+      "status": "completed",
+      "parallel": false,
+      "gate": "T-DOC-GATE",
+      "composed_of": [
+        {
+          "check": "typecheck",
+          "always": true,
+          "command": "npm run type-check"
+        },
+        { "check": "lint", "always": true, "command": "npm run lint" },
+        { "check": "unit", "always": true, "command": "npm test" },
+        { "check": "integration", "always": true, "command": "npm test" },
+        { "check": "security", "always": true, "agent": "code-reviewer" },
+        { "check": "code-review", "always": true, "agent": "code-reviewer" },
+        {
+          "check": "visual",
+          "always": false,
+          "condition": "ui_changes = moderate"
+        }
+      ]
+    }
+  ]
+}
+```
 
-### Database
+---
 
-- `packages/database/prisma/schema.prisma`
+## Outcome
 
-### Frontend
+**Status**: Phase 1A & 1B COMPLETED **Tests**: 343 passing (144 API + 199 Web)
+**Time**: Multiple sessions (Dec 31 - Jan 20) **Clarification gate**: Required
+(type = feature-major) — Session 1 completed
 
-- `apps/web/src/app/page.tsx`
-- `apps/web/src/components/WineDetailModal.tsx`
+### Lessons Learned
 
-### Tests
-
-- `apps/api/__tests__/routes/wine-image.integration.test.ts`
-- `apps/web/__tests__/WineDetailModal.test.tsx`
+1. Staged upload pattern works exceptionally well for UX
+2. Client + server validation is essential
+3. Sharp is the right choice for image processing
+4. Local storage sufficient for development
+5. Graceful error handling improves reliability
 
 ---
 
@@ -421,20 +694,36 @@ Response: { success: true }
 
 ---
 
-## Outcome
+## Files Created/Modified (Actual)
 
-**Status**: Phase 1A & 1B COMPLETED **Tests**: 343 passing (144 API + 199 Web)
-**Time**: Multiple sessions (Dec 31 - Jan 20)
+### Backend — New Files
 
-### Lessons Learned
+- `apps/api/src/services/storage/storage.interface.ts`
+- `apps/api/src/services/storage/local-storage.service.ts`
+- `apps/api/src/utils/image-validation.ts`
+- `apps/api/src/utils/image-processing.ts`
 
-1. Staged upload pattern works exceptionally well for UX
-2. Client + server validation is essential
-3. Sharp is the right choice for image processing
-4. Local storage sufficient for development
-5. Graceful error handling improves reliability
+### Backend — Modified
+
+- `apps/api/package.json` (added Sharp, Multer)
+- `apps/api/src/app.ts` (new routes)
+- `apps/api/src/errors/AppError.ts` (new error types)
+
+### Database
+
+- `packages/database/prisma/schema.prisma`
+
+### Frontend
+
+- `apps/web/src/app/page.tsx`
+- `apps/web/src/components/WineDetailModal.tsx`
+
+### Tests
+
+- `apps/api/__tests__/routes/wine-image.integration.test.ts`
+- `apps/web/src/__tests__/components/WineDetailModal.image.test.tsx`
 
 ---
 
-_This is a retrospective conversion showing SpecKit Lite format. The actual
+_This is a retrospective conversion showing SpecKit v2 format. The actual
 implementation used conventional Claude planning._

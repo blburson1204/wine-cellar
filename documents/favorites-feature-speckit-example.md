@@ -1,7 +1,7 @@
-# SpecKit Lite Conversion: Favorites Feature
+# SpecKit Conversion: Favorites Feature
 
 **Purpose**: Retrospective example showing what the Favorites feature planning
-documents would look like using SpecKit Lite methodology.
+documents would look like using the SpecKit v2 methodology.
 
 **Original Document**: [favorites-feature-plan.md](favorites-feature-plan.md)
 
@@ -9,24 +9,61 @@ documents would look like using SpecKit Lite methodology.
 
 # Part 1: Feature Specification (spec.md)
 
+```yaml
 ---
+meta:
+  spec_id: 001
+  spec_name: wine-favorites
+  status: completed
+  phase: completed
+  created: 2026-01-11
+  updated: 2026-01-11
 
-meta: spec_id: 001 spec_name: wine-favorites status: completed phase: completed
-created: 2026-01-11 updated: 2026-01-11
+summary:
+  goals:
+    - {
+        id: G1,
+        description: 'Allow users to mark wines as favorites',
+        priority: HIGH,
+      }
+    - {
+        id: G2,
+        description: 'Visual identification of favorites in list',
+        priority: HIGH,
+      }
+    - {
+        id: G3,
+        description: 'Filter wine list to show only favorites',
+        priority: MEDIUM,
+      }
+  constraints:
+    - {
+        id: C1,
+        description: 'Must integrate with existing wine table UI',
+        type: TECHNICAL,
+      }
+    - {
+        id: C2,
+        description: 'Star icons must match wine-themed color palette',
+        type: DESIGN,
+      }
+  decisions:
+    - {
+        id: D1,
+        decision: 'Use star icon for favorite indicator',
+        rationale: 'Universal recognition',
+      }
+    - {
+        id: D2,
+        decision: 'Ruby red (#E63946) for filled star',
+        rationale: 'Matches app theme',
+      }
 
-summary: goals: - {id: G1, description: "Allow users to mark wines as
-favorites", priority: HIGH} - {id: G2, description: "Visual identification of
-favorites in list", priority: HIGH} - {id: G3, description: "Filter wine list to
-show only favorites", priority: MEDIUM} constraints: - {id: C1, description:
-"Must integrate with existing wine table UI", type: TECHNICAL} - {id: C2,
-description: "Star icons must match wine-themed color palette", type: DESIGN}
-decisions: - {id: D1, decision: "Use star icon for favorite indicator",
-rationale: "Universal recognition"} - {id: D2, decision: "Ruby red (#E63946) for
-filled star", rationale: "Matches app theme"}
-
-critical_requirements: type: feature-minor ui_changes: minor
-
+critical_requirements:
+  type: feature-minor
+  ui_changes: minor
 ---
+```
 
 # Feature Specification: Wine Favorites
 
@@ -142,22 +179,26 @@ entire collection.
 
 # Part 2: Implementation Plan (plan.md)
 
+```yaml
 ---
+meta:
+  spec_id: 001
+  spec_name: wine-favorites
+  phase: completed
+  updated: 2026-01-11
 
-meta: spec_id: 001 spec_name: wine-favorites phase: completed updated:
-2026-01-11
-
-summary: tech_stack: [TypeScript, React, Express, Prisma, SQLite] external_deps:
-[] test_strategy: {unit: 60, integration: 40, e2e: 0} deployment: immediate
-
+summary:
+  tech_stack: [TypeScript, React, Express, Prisma, SQLite]
+  external_deps: []
+  test_strategy: { unit: 60, integration: 40, e2e: 0 }
+  deployment: immediate
 ---
+```
 
 # Implementation Plan: Wine Favorites
 
 **Branch**: `001-wine-favorites` | **Date**: 2026-01-11 | **Spec**:
 specs/001-wine-favorites/spec.md
-
----
 
 ## Summary
 
@@ -184,9 +225,11 @@ UI feedback (optimistic updates) **Constraints**: None significant
 
 ## Phase 0.1: Research & Testing Strategy
 
+_MANDATORY_
+
 ### Research
 
-No research needed - straightforward boolean field addition with existing
+No research needed — straightforward boolean field addition with existing
 patterns.
 
 ### Testing Strategy
@@ -211,6 +254,8 @@ Distribution: Unit 60%, Integration 40%
 
 ## Phase 0.3: Integration Analysis
 
+_MANDATORY_
+
 ### Codebase Pattern Discovery
 
 | Pattern Area    | Finding                               |
@@ -222,11 +267,27 @@ Distribution: Unit 60%, Integration 40%
 
 ### Code Reuse
 
+**Skill**: `code-reuse-analysis`
+
 | Pattern Needed | Existing Code                  | Decision |
 | -------------- | ------------------------------ | -------- |
 | Toggle handler | handleToggleFavorite           | NEW      |
 | Filter logic   | filteredAndSortedWines useMemo | EXTEND   |
 | Star icon      | Lucide icons library           | REUSE    |
+
+---
+
+## Phase 0.5: Infrastructure & Migrations
+
+_CONDITIONAL — Included because this feature adds a database field_
+
+### Migrations
+
+| Migration      | Type     | Risk | Rollback      |
+| -------------- | -------- | ---- | ------------- |
+| Add `favorite` | Additive | LOW  | Remove column |
+
+**Migration Risk**: LOW (additive, nullable boolean with default)
 
 ---
 
@@ -260,19 +321,142 @@ Response: { success: true, data: Wine }
 
 ---
 
-## Phase 2: Tasks
+## Phase 2: Task Planning Approach
 
-### Task Order
+_Executed by /tasks command, NOT /plan_
 
-1. Add `favorite` field to Prisma schema, run migration
-2. Update Zod schemas (createWineSchema, updateWineSchema)
-3. Add star column to WineTable with toggle handler
-4. Add star to WineDetailModal header
-5. Add favorites filter to WineFilters
-6. Add handleToggleFavorite to page.tsx with optimistic updates
-7. Update filteredAndSortedWines to include favorites filter
-8. Update tests with favorite field in mock data
-9. Run full test suite, verify all passing
+**Strategy**: Generate from Phase 1 contracts, constrain by Phase 0.1 testing
+estimates
+
+| From       | Task Type                        | Order |
+| ---------- | -------------------------------- | ----- |
+| Data model | Schema migration                 | 1st   |
+| Contracts  | Zod schema updates               | 2nd   |
+| Components | UI components (star, filter)     | 3rd   |
+| Stories    | Integration (optimistic updates) | 4th   |
+
+---
+
+## Progress Tracking
+
+| Phase                  | Status | Skip If                        |
+| ---------------------- | ------ | ------------------------------ |
+| 0.1 Research + Testing | [x]    | Never                          |
+| 0.2 Permissions        | SKIP   | No roles in spec               |
+| 0.3 Integration        | [x]    | Never                          |
+| 0.4 Design Pre-flight  | SKIP   | Minor UI                       |
+| 0.5 Infrastructure     | [x]    | No env/migrations/deprecations |
+| 1 Design & Contracts   | [x]    | —                              |
+| 2 Task Planning        | [x]    | —                              |
+
+---
+
+# Part 3: Tasks (tasks.json)
+
+```json
+{
+  "spec_id": "001",
+  "spec_name": "wine-favorites",
+  "generated": "2026-01-11",
+  "tasks": [
+    {
+      "id": "T001",
+      "phase": "setup",
+      "description": "Add favorite Boolean field to Prisma schema and run migration",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "packages/database/prisma/schema.prisma"
+    },
+    {
+      "id": "T002",
+      "phase": "setup",
+      "description": "Update Zod schemas (createWineSchema, updateWineSchema) with favorite field",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/api/src/schemas/wine.schema.ts"
+    },
+    {
+      "id": "T003",
+      "phase": "core",
+      "description": "Add star column to WineTable with toggle handler and click propagation stop",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/components/WineTable.tsx"
+    },
+    {
+      "id": "T004",
+      "phase": "core",
+      "description": "Add star icon to WineDetailModal header with toggle in view mode",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/components/WineDetailModal.tsx"
+    },
+    {
+      "id": "T005",
+      "phase": "core",
+      "description": "Add showOnlyFavorites checkbox to WineFilters component",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/components/WineFilters.tsx"
+    },
+    {
+      "id": "T006",
+      "phase": "integration",
+      "description": "Add handleToggleFavorite with optimistic updates and favorites filter to page.tsx",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/app/page.tsx"
+    },
+    {
+      "id": "T007",
+      "phase": "polish",
+      "description": "Update test mock data with favorite field in WineTable and WineFilters tests",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/__tests__/WineTable.test.tsx"
+    },
+    {
+      "id": "T-DOC-GATE",
+      "phase": "verify",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "completed",
+      "parallel": false,
+      "agent": "documentation-reconciliation",
+      "gate": "T007",
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "block_on": "Status: DRIFT_DETECTED in report"
+    },
+    {
+      "id": "T-FINAL",
+      "phase": "verify",
+      "description": "All verification gates passed",
+      "status": "completed",
+      "parallel": false,
+      "gate": "T-DOC-GATE",
+      "composed_of": [
+        {
+          "check": "typecheck",
+          "always": true,
+          "command": "npm run type-check"
+        },
+        { "check": "lint", "always": true, "command": "npm run lint" },
+        { "check": "unit", "always": true, "command": "npm test" },
+        { "check": "integration", "always": true, "command": "npm test" },
+        { "check": "security", "always": true, "agent": "code-reviewer" },
+        { "check": "code-review", "always": true, "agent": "code-reviewer" }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## Outcome
+
+**Status**: COMPLETED **Tests**: All 146 passing **Time**: Single session
+**Clarification gate**: Passed (type = feature-minor, clarification not
+required)
 
 ---
 
@@ -300,11 +484,5 @@ Response: { success: true, data: Wine }
 
 ---
 
-## Outcome
-
-**Status**: COMPLETED **Tests**: All 146 passing **Time**: Single session
-
----
-
-_This is a retrospective conversion showing SpecKit Lite format. The actual
+_This is a retrospective conversion showing SpecKit v2 format. The actual
 implementation used conventional Claude planning._
