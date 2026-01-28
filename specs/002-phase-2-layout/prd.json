@@ -1,0 +1,114 @@
+{
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Write unit tests for Backdrop component",
+      "status": "pending",
+      "notes": "Phase: 3.1",
+      "target_file": "apps/web/src/__tests__/components/Backdrop.test.tsx",
+      "gate": null,
+      "verify": "Test file created with tests for: renders when open, hidden when closed, calls onClick on click",
+      "parallel": true
+    },
+    {
+      "id": "T002",
+      "description": "Write unit tests for MobileFilterToggle component",
+      "status": "pending",
+      "notes": "Phase: 3.1",
+      "target_file": "apps/web/src/__tests__/components/MobileFilterToggle.test.tsx",
+      "gate": null,
+      "verify": "Test file created with tests for: renders filter icon, calls onClick, has 44x44px touch target",
+      "parallel": true
+    },
+    {
+      "id": "T003",
+      "description": "Write unit tests for FilterDrawer component",
+      "status": "pending",
+      "notes": "Phase: 3.1",
+      "target_file": "apps/web/src/__tests__/components/FilterDrawer.test.tsx",
+      "gate": null,
+      "verify": "Test file created with tests for: renders children, 80% width, animation classes, calls onClose",
+      "parallel": true
+    },
+    {
+      "id": "T004",
+      "description": "Create Backdrop component - semi-transparent overlay with click handler",
+      "status": "pending",
+      "notes": "Phase: 3.2",
+      "target_file": "apps/web/src/components/Backdrop.tsx",
+      "gate": "T001",
+      "verify": "Component created, unit tests pass",
+      "parallel": false
+    },
+    {
+      "id": "T005",
+      "description": "Create MobileFilterToggle component - filter/funnel icon button (44x44px)",
+      "status": "pending",
+      "notes": "Phase: 3.2",
+      "target_file": "apps/web/src/components/MobileFilterToggle.tsx",
+      "gate": "T002",
+      "verify": "Component created with filter icon SVG, unit tests pass",
+      "parallel": false
+    },
+    {
+      "id": "T006",
+      "description": "Create FilterDrawer component - 80% width slide-out with 300ms animation",
+      "status": "pending",
+      "notes": "Phase: 3.2",
+      "target_file": "apps/web/src/components/FilterDrawer.tsx",
+      "gate": "T003",
+      "verify": "Component created with Tailwind classes, unit tests pass",
+      "parallel": false
+    },
+    {
+      "id": "T007",
+      "description": "Modify WineFilters - add onClose and showCloseButton props for mobile drawer",
+      "status": "pending",
+      "notes": "Phase: 3.3",
+      "target_file": "apps/web/src/components/WineFilters.tsx",
+      "gate": "T006",
+      "verify": "Props added, close button renders when showCloseButton=true, existing tests pass",
+      "parallel": false
+    },
+    {
+      "id": "T008",
+      "description": "Modify page.tsx - add responsive layout with useMediaQuery, drawer state, conditional rendering",
+      "status": "pending",
+      "notes": "Phase: 3.4",
+      "target_file": "apps/web/src/app/page.tsx",
+      "gate": "T007",
+      "verify": "Mobile shows full-width + filter button, desktop shows 25%/75% sidebar, drawer opens/closes",
+      "parallel": false
+    },
+    {
+      "id": "T009",
+      "description": "Write integration tests for responsive layout behavior",
+      "status": "pending",
+      "notes": "Phase: 3.5",
+      "target_file": "apps/web/src/__tests__/integration/responsive-layout.test.tsx",
+      "gate": "T008",
+      "verify": "Tests for: mobile layout, desktop layout, drawer open/close, filter state preserved, breakpoint transition",
+      "parallel": false
+    },
+    {
+      "id": "T-DOC-GATE",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "pending",
+      "notes": "Phase: verify",
+      "target_file": null,
+      "gate": "T009",
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "parallel": false
+    },
+    {
+      "id": "T-FINAL",
+      "description": "All verification gates passed - spec complete",
+      "status": "pending",
+      "notes": "Phase: verify",
+      "target_file": null,
+      "gate": "T-DOC-GATE",
+      "verify": "All composed checks pass",
+      "parallel": false
+    }
+  ]
+}

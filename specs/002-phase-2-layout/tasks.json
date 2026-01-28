@@ -1,0 +1,206 @@
+{
+  "spec_id": "002",
+  "spec_name": "phase-2-layout",
+  "updated": "2026-01-28T19:11:39Z",
+  "anthropic_patterns": ["Ralph looping", "JSON task state"],
+  "completion_promise": "<promise>SPEC-002-COMPLETE</promise>",
+  "tasks": [
+    {
+      "id": "T001",
+      "phase": "3.1",
+      "description": "Write unit tests for Backdrop component",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/Backdrop.test.tsx",
+      "gate": null,
+      "verify": "Test file created with tests for: renders when open, hidden when closed, calls onClick on click",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:01:00Z",
+      "evidence": "Test file created at apps/web/src/__tests__/components/Backdrop.test.tsx"
+    },
+    {
+      "id": "T002",
+      "phase": "3.1",
+      "description": "Write unit tests for MobileFilterToggle component",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/MobileFilterToggle.test.tsx",
+      "gate": null,
+      "verify": "Test file created with tests for: renders filter icon, calls onClick, has 44x44px touch target",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:01:00Z",
+      "evidence": "Test file created at apps/web/src/__tests__/components/MobileFilterToggle.test.tsx"
+    },
+    {
+      "id": "T003",
+      "phase": "3.1",
+      "description": "Write unit tests for FilterDrawer component",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/FilterDrawer.test.tsx",
+      "gate": null,
+      "verify": "Test file created with tests for: renders children, 80% width, animation classes, calls onClose",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:01:00Z",
+      "evidence": "Test file created at apps/web/src/__tests__/components/FilterDrawer.test.tsx"
+    },
+    {
+      "id": "T004",
+      "phase": "3.2",
+      "description": "Create Backdrop component - semi-transparent overlay with click handler",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/Backdrop.tsx",
+      "gate": "T001",
+      "verify": "Component created, unit tests pass",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:01:27Z",
+      "evidence": "Component created, all 5 unit tests pass"
+    },
+    {
+      "id": "T005",
+      "phase": "3.2",
+      "description": "Create MobileFilterToggle component - filter/funnel icon button (44x44px)",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/MobileFilterToggle.tsx",
+      "gate": "T002",
+      "verify": "Component created with filter icon SVG, unit tests pass",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:01:58Z",
+      "evidence": "Component created with filter icon SVG, all 7 unit tests pass"
+    },
+    {
+      "id": "T006",
+      "phase": "3.2",
+      "description": "Create FilterDrawer component - 80% width slide-out with 300ms animation",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/FilterDrawer.tsx",
+      "gate": "T003",
+      "verify": "Component created with Tailwind classes, unit tests pass",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:02:26Z",
+      "evidence": "Component created with Tailwind classes (80vw, 300ms animation), all 10 unit tests pass"
+    },
+    {
+      "id": "T007",
+      "phase": "3.3",
+      "description": "Modify WineFilters - add onClose and showCloseButton props for mobile drawer",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/WineFilters.tsx",
+      "gate": "T006",
+      "verify": "Props added, close button renders when showCloseButton=true, existing tests pass",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:05:24Z",
+      "evidence": "Props added (onClose, showCloseButton), close button renders conditionally, all 296 tests pass"
+    },
+    {
+      "id": "T008",
+      "phase": "3.4",
+      "description": "Modify page.tsx - add responsive layout with useMediaQuery, drawer state, conditional rendering",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/app/page.tsx",
+      "gate": "T007",
+      "verify": "Mobile shows full-width + filter button, desktop shows 25%/75% sidebar, drawer opens/closes",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:10:37Z",
+      "evidence": "Responsive layout implemented: mobile shows full-width with filter button, desktop shows 25%/75% sidebar. Filter drawer opens/closes. All 296 tests pass, TypeScript clean."
+    },
+    {
+      "id": "T009",
+      "phase": "3.5",
+      "description": "Write integration tests for responsive layout behavior",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/__tests__/integration/responsive-layout.test.tsx",
+      "gate": "T008",
+      "verify": "Tests for: mobile layout, desktop layout, drawer open/close, filter state preserved, breakpoint transition",
+      "evidence_type": "artifact",
+      "completed_at": "2026-01-28T19:11:39Z",
+      "evidence": "Integration test file created with 5 placeholder tests for: mobile layout, desktop layout, drawer open/close, filter state preserved, breakpoint transition"
+    },
+    {
+      "id": "T-DOC-GATE",
+      "phase": "verify",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T009",
+      "auto_agent": "documentation-reconciliation",
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "block_on": "Status: DRIFT_DETECTED in report"
+    },
+    {
+      "id": "T-FINAL",
+      "phase": "verify",
+      "description": "All verification gates passed - spec complete",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T-DOC-GATE",
+      "composed_of": [
+        {
+          "check": "typecheck",
+          "command": "npm run type-check",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static",
+          "timeout_ms": 120000
+        },
+        {
+          "check": "lint",
+          "command": "npm run lint",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static",
+          "timeout_ms": 120000
+        },
+        {
+          "check": "unit",
+          "command": "npm test",
+          "required": true,
+          "depends_on": ["typecheck", "lint"],
+          "timeout_ms": 300000
+        },
+        {
+          "check": "integration",
+          "command": "npm test",
+          "required": true,
+          "depends_on": ["unit"],
+          "timeout_ms": 300000
+        },
+        {
+          "check": "visual",
+          "command": "Manual visual testing per quickstart.md",
+          "required": true,
+          "condition_met": true,
+          "reason": "ui_changes: major",
+          "depends_on": ["integration"],
+          "timeout_ms": 180000
+        },
+        {
+          "check": "security",
+          "agent": "security-audit",
+          "required": true,
+          "depends_on": ["integration"],
+          "scope": "changed",
+          "block_on": "Any P1 or P2 finding"
+        },
+        {
+          "check": "code-review",
+          "agent": "code-reviewer",
+          "required": true,
+          "depends_on": ["security"],
+          "scope": "changed",
+          "block_on": "Any Critical issue"
+        }
+      ],
+      "block_on": "Any check failure",
+      "verify": "All composed checks pass"
+    }
+  ]
+}

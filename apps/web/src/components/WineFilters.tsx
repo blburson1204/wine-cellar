@@ -20,6 +20,8 @@ interface WineFiltersProps {
   priceMin: number;
   priceMax: number;
   onClearAll: () => void;
+  onClose?: () => void; // NEW: Optional close handler for mobile
+  showCloseButton?: boolean; // NEW: Show close button in header
 }
 
 const WINE_COLORS = [
@@ -53,6 +55,8 @@ export default function WineFilters({
   priceMin,
   priceMax,
   onClearAll,
+  onClose,
+  showCloseButton = false,
 }: WineFiltersProps): React.JSX.Element {
   const handleColorToggle = (colorValue: string): void => {
     if (selectedColors.includes(colorValue)) {
@@ -111,9 +115,33 @@ export default function WineFilters({
             padding: '10px 16px',
             fontSize: '14px',
             fontWeight: '700',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          Filter Criteria
+          <span>Filter Criteria</span>
+          {showCloseButton && onClose && (
+            <button
+              onClick={onClose}
+              aria-label="Close filters"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'rgba(255, 255, 255, 0.7)',
+                fontSize: '24px',
+                cursor: 'pointer',
+                padding: '0',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              ×
+            </button>
+          )}
         </div>
 
         {/* Filter Content */}

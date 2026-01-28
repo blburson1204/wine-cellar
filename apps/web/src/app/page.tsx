@@ -4,6 +4,10 @@ import { useEffect, useState, useMemo } from 'react';
 import WineTable from '../components/WineTable';
 import WineFilters from '../components/WineFilters';
 import WineDetailModal from '../components/WineDetailModal';
+import Backdrop from '../components/Backdrop';
+import FilterDrawer from '../components/FilterDrawer';
+import MobileFilterToggle from '../components/MobileFilterToggle';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 interface Wine {
   id: string;
@@ -36,6 +40,10 @@ export default function Home(): React.JSX.Element {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [selectedWine, setSelectedWine] = useState<Wine | null>(null);
   const [modalMode, setModalMode] = useState<'view' | 'add' | null>(null);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  // Responsive breakpoint detection
+  const isMobile = useMediaQuery('(max-width: 1023px)');
 
   // Filter and sort state
   const [searchText, setSearchText] = useState('');
@@ -223,6 +231,30 @@ export default function Home(): React.JSX.Element {
 
   useEffect(() => {
     void fetchWines();
+  }, []);
+
+  // Close filter drawer when switching from mobile to desktop
+  useEffect(() => {
+    if (!isMobile) {
+      setIsFilterDrawerOpen(false);
+    }
+  }, [isMobile]);
+
+  // Close filter drawer on device orientation change
+  useEffect(() => {
+    const handleOrientationChange = (): void => {
+      setIsFilterDrawerOpen(false);
+    };
+
+    // Modern Screen Orientation API
+    if (typeof screen !== 'undefined' && screen.orientation) {
+      screen.orientation.addEventListener('change', handleOrientationChange);
+      return () => screen.orientation.removeEventListener('change', handleOrientationChange);
+    }
+
+    // Fallback for older browsers
+    window.addEventListener('orientationchange', handleOrientationChange);
+    return () => window.removeEventListener('orientationchange', handleOrientationChange);
   }, []);
 
   const fetchWines = async (): Promise<void> => {
@@ -422,7 +454,7 @@ export default function Home(): React.JSX.Element {
         </div>
       )}
 
-      {/* Top bar: Bottle count + Add Wine button */}
+      {/* Top bar: Bottle count + Add Wine button + Filter toggle (mobile) */}
       <div
         style={{
           display: 'flex',
@@ -431,16 +463,34 @@ export default function Home(): React.JSX.Element {
           padding: '10px 0',
           marginBottom: '16px',
           backgroundColor: '#282f20',
+          gap: '12px',
         }}
       >
+        {/* Mobile Filter Toggle */}
+        {isMobile && wines.length > 0 && (
+          <MobileFilterToggle
+            onClick={() => setIsFilterDrawerOpen(true)}
+            activeFilterCount={
+              selectedColors.length +
+              (selectedGrapeVariety ? 1 : 0) +
+              (selectedCountry ? 1 : 0) +
+              (showOnlyInCellar ? 1 : 0) +
+              (showOnlyFavorites ? 1 : 0) +
+              (minRating ? 1 : 0) +
+              (priceRange ? 1 : 0)
+            }
+          />
+        )}
+
         {wines.length > 0 ? (
           <h2
             style={{
               margin: 0,
-              fontSize: '24px',
+              fontSize: isMobile ? '18px' : '24px',
               fontWeight: '700',
               color: 'rgba(255, 255, 255, 0.7)',
               textAlign: 'left',
+              flex: 1,
             }}
           >
             {filteredAndSortedWines.length !== wines.length
@@ -448,17 +498,17 @@ export default function Home(): React.JSX.Element {
               : `${wines.length} ${wines.length === 1 ? 'Bottle' : 'Bottles'} in Collection`}
           </h2>
         ) : (
-          <div />
+          <div style={{ flex: 1 }} />
         )}
         <button
           onClick={() => setModalMode('add')}
           style={{
-            padding: '10px 28px',
+            padding: isMobile ? '8px 16px' : '10px 28px',
             backgroundColor: '#3d010b',
             color: 'rgba(255, 255, 255, 0.7)',
             border: 'none',
             borderRadius: '6px',
-            fontSize: '16px',
+            fontSize: isMobile ? '14px' : '16px',
             cursor: 'pointer',
             fontWeight: '700',
             transition: 'all 0.2s',
@@ -474,10 +524,44 @@ export default function Home(): React.JSX.Element {
         </button>
       </div>
 
+      {/* Mobile Filter Drawer */}
+      {isMobile && wines.length > 0 && (
+        <>
+          <Backdrop isOpen={isFilterDrawerOpen} onClick={() => setIsFilterDrawerOpen(false)} />
+          <FilterDrawer isOpen={isFilterDrawerOpen} onClose={() => setIsFilterDrawerOpen(false)}>
+            <WineFilters
+              searchText={searchText}
+              onSearchChange={setSearchText}
+              selectedColors={selectedColors}
+              onColorsChange={setSelectedColors}
+              selectedGrapeVariety={selectedGrapeVariety}
+              onGrapeVarietyChange={setSelectedGrapeVariety}
+              grapeVarieties={grapeVarieties}
+              selectedCountry={selectedCountry}
+              onCountryChange={setSelectedCountry}
+              countries={countries}
+              showOnlyInCellar={showOnlyInCellar}
+              onShowOnlyInCellarChange={setShowOnlyInCellar}
+              showOnlyFavorites={showOnlyFavorites}
+              onShowOnlyFavoritesChange={setShowOnlyFavorites}
+              minRating={minRating}
+              onMinRatingChange={setMinRating}
+              priceRange={priceRange}
+              onPriceRangeChange={setPriceRange}
+              priceMin={priceMin}
+              priceMax={priceMax}
+              onClearAll={handleClearFilters}
+              onClose={() => setIsFilterDrawerOpen(false)}
+              showCloseButton={true}
+            />
+          </FilterDrawer>
+        </>
+      )}
+
       {/* Main Content: Sidebar + Table Layout */}
       <div style={{ display: 'flex', gap: '26px', alignItems: 'flex-start' }}>
-        {/* Left Sidebar - Filters (25%) */}
-        {wines.length > 0 && (
+        {/* Left Sidebar - Filters (Desktop only, 25%) */}
+        {!isMobile && wines.length > 0 && (
           <div style={{ flex: '0 0 25%' }}>
             {/* Filters */}
             <WineFilters
@@ -509,7 +593,7 @@ export default function Home(): React.JSX.Element {
         {/* Right Content - Table */}
         <div
           style={{
-            flex: wines.length > 0 ? '1' : '1 1 100%',
+            flex: wines.length > 0 && !isMobile ? '1' : '1 1 100%',
           }}
         >
           {/* Wine Table */}

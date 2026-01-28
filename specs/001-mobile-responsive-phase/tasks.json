@@ -1,0 +1,195 @@
+{
+  "spec_id": "001",
+  "spec_name": "mobile-responsive-phase",
+  "updated": "2026-01-28T00:00:00Z",
+  "anthropic_patterns": ["Ralph looping", "JSON task state"],
+  "completion_promise": "<promise>SPEC-001-COMPLETE</promise>",
+  "tasks": [
+    {
+      "id": "T001",
+      "phase": "setup",
+      "description": "Install Tailwind CSS dependencies (tailwindcss, postcss, autoprefixer)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": "apps/web/package.json",
+      "gate": null,
+      "verify": "npm ls tailwindcss postcss autoprefixer shows installed versions",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T002",
+      "phase": "config",
+      "description": "Create tailwind.config.js with wine design tokens and content paths",
+      "status": "pending",
+      "parallel": true,
+      "target_file": "apps/web/tailwind.config.js",
+      "gate": "T001",
+      "verify": "File exists with wine-dark, wine-burgundy, wine-background, wine-surface, wine-header, wine-input, wine-hover colors defined",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T003",
+      "phase": "config",
+      "description": "Create postcss.config.js with Tailwind and Autoprefixer plugins",
+      "status": "pending",
+      "parallel": true,
+      "target_file": "apps/web/postcss.config.js",
+      "gate": "T001",
+      "verify": "File exists with tailwindcss and autoprefixer plugins configured",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T004",
+      "phase": "config",
+      "description": "Create globals.css with Tailwind directives (@tailwind base, components, utilities)",
+      "status": "pending",
+      "parallel": true,
+      "target_file": "apps/web/src/app/globals.css",
+      "gate": "T001",
+      "verify": "File exists with @tailwind base, @tailwind components, @tailwind utilities directives",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T005",
+      "phase": "integration",
+      "description": "Update layout.tsx to import globals.css and add viewport meta tag",
+      "status": "pending",
+      "parallel": false,
+      "target_file": "apps/web/src/app/layout.tsx",
+      "gate": "T004",
+      "verify": "globals.css imported, metadata includes viewport: 'width=device-width, initial-scale=1'",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T006",
+      "phase": "test-setup",
+      "description": "Add matchMedia mock to vitest.setup.ts for useMediaQuery tests",
+      "status": "pending",
+      "parallel": false,
+      "target_file": "apps/web/vitest.setup.ts",
+      "gate": "T001",
+      "verify": "window.matchMedia mock defined with addEventListener/removeEventListener support",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T007",
+      "phase": "test",
+      "description": "Write useMediaQuery hook tests (TDD red phase - tests should fail)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": "apps/web/src/hooks/useMediaQuery.test.ts",
+      "gate": "T006",
+      "verify": "Test file exists with tests for: initial false state, updates on match, cleanup on unmount, SSR safety",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T008",
+      "phase": "implement",
+      "description": "Create useMediaQuery hook implementation (TDD green phase)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": "apps/web/src/hooks/useMediaQuery.ts",
+      "gate": "T007",
+      "verify": "Hook exists with 'use client' directive, useState, useEffect, returns boolean",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T009",
+      "phase": "verify",
+      "description": "Verify useMediaQuery tests pass (TDD green confirmation)",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T008",
+      "gate_check": "cd apps/web && npm test -- --grep useMediaQuery",
+      "verify": "All useMediaQuery tests pass",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T010",
+      "phase": "verify",
+      "description": "Verify Tailwind build succeeds with Next.js",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T005",
+      "gate_check": "cd apps/web && npm run build",
+      "verify": "Build completes with exit code 0, no Tailwind errors",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T-DOC-GATE",
+      "phase": "verify",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "agent": "documentation-reconciliation",
+      "gate": "T010",
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "block_on": "Status: DRIFT_DETECTED in report",
+      "evidence": null,
+      "completed_at": null
+    },
+    {
+      "id": "T-FINAL",
+      "phase": "verify",
+      "description": "All verification gates passed - spec complete",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T-DOC-GATE",
+      "composed_of": [
+        {
+          "check": "typecheck",
+          "command": "npm run type-check",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static"
+        },
+        {
+          "check": "lint",
+          "command": "npm run lint",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static"
+        },
+        {
+          "check": "unit",
+          "command": "npm test",
+          "required": true,
+          "depends_on": ["typecheck", "lint"]
+        },
+        {
+          "check": "security",
+          "agent": "security-audit",
+          "required": true,
+          "scope": "changed",
+          "block_on": "Any P1 or P2 finding"
+        },
+        {
+          "check": "code-review",
+          "agent": "code-reviewer",
+          "required": true,
+          "depends_on": ["security"],
+          "scope": "changed",
+          "block_on": "Any Critical issue"
+        }
+      ],
+      "block_on": "Any check failure",
+      "verify": "All checks pass, ready for commit",
+      "evidence": null,
+      "completed_at": null
+    }
+  ]
+}

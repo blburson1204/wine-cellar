@@ -345,7 +345,8 @@ detailed test breakdown.
 
 - [x] Wine-themed color palette (#7C2D3C burgundy, #F5F1E8 off-white)
 - [x] Left-aligned sticky header with wine bottle emoji
-- [x] Two-column layout: 25% filter sidebar, 75% wine table
+- [x] Responsive layout: Desktop (≥1024px) shows 25% filter sidebar + 75% table;
+      Mobile (<1024px) shows full-width table with slide-out filter drawer
 - [x] Background image with transparency effects (wine_cellar_4.jpg at 0.75
       opacity)
 - [x] Semi-transparent components with frosted glass effect (0.6 opacity, 4px
@@ -354,6 +355,9 @@ detailed test breakdown.
 - [x] Bottle count header with filtered/total display
 - [x] Scrollable wine table with fixed headers
 - [x] Responsive table layout
+- [x] Mobile filter drawer (FilterDrawer, Backdrop, MobileFilterToggle
+      components)
+- [x] 44x44px touch targets for mobile accessibility
 - [x] Consistent background colors (`rgba(245, 241, 232, 0.8)`) for filter
       inputs and table highlights
 - [x] Keyboard navigation (Arrow Up/Down, Enter) for wine table

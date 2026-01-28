@@ -43,18 +43,19 @@ describe('useMediaQuery', () => {
   });
 
   it('should update when media query changes', async () => {
-    let capturedListener: ((e: MediaQueryListEvent) => void) | undefined;
+    let capturedListener: (() => void) | undefined;
+    let currentMatches = false;
 
-    const addEventListenerMock = vi.fn(
-      (event: string, handler: (e: MediaQueryListEvent) => void) => {
-        if (event === 'change') {
-          capturedListener = handler;
-        }
+    const addEventListenerMock = vi.fn((event: string, handler: () => void) => {
+      if (event === 'change') {
+        capturedListener = handler;
       }
-    );
+    });
 
     const mockMatchMedia = vi.fn().mockImplementation((query) => ({
-      matches: false,
+      get matches() {
+        return currentMatches;
+      },
       media: query,
       onchange: null,
       addEventListener: addEventListenerMock,
@@ -68,9 +69,10 @@ describe('useMediaQuery', () => {
 
     expect(result.current).toBe(false);
 
-    // Simulate media query change
+    // Simulate media query change - update the mock's return value and trigger listener
+    currentMatches = true;
     if (capturedListener) {
-      capturedListener({ matches: true } as MediaQueryListEvent);
+      capturedListener();
     }
 
     await waitFor(() => {
