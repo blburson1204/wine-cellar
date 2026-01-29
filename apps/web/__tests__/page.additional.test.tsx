@@ -433,10 +433,13 @@ describe('Home Page - Additional Coverage', () => {
         expect(screen.getByText('Add New Wine')).toBeInTheDocument();
       });
 
-      // Fill form
-      await user.type(screen.getByPlaceholderText('Enter wine name'), 'Test Wine');
+      // Fill form (blur Combobox fields to commit values)
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      await user.type(nameInput, 'Test Wine');
       await user.type(screen.getByPlaceholderText('Enter producer'), 'Test Producer');
+      await user.click(nameInput);
       await user.type(screen.getByPlaceholderText('Enter country'), 'France');
+      await user.click(nameInput);
 
       // Submit
       const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });

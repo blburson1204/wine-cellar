@@ -465,7 +465,9 @@ describe('WineDetailModal - Additional Coverage', () => {
       const longName = 'A'.repeat(201);
       await user.type(nameInput, longName);
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -491,7 +493,9 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'P'.repeat(201));
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -517,7 +521,9 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'C'.repeat(101));
+      await user.click(nameInput); // Blur Combobox
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -544,8 +550,11 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
       await user.type(regionInput, 'R'.repeat(201));
+      await user.click(nameInput); // Blur Combobox
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -572,8 +581,11 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
       await user.type(grapeVarietyInput, 'G'.repeat(201));
+      await user.click(nameInput); // Blur Combobox
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -601,7 +613,9 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
 
       // Notes is the last textbox (textarea)
       const textInputs = screen.getAllByRole('textbox');
@@ -636,7 +650,9 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const quantityInput = spinButtons.find((input) => input.getAttribute('min') === '0');
@@ -670,7 +686,9 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const priceInput = spinButtons.find((input) => input.getAttribute('step') === '0.01');
@@ -703,7 +721,9 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const priceInput = spinButtons.find((input) => input.getAttribute('step') === '0.01');
@@ -738,7 +758,9 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const ratingInput = spinButtons.find((input) => input.getAttribute('step') === '0.1');
@@ -777,7 +799,9 @@ describe('WineDetailModal - Additional Coverage', () => {
 
       await user.type(nameInput, 'Wine Name');
       await user.type(producerInput, 'Producer');
+      await user.click(nameInput); // Blur Combobox
       await user.type(countryInput, 'Country');
+      await user.click(nameInput); // Blur Combobox
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 

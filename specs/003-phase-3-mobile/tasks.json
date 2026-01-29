@@ -1,0 +1,256 @@
+{
+  "spec_id": 3,
+  "spec_name": "phase-3-mobile",
+  "updated": "2026-01-28T12:00:00Z",
+  "anthropic_patterns": ["Ralph looping", "JSON task state", "TDD workflow"],
+  "completion_promise": "<promise>SPEC-003-COMPLETE</promise>",
+  "tasks": [
+    {
+      "id": "T001",
+      "phase": "setup",
+      "description": "Install @headlessui/react dependency",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/package.json",
+      "gate": null,
+      "verify": "@headlessui/react in package.json dependencies",
+      "evidence_type": "execution"
+    },
+    {
+      "id": "T002",
+      "phase": "test",
+      "description": "Write Combobox unit tests - rendering and props",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/Combobox.test.tsx",
+      "gate": "T001",
+      "verify": "Test file created, tests fail (TDD red phase)",
+      "evidence_type": "artifact"
+    },
+    {
+      "id": "T003",
+      "phase": "test",
+      "description": "Write Combobox tests - keyboard nav, filtering, free text",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/Combobox.keyboard.test.tsx",
+      "gate": "T001",
+      "verify": "Test file created, tests fail (TDD red phase)",
+      "evidence_type": "artifact"
+    },
+    {
+      "id": "T004",
+      "phase": "impl",
+      "description": "Implement Combobox component wrapping @headlessui/react",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/Combobox.tsx",
+      "gate": "T003",
+      "verify": "Combobox tests pass (TDD green phase)",
+      "evidence_type": "execution"
+    },
+    {
+      "id": "T005",
+      "phase": "test",
+      "description": "Write WineCard unit tests - rendering 8 fields in 4-line layout",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/WineCard.test.tsx",
+      "gate": "T001",
+      "verify": "Test file created, tests fail (TDD red phase)",
+      "evidence_type": "artifact"
+    },
+    {
+      "id": "T006",
+      "phase": "test",
+      "description": "Write WineCard tests - click handlers, favorite toggle, touch targets",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/WineCard.interaction.test.tsx",
+      "gate": "T001",
+      "verify": "Test file created, tests fail (TDD red phase)",
+      "evidence_type": "artifact"
+    },
+    {
+      "id": "T007",
+      "phase": "impl",
+      "description": "Implement WineCard component with 8 fields, 4-line layout",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/WineCard.tsx",
+      "gate": "T006",
+      "verify": "WineCard tests pass (TDD green phase)",
+      "evidence_type": "execution"
+    },
+    {
+      "id": "T008",
+      "phase": "test",
+      "description": "Write MobileSortSelector unit tests - dropdown and direction toggle",
+      "status": "completed",
+      "parallel": true,
+      "target_file": "apps/web/src/__tests__/components/MobileSortSelector.test.tsx",
+      "gate": "T001",
+      "verify": "Test file created, tests fail (TDD red phase)",
+      "evidence_type": "artifact"
+    },
+    {
+      "id": "T009",
+      "phase": "impl",
+      "description": "Implement MobileSortSelector component",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/MobileSortSelector.tsx",
+      "gate": "T008",
+      "verify": "MobileSortSelector tests pass (TDD green phase)",
+      "evidence_type": "execution"
+    },
+    {
+      "id": "T010",
+      "phase": "test",
+      "description": "Write WineTable responsive tests - card on mobile, table on desktop",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/__tests__/components/WineTable.responsive.test.tsx",
+      "gate": "T007",
+      "verify": "Test file created, tests fail (TDD red phase)",
+      "evidence_type": "artifact"
+    },
+    {
+      "id": "T011",
+      "phase": "impl",
+      "description": "Modify WineTable for responsive card/table switching",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/WineTable.tsx",
+      "gate": "T010",
+      "verify": "WineTable responsive tests pass, existing tests still pass",
+      "evidence_type": "execution"
+    },
+    {
+      "id": "T012",
+      "phase": "test",
+      "description": "Write WineDetailModal mobile layout tests - full-screen, single-column",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/__tests__/components/WineDetailModal.mobile.test.tsx",
+      "gate": "T004",
+      "verify": "Test file created, tests fail (TDD red phase)",
+      "evidence_type": "artifact"
+    },
+    {
+      "id": "T013",
+      "phase": "impl",
+      "description": "Modify WineDetailModal for mobile layout + replace datalist with Combobox",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/components/WineDetailModal.tsx",
+      "gate": "T012",
+      "verify": "WineDetailModal mobile tests pass, existing tests still pass",
+      "evidence_type": "execution"
+    },
+    {
+      "id": "T014",
+      "phase": "integration",
+      "description": "Write integration tests for responsive behavior across components",
+      "status": "completed",
+      "parallel": false,
+      "target_file": "apps/web/src/__tests__/integration/responsive-layout.test.tsx",
+      "gate": "T013",
+      "verify": "Integration tests pass for mobile/desktop switching",
+      "evidence_type": "execution"
+    },
+    {
+      "id": "T015",
+      "phase": "polish",
+      "description": "Verify touch targets (44px minimum) on all interactive elements",
+      "status": "completed",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T014",
+      "verify": "All buttons and inputs have min 44x44px touch targets",
+      "evidence_type": "inspection"
+    },
+    {
+      "id": "T-DOC-GATE",
+      "phase": "verify",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T015",
+      "auto_agent": "documentation-reconciliation",
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "block_on": "Status: DRIFT_DETECTED in report"
+    },
+    {
+      "id": "T-FINAL",
+      "phase": "verify",
+      "description": "All verification gates passed - spec complete",
+      "status": "pending",
+      "parallel": false,
+      "target_file": null,
+      "gate": "T-DOC-GATE",
+      "gate_type": "composite",
+      "composed_of": [
+        {
+          "check": "typecheck",
+          "command": "npm run type-check",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static"
+        },
+        {
+          "check": "lint",
+          "command": "npm run lint",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static"
+        },
+        {
+          "check": "unit",
+          "command": "npm test",
+          "required": true,
+          "depends_on": ["typecheck", "lint"]
+        },
+        {
+          "check": "integration",
+          "command": "npm test",
+          "required": true,
+          "depends_on": ["unit"]
+        },
+        {
+          "check": "visual",
+          "command": "Manual visual verification in browser DevTools",
+          "required": true,
+          "condition_met": true,
+          "reason": "ui_changes: major in spec frontmatter",
+          "depends_on": ["integration"]
+        },
+        {
+          "check": "a11y",
+          "command": "Verify touch targets and keyboard navigation",
+          "required": true,
+          "condition_met": true,
+          "reason": "Major UI with accessibility requirements (44px touch targets)",
+          "depends_on": ["visual"]
+        },
+        {
+          "check": "security",
+          "agent": "security-audit",
+          "required": true,
+          "scope": "changed",
+          "depends_on": ["integration"]
+        },
+        {
+          "check": "code-review",
+          "agent": "code-reviewer",
+          "required": true,
+          "scope": "changed",
+          "depends_on": ["security"]
+        }
+      ],
+      "verify": "All checks pass: typecheck, lint, unit, integration, visual, a11y, security, code-review",
+      "block_on": "Any check failure"
+    }
+  ]
+}

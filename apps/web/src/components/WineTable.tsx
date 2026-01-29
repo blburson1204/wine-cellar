@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useMediaQuery } from '../hooks/useMediaQuery';
+import WineCard from './WineCard';
+import MobileSortSelector from './MobileSortSelector';
 
 interface Wine {
   id: string;
@@ -67,6 +70,7 @@ export default function WineTable({
 }: WineTableProps): React.JSX.Element {
   const [focusedIndex, setFocusedIndex] = useState<number>(0);
   const tableRef = useRef<HTMLDivElement>(null);
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   // Set focus on first row when wines change (including initial load)
   useEffect(() => {
@@ -129,6 +133,26 @@ export default function WineTable({
     );
   }
 
+  // Mobile card layout
+  if (isMobile) {
+    return (
+      <div className="space-y-4">
+        <MobileSortSelector sortBy={sortBy} sortDirection={sortDirection} onSort={onSort} />
+        <div className="space-y-3">
+          {wines.map((wine) => (
+            <WineCard
+              key={wine.id}
+              wine={wine}
+              onClick={onRowClick}
+              onToggleFavorite={onToggleFavorite}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop table layout
   return (
     <div
       ref={tableRef}

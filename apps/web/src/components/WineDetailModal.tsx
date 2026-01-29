@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useMediaQuery } from '../hooks/useMediaQuery';
+import Combobox from './Combobox';
 
 interface Wine {
   id: string;
@@ -126,6 +128,7 @@ export default function WineDetailModal({
   const [countryOptions, setCountryOptions] = useState<string[]>([]);
   const [regionOptions, setRegionOptions] = useState<string[]>([]);
   const [grapeVarietyOptions, setGrapeVarietyOptions] = useState<string[]>([]);
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const nameInputRef = useRef<HTMLInputElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -580,7 +583,7 @@ export default function WineDetailModal({
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          padding: '16px',
+          padding: isMobile ? '0' : '16px',
         }}
         onClick={onClose}
       >
@@ -592,15 +595,18 @@ export default function WineDetailModal({
           className="wine-modal-form"
           style={{
             backgroundColor: '#221a13',
-            borderRadius: '8px',
-            maxWidth: '900px',
+            borderRadius: isMobile ? '0' : '8px',
+            maxWidth: isMobile ? '100%' : '900px',
             width: '100%',
-            maxHeight: '90vh',
+            height: isMobile ? '100%' : 'auto',
+            maxHeight: isMobile ? '100%' : '90vh',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 12px 48px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5)',
+            border: isMobile ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: isMobile
+              ? 'none'
+              : '0 12px 48px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5)',
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -1085,6 +1091,7 @@ export default function WineDetailModal({
                       onClick={onClose}
                       style={{
                         padding: '10px 20px',
+                        minHeight: '44px',
                         backgroundColor: 'transparent',
                         color: 'rgba(255, 255, 255, 0.7)',
                         border: '1px solid rgba(255, 255, 255, 0.4)',
@@ -1107,6 +1114,7 @@ export default function WineDetailModal({
                       onClick={handleEditClick}
                       style={{
                         padding: '10px 20px',
+                        minHeight: '44px',
                         backgroundColor: '#3d010b',
                         color: 'rgba(255, 255, 255, 0.7)',
                         border: 'none',
@@ -1331,174 +1339,58 @@ export default function WineDetailModal({
 
                       {/* Producer - Wide (9 cols) */}
                       <div style={{ gridColumn: 'span 9' }}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '2px',
-                            fontSize: '13px',
-                            fontWeight: '700',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                          }}
-                        >
-                          Producer *
-                        </label>
-                        <input
-                          type="text"
-                          list="producer-options"
-                          placeholder="Enter producer"
+                        <Combobox
+                          id="producer"
+                          label="Producer"
                           value={editForm.producer || ''}
-                          onChange={(e) => setEditForm({ ...editForm, producer: e.target.value })}
-                          style={{
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: errors.producer ? '1px solid #C73E3A' : 'none',
-                            borderRadius: '4px',
-                            width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            boxSizing: 'border-box',
-                          }}
+                          onChange={(value) => setEditForm({ ...editForm, producer: value })}
+                          options={producerOptions}
+                          placeholder="Enter producer"
+                          required
+                          error={errors.producer}
                         />
-                        <datalist id="producer-options">
-                          {producerOptions.map((option) => (
-                            <option key={option} value={option} />
-                          ))}
-                        </datalist>
-                        {errors.producer && (
-                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                            {errors.producer}
-                          </span>
-                        )}
                       </div>
 
                       {/* Country - (4 cols) */}
                       <div style={{ gridColumn: 'span 4' }}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '2px',
-                            fontSize: '13px',
-                            fontWeight: '700',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                          }}
-                        >
-                          Country *
-                        </label>
-                        <input
-                          type="text"
-                          list="country-options"
-                          placeholder="Enter country"
+                        <Combobox
+                          id="country"
+                          label="Country"
                           value={editForm.country || ''}
-                          onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
-                          style={{
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: errors.country ? '1px solid #C73E3A' : 'none',
-                            borderRadius: '4px',
-                            width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            boxSizing: 'border-box',
-                          }}
+                          onChange={(value) => setEditForm({ ...editForm, country: value })}
+                          options={countryOptions}
+                          placeholder="Enter country"
+                          required
+                          error={errors.country}
                         />
-                        <datalist id="country-options">
-                          {countryOptions.map((option) => (
-                            <option key={option} value={option} />
-                          ))}
-                        </datalist>
-                        {errors.country && (
-                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                            {errors.country}
-                          </span>
-                        )}
                       </div>
 
                       {/* Region - Wide (8 cols) */}
                       <div style={{ gridColumn: 'span 8' }}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '2px',
-                            fontSize: '13px',
-                            fontWeight: '700',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                          }}
-                        >
-                          Region
-                        </label>
-                        <input
-                          type="text"
-                          list="region-options"
-                          placeholder="Enter region"
+                        <Combobox
+                          id="region"
+                          label="Region"
                           value={editForm.region || ''}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, region: e.target.value || null })
-                          }
-                          style={{
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: errors.region ? '1px solid #C73E3A' : 'none',
-                            borderRadius: '4px',
-                            width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            boxSizing: 'border-box',
-                          }}
+                          onChange={(value) => setEditForm({ ...editForm, region: value || null })}
+                          options={regionOptions}
+                          placeholder="Enter region"
+                          error={errors.region}
                         />
-                        <datalist id="region-options">
-                          {regionOptions.map((option) => (
-                            <option key={option} value={option} />
-                          ))}
-                        </datalist>
-                        {errors.region && (
-                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                            {errors.region}
-                          </span>
-                        )}
                       </div>
 
                       {/* Grape Variety - (4 cols) */}
                       <div style={{ gridColumn: 'span 4' }}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '2px',
-                            fontSize: '13px',
-                            fontWeight: '700',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                          }}
-                        >
-                          Grape Variety
-                        </label>
-                        <input
-                          type="text"
-                          list="grape-variety-options"
-                          placeholder="Enter grape variety"
+                        <Combobox
+                          id="grape-variety"
+                          label="Grape Variety"
                           value={editForm.grapeVariety || ''}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, grapeVariety: e.target.value || null })
+                          onChange={(value) =>
+                            setEditForm({ ...editForm, grapeVariety: value || null })
                           }
-                          style={{
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: errors.grapeVariety ? '1px solid #C73E3A' : 'none',
-                            borderRadius: '4px',
-                            width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            boxSizing: 'border-box',
-                          }}
+                          options={grapeVarietyOptions}
+                          placeholder="Enter grape variety"
+                          error={errors.grapeVariety}
                         />
-                        <datalist id="grape-variety-options">
-                          {grapeVarietyOptions.map((option) => (
-                            <option key={option} value={option} />
-                          ))}
-                        </datalist>
-                        {errors.grapeVariety && (
-                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                            {errors.grapeVariety}
-                          </span>
-                        )}
                       </div>
 
                       {/* Blend Details - (8 cols) */}
@@ -1798,46 +1690,17 @@ export default function WineDetailModal({
 
                       {/* Where Purchased - Combobox (4 cols) */}
                       <div style={{ gridColumn: 'span 4' }}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '2px',
-                            fontSize: '13px',
-                            fontWeight: '700',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                          }}
-                        >
-                          Where Purchased
-                        </label>
-                        <input
-                          type="text"
-                          list="where-purchased-options"
+                        <Combobox
+                          id="where-purchased"
+                          label="Where Purchased"
                           value={editForm.wherePurchased || ''}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, wherePurchased: e.target.value || null })
+                          onChange={(value) =>
+                            setEditForm({ ...editForm, wherePurchased: value || null })
                           }
+                          options={wherePurchasedOptions}
                           placeholder="Select or type..."
-                          style={{
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: errors.wherePurchased ? '1px solid #C73E3A' : 'none',
-                            borderRadius: '4px',
-                            width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            boxSizing: 'border-box',
-                          }}
+                          error={errors.wherePurchased}
                         />
-                        <datalist id="where-purchased-options">
-                          {wherePurchasedOptions.map((option) => (
-                            <option key={option} value={option} />
-                          ))}
-                        </datalist>
-                        {errors.wherePurchased && (
-                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                            {errors.wherePurchased}
-                          </span>
-                        )}
                       </div>
 
                       {/* Expert Ratings (8 cols) */}
@@ -2225,6 +2088,7 @@ export default function WineDetailModal({
                 style={{
                   padding: '8px 16px',
                   minWidth: '110px',
+                  minHeight: '44px',
                   backgroundColor: 'transparent',
                   color: 'rgba(255, 255, 255, 0.7)',
                   border: '1px solid rgba(255, 255, 255, 0.4)',
@@ -2250,6 +2114,7 @@ export default function WineDetailModal({
                 style={{
                   padding: '8px 16px',
                   minWidth: '110px',
+                  minHeight: '44px',
                   backgroundColor: isSaving ? '#5a0210' : '#3d010b',
                   color: 'rgba(255, 255, 255, 0.7)',
                   border: 'none',

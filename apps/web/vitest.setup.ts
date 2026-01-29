@@ -34,6 +34,14 @@ global.fetch = vi.fn().mockImplementation((url: string | URL | Request) => {
   return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
 });
 
+// Mock ResizeObserver for Headless UI
+class MockResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+global.ResizeObserver = MockResizeObserver;
+
 // Mock window.matchMedia for responsive hook tests
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

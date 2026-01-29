@@ -361,14 +361,17 @@ describe('WineDetailModal', () => {
       const producerInput = screen.getByPlaceholderText('Enter producer');
       const countryInput = screen.getByPlaceholderText('Enter country');
 
+      // Fill name (regular input)
       await user.type(nameInput, 'New Wine');
-      await user.type(producerInput, 'New Producer');
-      await user.type(countryInput, 'Italy');
-
-      // Verify the values were entered
       expect(nameInput).toHaveValue('New Wine');
-      expect(producerInput).toHaveValue('New Producer');
-      expect(countryInput).toHaveValue('Italy');
+
+      // Fill producer (Combobox) - type and blur by clicking elsewhere
+      await user.type(producerInput, 'New Producer');
+      await user.click(nameInput); // Blur producer combobox
+
+      // Fill country (Combobox) - type and blur by clicking elsewhere
+      await user.type(countryInput, 'Italy');
+      await user.click(nameInput); // Blur country combobox
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -430,8 +433,11 @@ describe('WineDetailModal', () => {
       const producerInput = screen.getByPlaceholderText('Enter producer');
       const countryInput = screen.getByPlaceholderText('Enter country');
       await user.type(nameInput, 'Test');
+      // Blur Combobox fields to commit values
       await user.type(producerInput, 'Test Producer');
+      await user.click(nameInput);
       await user.type(countryInput, 'France');
+      await user.click(nameInput);
 
       const spinButtons = screen.getAllByRole('spinbutton');
       const ratingInput = spinButtons.find((input) => input.getAttribute('step') === '0.1');
@@ -499,13 +505,15 @@ describe('WineDetailModal', () => {
         />
       );
 
-      // Fill in required fields
+      // Fill in required fields (blur Combobox fields to commit values)
       const nameInput = screen.getByPlaceholderText('Enter wine name');
       const producerInput = screen.getByPlaceholderText('Enter producer');
       const countryInput = screen.getByPlaceholderText('Enter country');
       await user.type(nameInput, 'Test');
       await user.type(producerInput, 'Test Producer');
+      await user.click(nameInput);
       await user.type(countryInput, 'France');
+      await user.click(nameInput);
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -531,13 +539,15 @@ describe('WineDetailModal', () => {
         />
       );
 
-      // Fill in required fields
+      // Fill in required fields (blur Combobox fields to commit values)
       const nameInput = screen.getByPlaceholderText('Enter wine name');
       const producerInput = screen.getByPlaceholderText('Enter producer');
       const countryInput = screen.getByPlaceholderText('Enter country');
       await user.type(nameInput, 'Test');
       await user.type(producerInput, 'Test Producer');
+      await user.click(nameInput);
       await user.type(countryInput, 'France');
+      await user.click(nameInput);
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
@@ -820,7 +830,7 @@ describe('WineDetailModal', () => {
       expect(expertRatingsInput).toBeInTheDocument();
     });
 
-    it('shows where purchased input with datalist in edit mode', async () => {
+    it('shows where purchased input as combobox in edit mode', async () => {
       const user = userEvent.setup();
 
       render(
@@ -834,10 +844,10 @@ describe('WineDetailModal', () => {
 
       await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
 
-      // Find the where purchased input by placeholder
+      // Find the where purchased input by placeholder (now a Combobox)
       const wherePurchasedInput = screen.getByPlaceholderText('Select or type...');
       expect(wherePurchasedInput).toBeInTheDocument();
-      expect(wherePurchasedInput).toHaveAttribute('list', 'where-purchased-options');
+      expect(wherePurchasedInput).toHaveAttribute('role', 'combobox');
     });
 
     it('can edit expert ratings field', async () => {
@@ -885,8 +895,12 @@ describe('WineDetailModal', () => {
 
       await user.click(screen.getByRole('button', { name: 'Edit Wine' }));
 
+      // Where Purchased is now a Combobox - type and blur to commit value
       const wherePurchasedInput = screen.getByPlaceholderText('Select or type...');
       await user.type(wherePurchasedInput, 'Wine.com');
+      // Click elsewhere to trigger blur and commit the value
+      const nameInput = screen.getByPlaceholderText('Enter wine name');
+      await user.click(nameInput);
 
       await user.click(screen.getByRole('button', { name: 'Save Changes' }));
 

@@ -146,8 +146,11 @@ describe('Home Page - Wine Cellar', () => {
       const producerInput = screen.getByPlaceholderText('Enter producer');
       const countryInput = screen.getByPlaceholderText('Enter country');
       await user.type(nameInput, 'Test Wine');
+      // Blur Combobox fields to commit values
       await user.type(producerInput, 'Test Producer');
+      await user.click(nameInput);
       await user.type(countryInput, 'France');
+      await user.click(nameInput);
 
       // Submit - click the second Add Wine button (in modal)
       const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });
@@ -952,8 +955,11 @@ describe('Home Page - Wine Cellar', () => {
       const producerInput = screen.getByPlaceholderText('Enter producer');
       const countryInput = screen.getByPlaceholderText('Enter country');
       await user.type(nameInput, 'Test Wine');
+      // Blur Combobox fields to commit values
       await user.type(producerInput, 'Test Producer');
+      await user.click(nameInput);
       await user.type(countryInput, 'France');
+      await user.click(nameInput);
 
       const submitButtons = screen.getAllByRole('button', { name: /Add Wine/i });
       await user.click(submitButtons[submitButtons.length - 1]);

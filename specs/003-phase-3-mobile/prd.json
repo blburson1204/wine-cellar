@@ -1,0 +1,106 @@
+{
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Install @headlessui/react dependency",
+      "status": "pending",
+      "notes": "Phase: setup | Target: apps/web/package.json | Verify: @headlessui/react in package.json dependencies"
+    },
+    {
+      "id": "T002",
+      "description": "Write Combobox unit tests - rendering and props",
+      "status": "pending",
+      "notes": "Phase: test | Target: apps/web/src/__tests__/components/Combobox.test.tsx | Verify: Test file created, tests fail (TDD red phase)"
+    },
+    {
+      "id": "T003",
+      "description": "Write Combobox tests - keyboard nav, filtering, free text",
+      "status": "pending",
+      "notes": "Phase: test | Target: apps/web/src/__tests__/components/Combobox.keyboard.test.tsx | Verify: Test file created, tests fail (TDD red phase)"
+    },
+    {
+      "id": "T004",
+      "description": "Implement Combobox component wrapping @headlessui/react",
+      "status": "pending",
+      "notes": "Phase: impl | Target: apps/web/src/components/Combobox.tsx | Verify: Combobox tests pass (TDD green phase)"
+    },
+    {
+      "id": "T005",
+      "description": "Write WineCard unit tests - rendering 8 fields in 4-line layout",
+      "status": "pending",
+      "notes": "Phase: test | Target: apps/web/src/__tests__/components/WineCard.test.tsx | Verify: Test file created, tests fail (TDD red phase)"
+    },
+    {
+      "id": "T006",
+      "description": "Write WineCard tests - click handlers, favorite toggle, touch targets",
+      "status": "pending",
+      "notes": "Phase: test | Target: apps/web/src/__tests__/components/WineCard.interaction.test.tsx | Verify: Test file created, tests fail (TDD red phase)"
+    },
+    {
+      "id": "T007",
+      "description": "Implement WineCard component with 8 fields, 4-line layout",
+      "status": "pending",
+      "notes": "Phase: impl | Target: apps/web/src/components/WineCard.tsx | Verify: WineCard tests pass (TDD green phase)"
+    },
+    {
+      "id": "T008",
+      "description": "Write MobileSortSelector unit tests - dropdown and direction toggle",
+      "status": "pending",
+      "notes": "Phase: test | Target: apps/web/src/__tests__/components/MobileSortSelector.test.tsx | Verify: Test file created, tests fail (TDD red phase)"
+    },
+    {
+      "id": "T009",
+      "description": "Implement MobileSortSelector component",
+      "status": "pending",
+      "notes": "Phase: impl | Target: apps/web/src/components/MobileSortSelector.tsx | Verify: MobileSortSelector tests pass (TDD green phase)"
+    },
+    {
+      "id": "T010",
+      "description": "Write WineTable responsive tests - card on mobile, table on desktop",
+      "status": "pending",
+      "notes": "Phase: test | Target: apps/web/src/__tests__/components/WineTable.responsive.test.tsx | Verify: Test file created, tests fail (TDD red phase)"
+    },
+    {
+      "id": "T011",
+      "description": "Modify WineTable for responsive card/table switching",
+      "status": "pending",
+      "notes": "Phase: impl | Target: apps/web/src/components/WineTable.tsx | Verify: WineTable responsive tests pass, existing tests still pass"
+    },
+    {
+      "id": "T012",
+      "description": "Write WineDetailModal mobile layout tests - full-screen, single-column",
+      "status": "pending",
+      "notes": "Phase: test | Target: apps/web/src/__tests__/components/WineDetailModal.mobile.test.tsx | Verify: Test file created, tests fail (TDD red phase)"
+    },
+    {
+      "id": "T013",
+      "description": "Modify WineDetailModal for mobile layout + replace datalist with Combobox",
+      "status": "pending",
+      "notes": "Phase: impl | Target: apps/web/src/components/WineDetailModal.tsx | Verify: WineDetailModal mobile tests pass, existing tests still pass"
+    },
+    {
+      "id": "T014",
+      "description": "Write integration tests for responsive behavior across components",
+      "status": "pending",
+      "notes": "Phase: integration | Target: apps/web/src/__tests__/integration/responsive-layout.test.tsx | Verify: Integration tests pass for mobile/desktop switching"
+    },
+    {
+      "id": "T015",
+      "description": "Verify touch targets (44px minimum) on all interactive elements",
+      "status": "pending",
+      "notes": "Phase: polish | Target: N/A | Verify: All buttons and inputs have min 44x44px touch targets"
+    },
+    {
+      "id": "T-DOC-GATE",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "pending",
+      "notes": "Phase: verify | Target: N/A | Verify: documentation-update-report.md generated with Status: PASS"
+    },
+    {
+      "id": "T-FINAL",
+      "description": "All verification gates passed - spec complete",
+      "status": "pending",
+      "notes": "Phase: verify | Target: N/A | Verify: All checks pass: typecheck, lint, unit, integration, visual, a11y, security, code-review"
+    }
+  ]
+}
