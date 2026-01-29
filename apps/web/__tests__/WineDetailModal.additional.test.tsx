@@ -620,10 +620,7 @@ describe('WineDetailModal - Additional Coverage', () => {
       // Notes is the last textbox (textarea)
       const textInputs = screen.getAllByRole('textbox');
       const notesInput = textInputs[textInputs.length - 1];
-      // Notes has maxLength=2000, but we test the validation logic
-      await user.type(notesInput, 'N'.repeat(500)); // Start typing
-
-      // Manually set value beyond limit to test validation
+      // Set value beyond limit to test validation
       fireEvent.change(notesInput, { target: { value: 'N'.repeat(2001) } });
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
