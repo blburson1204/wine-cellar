@@ -29,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
           color: '#4A1C26',
           position: 'relative',
           minHeight: '100vh',
+          overflowX: 'hidden',
         }}
       >
         <header

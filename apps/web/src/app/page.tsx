@@ -559,7 +559,7 @@ export default function Home(): React.JSX.Element {
       )}
 
       {/* Main Content: Sidebar + Table Layout */}
-      <div style={{ display: 'flex', gap: '26px', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: isMobile ? 0 : '26px', alignItems: 'flex-start' }}>
         {/* Left Sidebar - Filters (Desktop only, 25%) */}
         {!isMobile && wines.length > 0 && (
           <div style={{ flex: '0 0 25%' }}>
@@ -593,7 +593,8 @@ export default function Home(): React.JSX.Element {
         {/* Right Content - Table */}
         <div
           style={{
-            flex: wines.length > 0 && !isMobile ? '1' : '1 1 100%',
+            flex: wines.length > 0 && !isMobile ? '1' : '1',
+            minWidth: 0,
           }}
         >
           {/* Wine Table */}

@@ -56,6 +56,24 @@ const formatPrice = (price: number | null): string => {
   return `$${price.toFixed(2)}`;
 };
 
+const WINE_TYPE_OPTIONS = ['Red', 'White', 'Rosé', 'Sparkling', 'Dessert', 'Fortified'];
+const WINE_TYPE_TO_DISPLAY: Record<string, string> = {
+  RED: 'Red',
+  WHITE: 'White',
+  ROSE: 'Rosé',
+  SPARKLING: 'Sparkling',
+  DESSERT: 'Dessert',
+  FORTIFIED: 'Fortified',
+};
+const DISPLAY_TO_WINE_TYPE: Record<string, string> = {
+  Red: 'RED',
+  White: 'WHITE',
+  Rosé: 'ROSE',
+  Sparkling: 'SPARKLING',
+  Dessert: 'DESSERT',
+  Fortified: 'FORTIFIED',
+};
+
 const StarRating = ({ rating }: { rating: number | null }): React.JSX.Element => {
   if (!rating) return <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>Not rated</span>;
 
@@ -570,6 +588,26 @@ export default function WineDetailModal({
         .wine-modal-form textarea::placeholder {
           color: rgba(0, 0, 0, 0.5);
         }
+        .edit-form-grid input,
+        .edit-form-grid select {
+          min-height: 44px;
+          box-sizing: border-box;
+        }
+        @media (max-width: 767px) {
+          .edit-form-grid > div {
+            grid-column: span 1 !important;
+          }
+          .edit-form-grid > div:nth-child(13) {
+            order: 3;
+            grid-column: 1 / -1 !important;
+          }
+          .edit-form-grid > div:nth-child(14) {
+            order: 1;
+          }
+          .edit-form-grid > div:nth-child(15) {
+            order: 2;
+          }
+        }
       `}</style>
       <div
         style={{
@@ -726,7 +764,14 @@ export default function WineDetailModal({
             {!isEditMode && mode === 'view' && wine && (
               <div>
                 {/* Main content flex container */}
-                <div style={{ display: 'flex', gap: '24px', marginBottom: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: '24px',
+                    marginBottom: '12px',
+                  }}
+                >
                   {/* Left side - Wine Details */}
                   <div style={{ flex: 1 }}>
                     {/* Details Grid */}
@@ -1000,8 +1045,14 @@ export default function WineDetailModal({
                     </div>
                   </div>
 
-                  {/* Right side - Wine Label Image */}
-                  <div style={{ flexShrink: 0, width: '270px' }}>
+                  {/* Wine Label Image - above content on mobile, right side on desktop */}
+                  <div
+                    style={{
+                      flexShrink: 0,
+                      width: isMobile ? '100%' : '270px',
+                      order: isMobile ? -1 : undefined,
+                    }}
+                  >
                     {currentImageUrl ? (
                       <img
                         src={`/api/wines/${wine.id}/image?t=${imageTimestamp}`}
@@ -1051,90 +1102,92 @@ export default function WineDetailModal({
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
-                  {/* Delete button on the left */}
-                  {onDelete && wine && (
-                    <button
-                      onClick={() => {
-                        if (wine) {
-                          onClose(); // Close the detail modal first
-                          onDelete(wine.id); // Then show the delete confirmation modal
-                        }
-                      }}
-                      style={{
-                        padding: '10px 20px',
-                        backgroundColor: 'transparent',
-                        color: '#8B3A3A',
-                        border: '1px solid #8B3A3A',
-                        borderRadius: '6px',
-                        fontSize: '16px',
-                        cursor: 'pointer',
-                        fontWeight: '700',
-                        transition: 'all 0.2s',
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(139, 58, 58, 0.2)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      Delete Wine
-                    </button>
-                  )}
+                {/* Action Buttons - Desktop only (mobile uses fixed footer below) */}
+                {!isMobile && (
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
+                    {/* Delete button on the left */}
+                    {onDelete && wine && (
+                      <button
+                        onClick={() => {
+                          if (wine) {
+                            onClose(); // Close the detail modal first
+                            onDelete(wine.id); // Then show the delete confirmation modal
+                          }
+                        }}
+                        style={{
+                          padding: '10px 20px',
+                          backgroundColor: 'transparent',
+                          color: '#8B3A3A',
+                          border: '1px solid #8B3A3A',
+                          borderRadius: '6px',
+                          fontSize: '16px',
+                          cursor: 'pointer',
+                          fontWeight: '700',
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(139, 58, 58, 0.2)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        Delete Wine
+                      </button>
+                    )}
 
-                  {/* Close and Edit buttons on the right */}
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <button
-                      ref={closeButtonRef}
-                      onClick={onClose}
-                      style={{
-                        padding: '10px 20px',
-                        minHeight: '44px',
-                        backgroundColor: 'transparent',
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        border: '1px solid rgba(255, 255, 255, 0.4)',
-                        borderRadius: '6px',
-                        fontSize: '16px',
-                        cursor: 'pointer',
-                        fontWeight: '700',
-                        transition: 'all 0.2s',
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      Close
-                    </button>
-                    <button
-                      onClick={handleEditClick}
-                      style={{
-                        padding: '10px 20px',
-                        minHeight: '44px',
-                        backgroundColor: '#3d010b',
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '16px',
-                        cursor: 'pointer',
-                        fontWeight: '700',
-                        transition: 'all 0.2s',
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.backgroundColor = '#5a0210';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.backgroundColor = '#3d010b';
-                      }}
-                    >
-                      Edit Wine
-                    </button>
+                    {/* Close and Edit buttons on the right */}
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        ref={closeButtonRef}
+                        onClick={onClose}
+                        style={{
+                          padding: '10px 20px',
+                          minHeight: '44px',
+                          backgroundColor: 'transparent',
+                          color: 'rgba(255, 255, 255, 0.7)',
+                          border: '1px solid rgba(255, 255, 255, 0.4)',
+                          borderRadius: '6px',
+                          fontSize: '16px',
+                          cursor: 'pointer',
+                          fontWeight: '700',
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        Close
+                      </button>
+                      <button
+                        onClick={handleEditClick}
+                        style={{
+                          padding: '10px 20px',
+                          minHeight: '44px',
+                          backgroundColor: '#3d010b',
+                          color: 'rgba(255, 255, 255, 0.7)',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '16px',
+                          cursor: 'pointer',
+                          fontWeight: '700',
+                          transition: 'all 0.2s',
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = '#5a0210';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = '#3d010b';
+                        }}
+                      >
+                        Edit Wine
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -1159,16 +1212,25 @@ export default function WineDetailModal({
                 )}
 
                 {/* Main content flex container */}
-                <div style={{ display: 'flex', gap: '20px', marginBottom: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: '20px',
+                    marginBottom: '12px',
+                  }}
+                >
                   {/* Left side - Edit Form */}
                   <div style={{ flex: 1 }}>
                     {/* Edit Form Grid - 12 column layout for flexible widths */}
                     <div
+                      className="edit-form-grid"
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(12, 1fr)',
+                        gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(12, 1fr)',
                         gap: '12px 16px',
                         marginBottom: '8px',
+                        alignItems: 'start',
                       }}
                     >
                       {/* Vintage - (3 cols) */}
@@ -1182,7 +1244,7 @@ export default function WineDetailModal({
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
                         >
-                          Vintage *
+                          Vintage <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <input
                           ref={nameInputRef}
@@ -1222,7 +1284,7 @@ export default function WineDetailModal({
                             color: 'rgba(255, 255, 255, 0.7)',
                           }}
                         >
-                          Wine Name *
+                          Wine Name <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <input
                           type="text"
@@ -1249,92 +1311,20 @@ export default function WineDetailModal({
 
                       {/* Wine Type - (3 cols) */}
                       <div style={{ gridColumn: 'span 3' }}>
-                        <label
-                          style={{
-                            display: 'block',
-                            marginBottom: '2px',
-                            fontSize: '13px',
-                            fontWeight: '700',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                          }}
-                        >
-                          Wine Type *
-                        </label>
-                        <select
-                          value={editForm.color || ''}
-                          onChange={(e) => setEditForm({ ...editForm, color: e.target.value })}
-                          style={{
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: errors.color ? '1px solid #C73E3A' : 'none',
-                            borderRadius: '4px',
-                            width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            cursor: 'pointer',
-                            boxSizing: 'border-box',
-                          }}
-                        >
-                          <option
-                            value="RED"
-                            style={{
-                              backgroundColor: '#443326',
-                              color: 'rgba(255, 255, 255, 0.7)',
-                            }}
-                          >
-                            Red
-                          </option>
-                          <option
-                            value="WHITE"
-                            style={{
-                              backgroundColor: '#443326',
-                              color: 'rgba(255, 255, 255, 0.7)',
-                            }}
-                          >
-                            White
-                          </option>
-                          <option
-                            value="ROSE"
-                            style={{
-                              backgroundColor: '#443326',
-                              color: 'rgba(255, 255, 255, 0.7)',
-                            }}
-                          >
-                            Rosé
-                          </option>
-                          <option
-                            value="SPARKLING"
-                            style={{
-                              backgroundColor: '#443326',
-                              color: 'rgba(255, 255, 255, 0.7)',
-                            }}
-                          >
-                            Sparkling
-                          </option>
-                          <option
-                            value="DESSERT"
-                            style={{
-                              backgroundColor: '#443326',
-                              color: 'rgba(255, 255, 255, 0.7)',
-                            }}
-                          >
-                            Dessert
-                          </option>
-                          <option
-                            value="FORTIFIED"
-                            style={{
-                              backgroundColor: '#443326',
-                              color: 'rgba(255, 255, 255, 0.7)',
-                            }}
-                          >
-                            Fortified
-                          </option>
-                        </select>
-                        {errors.color && (
-                          <span style={{ fontSize: '12px', color: '#C73E3A', marginTop: '2px' }}>
-                            {errors.color}
-                          </span>
-                        )}
+                        <Combobox
+                          id="wine-type"
+                          label="Wine Type"
+                          value={WINE_TYPE_TO_DISPLAY[editForm.color || 'RED'] || ''}
+                          onChange={(value) =>
+                            setEditForm({
+                              ...editForm,
+                              color: DISPLAY_TO_WINE_TYPE[value] || value,
+                            })
+                          }
+                          options={WINE_TYPE_OPTIONS}
+                          required
+                          error={errors.color}
+                        />
                       </div>
 
                       {/* Producer - Wide (9 cols) */}
@@ -1745,7 +1735,13 @@ export default function WineDetailModal({
 
                   {/* Right side - Wine Label Image with Upload/Delete */}
                   {(wine || mode === 'add') && (
-                    <div style={{ flexShrink: 0, width: '270px' }}>
+                    <div
+                      style={{
+                        flexShrink: 0,
+                        width: isMobile ? '100%' : '270px',
+                        order: isMobile ? -1 : undefined,
+                      }}
+                    >
                       {/* Image Display */}
                       {mode === 'add' && stagedImagePreview ? (
                         // Show staged image preview in add mode
@@ -2069,6 +2065,79 @@ export default function WineDetailModal({
             )}
           </div>
           {/* End scrollable content area */}
+
+          {/* Fixed footer with buttons - mobile view mode */}
+          {isMobile && !isEditMode && mode === 'view' && wine && (
+            <div
+              style={{
+                padding: '12px 24px',
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: '12px',
+                backgroundColor: '#221a13',
+              }}
+            >
+              {/* Delete button on the left */}
+              {onDelete && (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onDelete(wine.id);
+                  }}
+                  style={{
+                    padding: '10px 16px',
+                    minHeight: '44px',
+                    backgroundColor: 'transparent',
+                    color: '#8B3A3A',
+                    border: '1px solid #8B3A3A',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    fontWeight: '700',
+                  }}
+                >
+                  Delete
+                </button>
+              )}
+              {/* Close and Edit buttons on the right */}
+              <div style={{ display: 'flex', gap: '12px', marginLeft: 'auto' }}>
+                <button
+                  ref={closeButtonRef}
+                  onClick={onClose}
+                  style={{
+                    padding: '10px 16px',
+                    minHeight: '44px',
+                    backgroundColor: 'transparent',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    fontWeight: '700',
+                  }}
+                >
+                  Close
+                </button>
+                <button
+                  onClick={handleEditClick}
+                  style={{
+                    padding: '10px 16px',
+                    minHeight: '44px',
+                    backgroundColor: '#3d010b',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    fontWeight: '700',
+                  }}
+                >
+                  Edit Wine
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Fixed footer with buttons - only show in edit/add mode */}
           {(isEditMode || mode === 'add') && (

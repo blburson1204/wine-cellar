@@ -74,7 +74,7 @@ export default function WineCard({
       tabIndex={0}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
-      className="bg-white/10 rounded-lg p-4 cursor-pointer hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine-burgundy transition-colors"
+      className="bg-wine-background rounded-lg p-4 cursor-pointer hover:bg-[#2d2218] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine-burgundy transition-colors"
       style={{ minHeight: '44px' }}
     >
       {/* Line 1: Favorite + Name */}

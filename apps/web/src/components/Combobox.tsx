@@ -70,8 +70,8 @@ export default function Combobox({
     <div className="relative">
       <label
         htmlFor={id}
-        className="block text-sm font-medium mb-1"
-        style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+        className="block font-bold mb-0.5"
+        style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '13px' }}
       >
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
@@ -81,7 +81,7 @@ export default function Combobox({
         <div className="relative">
           <ComboboxInput
             id={id}
-            className="w-full rounded-md border-0 py-2 px-3 text-sm leading-6 focus:ring-2 focus:ring-wine-burgundy"
+            className="w-full rounded border-0 py-2 px-3 text-sm leading-6 focus:ring-2 focus:ring-wine-burgundy"
             style={{
               minHeight: '44px',
               backgroundColor: 'rgba(255, 255, 255, 0.75)',
