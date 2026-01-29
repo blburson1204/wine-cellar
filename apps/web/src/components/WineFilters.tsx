@@ -98,6 +98,22 @@ export default function WineFilters({
         .wine-filters input::placeholder {
           color: rgba(0, 0, 0, 0.5);
         }
+        .wine-filters input[type="number"]::-webkit-outer-spin-button,
+        .wine-filters input[type="number"]::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        .wine-filters input[type="number"] {
+          -moz-appearance: textfield;
+        }
+        @media (min-width: 1024px) {
+          .wine-filters label,
+          .wine-filters select,
+          .wine-filters input,
+          .wine-filters button {
+            min-height: auto !important;
+          }
+}
       `}</style>
       <div
         className="wine-filters"
@@ -362,188 +378,127 @@ export default function WineFilters({
             </div>
           </div>
 
-          {/* Show Wine & Rating (left) / Price Range (right) - Side by Side */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-            {/* Left column: Show Wine + Rating stacked */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div>
+          {/* Show Wine (left) / Price Range (right) - Side by Side */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+              gap: '8px',
+            }}
+          >
+            {/* Left column: Show Wine */}
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: '#221a13',
+                }}
+              >
+                Show Wine
+              </label>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  padding: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                  borderRadius: '4px',
+                }}
+              >
                 <label
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    backgroundColor: '#221a13',
-                  }}
-                >
-                  Show Wine
-                </label>
-                <div
                   style={{
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
-                    padding: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                    borderRadius: '4px',
-                  }}
-                >
-                  <label
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      cursor: 'pointer',
-                      minHeight: '44px',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={showOnlyInCellar}
-                      onChange={(e) => onShowOnlyInCellarChange(e.target.checked)}
-                      style={{
-                        position: 'absolute',
-                        opacity: 0,
-                        width: 0,
-                        height: 0,
-                      }}
-                    />
-                    <span
-                      className="checkbox-indicator"
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        borderRadius: '3px',
-                        border: '2px solid #7C2D3C',
-                        backgroundColor: showOnlyInCellar ? '#7C2D3C' : 'transparent',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {showOnlyInCellar && (
-                        <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
-                          ✓
-                        </span>
-                      )}
-                    </span>
-                    <span style={{ fontSize: '13px', color: '#7C2D3C' }}>In Cellar</span>
-                  </label>
-                  <label
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      cursor: 'pointer',
-                      minHeight: '44px',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={showOnlyFavorites}
-                      onChange={(e) => onShowOnlyFavoritesChange(e.target.checked)}
-                      style={{
-                        position: 'absolute',
-                        opacity: 0,
-                        width: 0,
-                        height: 0,
-                      }}
-                    />
-                    <span
-                      className="checkbox-indicator"
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        borderRadius: '3px',
-                        border: '2px solid #7C2D3C',
-                        backgroundColor: showOnlyFavorites ? '#7C2D3C' : 'transparent',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {showOnlyFavorites && (
-                        <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
-                          ✓
-                        </span>
-                      )}
-                    </span>
-                    <span style={{ fontSize: '13px', color: '#7C2D3C' }}>Favorites</span>
-                  </label>
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="min-rating"
-                  style={{
-                    display: 'block',
-                    marginBottom: '4px',
-                    fontSize: '14px',
-                    fontWeight: '400',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    backgroundColor: '#221a13',
-                  }}
-                >
-                  Rating
-                </label>
-                <select
-                  id="min-rating"
-                  value={minRating ?? ''}
-                  onChange={(e) =>
-                    onMinRatingChange(e.target.value ? parseFloat(e.target.value) : null)
-                  }
-                  style={{
-                    padding: '8px',
-                    fontSize: '13px',
-                    border: 'none',
-                    borderRadius: '4px',
-                    width: '100%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                    color: '#7C2D3C',
+                    alignItems: 'center',
+                    gap: '8px',
                     cursor: 'pointer',
-                    boxSizing: 'border-box',
                     minHeight: '44px',
                   }}
                 >
-                  <option
-                    value=""
-                    style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                  <input
+                    type="checkbox"
+                    checked={showOnlyInCellar}
+                    onChange={(e) => onShowOnlyInCellarChange(e.target.checked)}
+                    style={{
+                      position: 'absolute',
+                      opacity: 0,
+                      width: 0,
+                      height: 0,
+                    }}
+                  />
+                  <span
+                    className="checkbox-indicator"
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '3px',
+                      border: '2px solid #7C2D3C',
+                      backgroundColor: showOnlyInCellar ? '#7C2D3C' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
                   >
-                    Any
-                  </option>
-                  <option
-                    value="4.5"
-                    style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                    {showOnlyInCellar && (
+                      <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+                        ✓
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ fontSize: '13px', color: '#7C2D3C' }}>In Cellar</span>
+                </label>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    minHeight: '44px',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={showOnlyFavorites}
+                    onChange={(e) => onShowOnlyFavoritesChange(e.target.checked)}
+                    style={{
+                      position: 'absolute',
+                      opacity: 0,
+                      width: 0,
+                      height: 0,
+                    }}
+                  />
+                  <span
+                    className="checkbox-indicator"
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '3px',
+                      border: '2px solid #7C2D3C',
+                      backgroundColor: showOnlyFavorites ? '#7C2D3C' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
                   >
-                    4.5+
-                  </option>
-                  <option
-                    value="4"
-                    style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
-                  >
-                    4.0+
-                  </option>
-                  <option
-                    value="3.5"
-                    style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
-                  >
-                    3.5+
-                  </option>
-                  <option
-                    value="3"
-                    style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
-                  >
-                    3.0+
-                  </option>
-                </select>
+                    {showOnlyFavorites && (
+                      <span style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+                        ✓
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ fontSize: '13px', color: '#7C2D3C' }}>Favorites</span>
+                </label>
               </div>
             </div>
 
             {/* Right column: Price Range */}
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label
                 style={{
                   display: 'block',
@@ -565,7 +520,7 @@ export default function WineFilters({
                   padding: '8px',
                   backgroundColor: 'rgba(255, 255, 255, 0.75)',
                   borderRadius: '4px',
-                  height: '59px',
+                  flex: 1,
                   boxSizing: 'border-box',
                 }}
               >
@@ -621,6 +576,75 @@ export default function WineFilters({
                   }}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Rating */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div>
+              <label
+                htmlFor="min-rating"
+                style={{
+                  display: 'block',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  backgroundColor: '#221a13',
+                }}
+              >
+                Rating
+              </label>
+              <select
+                id="min-rating"
+                value={minRating ?? ''}
+                onChange={(e) =>
+                  onMinRatingChange(e.target.value ? parseFloat(e.target.value) : null)
+                }
+                style={{
+                  padding: '8px',
+                  fontSize: '13px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  width: '100%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                  color: '#7C2D3C',
+                  cursor: 'pointer',
+                  boxSizing: 'border-box',
+                  minHeight: '44px',
+                }}
+              >
+                <option
+                  value=""
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  Any
+                </option>
+                <option
+                  value="4.5"
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  4.5+
+                </option>
+                <option
+                  value="4"
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  4.0+
+                </option>
+                <option
+                  value="3.5"
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  3.5+
+                </option>
+                <option
+                  value="3"
+                  style={{ backgroundColor: '#443326', color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  3.0+
+                </option>
+              </select>
             </div>
           </div>
 
