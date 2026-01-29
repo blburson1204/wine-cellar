@@ -17,12 +17,14 @@ describe('Home Page - Wine Cellar', () => {
   });
 
   describe('Loading State', () => {
-    it('displays loading message initially', () => {
+    it('displays skeleton loader initially', () => {
       // Mock fetch to never resolve (keeps loading state)
       vi.mocked(global.fetch).mockImplementation(() => new Promise(() => {}));
 
-      render(<Home />);
-      expect(screen.getByText('Loading your collection...')).toBeInTheDocument();
+      const { container } = render(<Home />);
+      // Skeleton loader should be present instead of loading text
+      const skeletonElements = container.querySelectorAll('[data-testid^="skeleton-"]');
+      expect(skeletonElements.length).toBeGreaterThan(0);
     });
   });
 

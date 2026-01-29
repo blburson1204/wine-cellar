@@ -518,7 +518,7 @@ describe('WineDetailModal', () => {
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Adding...' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /adding/i })).toBeInTheDocument();
       });
 
       resolveSave!();

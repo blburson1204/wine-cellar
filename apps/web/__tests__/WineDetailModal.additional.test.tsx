@@ -204,10 +204,9 @@ describe('WineDetailModal - Additional Coverage', () => {
         />
       );
 
-      // The filled star in the header (not the rating stars)
-      const header = screen.getByRole('heading', { name: mockWine.name }).parentElement;
-      const favoriteStar = header?.querySelector('span');
-      expect(favoriteStar?.textContent).toBe('★');
+      // The filled star in the header (now a button, not a span)
+      const favoriteButton = screen.getByRole('button', { name: /favorite/i });
+      expect(favoriteButton.textContent).toBe('★');
     });
 
     it('calls onToggleFavorite when star is clicked', async () => {

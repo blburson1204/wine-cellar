@@ -1,0 +1,263 @@
+{
+  "spec_id": "004",
+  "spec_name": "phase-4-touch",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Write LoadingSpinner component tests (render, sizes, animation class)",
+      "status": "pending",
+      "notes": "Phase: test",
+      "target_file": "apps/web/src/__tests__/components/LoadingSpinner.test.tsx",
+      "gate": null,
+      "verify": "Test file created, tests fail (component doesn't exist yet)",
+      "fr": ["FR-012"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T002",
+      "description": "Write WineListSkeleton component tests (mobile card skeletons, desktop row skeletons, pulse animation)",
+      "status": "pending",
+      "notes": "Phase: test",
+      "target_file": "apps/web/src/__tests__/components/WineListSkeleton.test.tsx",
+      "gate": null,
+      "verify": "Test file created, tests fail (component doesn't exist yet)",
+      "fr": ["FR-011"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T003",
+      "description": "Write WineFilters touch target tests (close button 44px, checkbox hit areas, select minHeight, input minHeight, clear button minHeight)",
+      "status": "pending",
+      "notes": "Phase: test",
+      "target_file": "apps/web/src/__tests__/components/WineFilters.touchTargets.test.tsx",
+      "gate": null,
+      "verify": "Test file created, tests fail (touch targets not yet updated)",
+      "fr": ["FR-001", "FR-002", "FR-003", "FR-004", "FR-005"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T004",
+      "description": "Write WineDetailModal touch target tests (favorite button element + aria + 44px, wine link padding, spinner in save/upload buttons)",
+      "status": "pending",
+      "notes": "Phase: test",
+      "target_file": "apps/web/src/__tests__/components/WineDetailModal.touchTargets.test.tsx",
+      "gate": null,
+      "verify": "Test file created, tests fail (touch targets not yet updated)",
+      "fr": ["FR-006", "FR-007", "FR-013"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T005",
+      "description": "Write FilterDrawer gesture tests (ESC key closes drawer, swipe left closes, partial swipe snaps back)",
+      "status": "pending",
+      "notes": "Phase: test",
+      "target_file": "apps/web/src/__tests__/components/FilterDrawer.gesture.test.tsx",
+      "gate": null,
+      "verify": "Test file created, tests fail (gestures not yet implemented)",
+      "fr": ["FR-008", "FR-009", "FR-010"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T006",
+      "description": "Implement LoadingSpinner component (border-based CSS spinner with animate-spin, sm/md sizes)",
+      "status": "pending",
+      "notes": "Phase: impl",
+      "target_file": "apps/web/src/components/LoadingSpinner.tsx",
+      "gate": "T001",
+      "verify": "LoadingSpinner tests pass",
+      "fr": ["FR-012"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T007",
+      "description": "Implement WineListSkeleton component (mobile card skeletons + desktop table row skeletons with animate-pulse)",
+      "status": "pending",
+      "notes": "Phase: impl",
+      "target_file": "apps/web/src/components/WineListSkeleton.tsx",
+      "gate": "T002",
+      "verify": "WineListSkeleton tests pass",
+      "fr": ["FR-011"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T008",
+      "description": "Fix WineFilters touch targets: close button 44x44px, checkbox label hit areas 44px, select/input minHeight 44px, clear button minHeight 44px",
+      "status": "pending",
+      "notes": "Phase: impl",
+      "target_file": "apps/web/src/components/WineFilters.tsx",
+      "gate": "T003",
+      "verify": "WineFilters touch target tests pass, existing WineFilters tests still pass",
+      "fr": ["FR-001", "FR-002", "FR-003", "FR-004", "FR-005"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T009",
+      "description": "Fix WineDetailModal: convert favorite span to button with 44px + aria, add wine link padding, integrate LoadingSpinner in save/upload buttons",
+      "status": "pending",
+      "notes": "Phase: impl",
+      "target_file": "apps/web/src/components/WineDetailModal.tsx",
+      "gate": "T006",
+      "verify": "WineDetailModal touch target tests pass, existing modal tests still pass",
+      "fr": ["FR-006", "FR-007", "FR-013"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T010",
+      "description": "Implement FilterDrawer gestures: ESC key handler via useEffect, swipe-to-close via touch events (50px threshold), snap-back on partial swipe",
+      "status": "pending",
+      "notes": "Phase: impl",
+      "target_file": "apps/web/src/components/FilterDrawer.tsx",
+      "gate": "T005",
+      "verify": "FilterDrawer gesture tests pass, existing FilterDrawer tests still pass",
+      "fr": ["FR-008", "FR-009", "FR-010"],
+      "parallel": true,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T011",
+      "description": "Wire WineListSkeleton into page.tsx: replace 'Loading your collection...' text with WineListSkeleton component",
+      "status": "pending",
+      "notes": "Phase: integration",
+      "target_file": "apps/web/src/app/page.tsx",
+      "gate": "T007",
+      "verify": "Page shows skeleton on load instead of text, all page tests pass",
+      "fr": ["FR-011"],
+      "parallel": false,
+      "agent": null,
+      "block_on": null,
+      "composed_of": null
+    },
+    {
+      "id": "T-DOC-GATE",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "pending",
+      "notes": "Phase: verify",
+      "target_file": null,
+      "gate": "T011",
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "fr": null,
+      "parallel": false,
+      "agent": "documentation-reconciliation",
+      "block_on": "Status: DRIFT_DETECTED in report",
+      "composed_of": null
+    },
+    {
+      "id": "T-FINAL",
+      "description": "All verification gates passed - spec complete",
+      "status": "pending",
+      "notes": "Phase: verify",
+      "target_file": null,
+      "gate": "T-DOC-GATE",
+      "verify": "All checks pass",
+      "fr": null,
+      "parallel": false,
+      "agent": null,
+      "block_on": "Any check failure",
+      "composed_of": [
+        {
+          "check": "typecheck",
+          "command": "npm run type-check",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static",
+          "timeout_ms": 120000
+        },
+        {
+          "check": "lint",
+          "command": "npm run lint",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static",
+          "timeout_ms": 120000
+        },
+        {
+          "check": "format",
+          "command": "npm run format:check",
+          "required": true,
+          "parallel": true,
+          "parallel_group": "static",
+          "timeout_ms": 120000
+        },
+        {
+          "check": "unit",
+          "command": "npm test",
+          "required": true,
+          "depends_on": ["typecheck", "lint"],
+          "timeout_ms": 300000
+        },
+        {
+          "check": "visual",
+          "command": null,
+          "required": false,
+          "condition_triggered": true,
+          "condition_reason": "ui_changes=moderate in spec frontmatter",
+          "skipped_reason": "No visual regression test infrastructure (Playwright not configured)",
+          "depends_on": ["unit"]
+        },
+        {
+          "check": "e2e",
+          "command": null,
+          "required": false,
+          "condition_triggered": true,
+          "condition_reason": "UI keywords (component, modal, button) in spec",
+          "skipped_reason": "No E2E test infrastructure configured",
+          "depends_on": ["unit"]
+        },
+        {
+          "check": "a11y",
+          "command": null,
+          "required": false,
+          "condition_triggered": true,
+          "condition_reason": "WCAG keyword in spec + ui_changes=moderate",
+          "skipped_reason": "No Lighthouse a11y audit configured",
+          "depends_on": ["unit"]
+        },
+        {
+          "check": "security",
+          "agent": "security-audit",
+          "required": true,
+          "depends_on": ["unit"],
+          "scope": "changed",
+          "block_on": "Any P1 or P2 finding"
+        },
+        {
+          "check": "code-review",
+          "agent": "code-reviewer",
+          "required": true,
+          "depends_on": ["security"],
+          "scope": "changed",
+          "block_on": "Any Critical issue"
+        }
+      ]
+    }
+  ]
+}

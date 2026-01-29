@@ -7,6 +7,7 @@ import WineDetailModal from '../components/WineDetailModal';
 import Backdrop from '../components/Backdrop';
 import FilterDrawer from '../components/FilterDrawer';
 import MobileFilterToggle from '../components/MobileFilterToggle';
+import WineListSkeleton from '../components/WineListSkeleton';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 
 interface Wine {
@@ -379,8 +380,8 @@ export default function Home(): React.JSX.Element {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '48px', color: '#7C2D3C' }}>
-        <p style={{ fontSize: '18px' }}>Loading your collection...</p>
+      <div style={{ padding: '24px' }}>
+        <WineListSkeleton isMobile={isMobile} />
       </div>
     );
   }

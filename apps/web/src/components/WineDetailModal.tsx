@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import Combobox from './Combobox';
+import LoadingSpinner from './LoadingSpinner';
 
 interface Wine {
   id: string;
@@ -694,13 +695,24 @@ export default function WineDetailModal({
                     {wine.name}
                   </h2>
                   {onToggleFavorite && (
-                    <span
+                    <button
+                      type="button"
                       onClick={() => onToggleFavorite(wine)}
+                      aria-label="Toggle favorite"
+                      aria-pressed={wine.favorite}
                       style={{
                         fontSize: '24px',
                         cursor: 'pointer',
                         color: wine.favorite ? '#E63946' : 'rgba(255, 255, 255, 0.3)',
                         transition: 'color 0.2s',
+                        background: 'none',
+                        border: 'none',
+                        padding: '0',
+                        minWidth: '44px',
+                        minHeight: '44px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}
                       onMouseOver={(e) => {
                         if (!wine.favorite) {
@@ -714,7 +726,7 @@ export default function WineDetailModal({
                       }}
                     >
                       {wine.favorite ? '★' : '☆'}
-                    </span>
+                    </button>
                   )}
                 </div>
                 <div
@@ -745,6 +757,9 @@ export default function WineDetailModal({
                         fontWeight: '600',
                         color: '#d4a574',
                         textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        minHeight: '44px',
                       }}
                       onMouseOver={(e) => {
                         e.currentTarget.style.textDecoration = 'underline';
@@ -1910,11 +1925,16 @@ export default function WineDetailModal({
                               }
                             }}
                           >
-                            {isUploadingImage
-                              ? 'Uploading...'
-                              : currentImageUrl || stagedImagePreview
-                                ? 'Replace'
-                                : 'Upload Image'}
+                            {isUploadingImage ? (
+                              <>
+                                <LoadingSpinner size="sm" className="mr-2" />
+                                Uploading...
+                              </>
+                            ) : currentImageUrl || stagedImagePreview ? (
+                              'Replace'
+                            ) : (
+                              'Upload Image'
+                            )}
                           </button>
 
                           {/* Delete Button (only if image exists) */}
@@ -2204,13 +2224,16 @@ export default function WineDetailModal({
                   if (!isSaving) e.currentTarget.style.backgroundColor = '#3d010b';
                 }}
               >
-                {isSaving
-                  ? mode === 'add'
-                    ? 'Adding...'
-                    : 'Saving...'
-                  : mode === 'add'
-                    ? 'Add Wine'
-                    : 'Save Changes'}
+                {isSaving ? (
+                  <>
+                    <LoadingSpinner size="sm" className="mr-2" />
+                    {mode === 'add' ? 'Adding...' : 'Saving...'}
+                  </>
+                ) : mode === 'add' ? (
+                  'Add Wine'
+                ) : (
+                  'Save Changes'
+                )}
               </button>
             </div>
           )}

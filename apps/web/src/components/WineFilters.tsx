@@ -132,8 +132,8 @@ export default function WineFilters({
                 fontSize: '24px',
                 cursor: 'pointer',
                 padding: '0',
-                width: '32px',
-                height: '32px',
+                minWidth: '44px',
+                minHeight: '44px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -221,6 +221,7 @@ export default function WineFilters({
                       alignItems: 'center',
                       gap: '8px',
                       cursor: 'pointer',
+                      minHeight: '44px',
                     }}
                   >
                     <input
@@ -291,6 +292,7 @@ export default function WineFilters({
                   color: '#7C2D3C',
                   cursor: 'pointer',
                   boxSizing: 'border-box',
+                  minHeight: '44px',
                 }}
               >
                 <option
@@ -338,6 +340,7 @@ export default function WineFilters({
                   color: '#7C2D3C',
                   cursor: 'pointer',
                   boxSizing: 'border-box',
+                  minHeight: '44px',
                 }}
               >
                 <option
@@ -392,6 +395,7 @@ export default function WineFilters({
                       alignItems: 'center',
                       gap: '8px',
                       cursor: 'pointer',
+                      minHeight: '44px',
                     }}
                   >
                     <input
@@ -433,6 +437,7 @@ export default function WineFilters({
                       alignItems: 'center',
                       gap: '8px',
                       cursor: 'pointer',
+                      minHeight: '44px',
                     }}
                   >
                     <input
@@ -500,6 +505,7 @@ export default function WineFilters({
                     color: '#7C2D3C',
                     cursor: 'pointer',
                     boxSizing: 'border-box',
+                    minHeight: '44px',
                   }}
                 >
                   <option
@@ -585,6 +591,7 @@ export default function WineFilters({
                     boxSizing: 'border-box',
                     cursor: priceMin === priceMax ? 'not-allowed' : 'text',
                     minWidth: 0,
+                    minHeight: '44px',
                   }}
                 />
                 <span style={{ fontSize: '13px', color: '#7C2D3C', flexShrink: 0 }}>to</span>
@@ -610,6 +617,7 @@ export default function WineFilters({
                     boxSizing: 'border-box',
                     cursor: priceMin === priceMax ? 'not-allowed' : 'text',
                     minWidth: 0,
+                    minHeight: '44px',
                   }}
                 />
               </div>
@@ -637,6 +645,7 @@ export default function WineFilters({
                 fontWeight: '700',
                 transition: 'all 0.2s',
                 width: '100%',
+                minHeight: '44px',
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.backgroundColor = '#5a0210';
