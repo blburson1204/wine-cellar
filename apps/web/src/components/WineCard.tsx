@@ -74,7 +74,7 @@ export default function WineCard({
       tabIndex={0}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
-      className="bg-wine-background rounded-lg p-4 cursor-pointer hover:bg-[#2d2218] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine-burgundy transition-colors"
+      className="bg-wine-background rounded-lg p-4 border-l-[5px] border-wine-burgundy cursor-pointer hover:bg-[#2d2218] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine-burgundy transition-colors"
       style={{ minHeight: '44px' }}
     >
       {/* Line 1: Favorite + Name */}
@@ -114,17 +114,23 @@ export default function WineCard({
             </svg>
           )}
         </button>
-        <span className="text-lg font-semibold text-white truncate">{wine.name}</span>
+        <span className="text-lg font-semibold text-[#a13d4e] truncate">{wine.name}</span>
       </div>
 
-      {/* Line 2: Vintage + Producer */}
+      {/* Line 2: Vintage + Producer + Rating */}
       <div className="flex items-center gap-2 mb-1 text-sm text-white/80">
         <span className="font-medium">{wine.vintage}</span>
         <span className="text-white/50">•</span>
         <span className="truncate">{wine.producer}</span>
+        {wine.rating !== null && (
+          <>
+            <span className="text-white/50">•</span>
+            <span>{wine.rating}</span>
+          </>
+        )}
       </div>
 
-      {/* Line 3: Type + Grape Variety */}
+      {/* Line 3: Type + Grape Variety + In Cellar */}
       <div className="flex items-center gap-2 mb-1 text-sm text-white/70">
         <span>{COLOR_LABELS[wine.color] || wine.color}</span>
         {wine.grapeVariety && (
@@ -133,9 +139,11 @@ export default function WineCard({
             <span className="truncate">{wine.grapeVariety}</span>
           </>
         )}
+        <span className="text-white/50">•</span>
+        <span>{wine.quantity > 0 ? 'In Cellar' : 'Not in Cellar'}</span>
       </div>
 
-      {/* Line 4: Region + Country */}
+      {/* Line 4: Region + Country + Price */}
       <div className="flex items-center gap-2 text-sm text-white/60">
         {wine.region && (
           <>
@@ -144,6 +152,12 @@ export default function WineCard({
           </>
         )}
         <span>{wine.country}</span>
+        {wine.purchasePrice !== null && (
+          <>
+            <span className="text-white/50">•</span>
+            <span>${wine.purchasePrice.toFixed(2)}</span>
+          </>
+        )}
       </div>
     </article>
   );

@@ -78,6 +78,47 @@ describe('WineCard', () => {
     });
   });
 
+  describe('Rating, In Cellar, Price fields', () => {
+    it('renders rating when present', () => {
+      render(<WineCard {...defaultProps} />);
+      expect(screen.getByText('95')).toBeInTheDocument();
+    });
+
+    it('renders In Cellar when quantity > 0', () => {
+      render(<WineCard {...defaultProps} />);
+      expect(screen.getByText('In Cellar')).toBeInTheDocument();
+    });
+
+    it('renders Not in Cellar when quantity is 0', () => {
+      const outOfStockWine = { ...mockWine, quantity: 0 };
+      render(<WineCard {...defaultProps} wine={outOfStockWine} />);
+      expect(screen.getByText('Not in Cellar')).toBeInTheDocument();
+    });
+
+    it('renders price when present', () => {
+      render(<WineCard {...defaultProps} />);
+      expect(screen.getByText('$350.00')).toBeInTheDocument();
+    });
+
+    it('omits rating when null', () => {
+      const noRatingWine = { ...mockWine, rating: null };
+      render(<WineCard {...defaultProps} wine={noRatingWine} />);
+      expect(screen.queryByText('95')).not.toBeInTheDocument();
+      // Other fields still present
+      expect(screen.getByText('In Cellar')).toBeInTheDocument();
+      expect(screen.getByText('$350.00')).toBeInTheDocument();
+    });
+
+    it('omits price when null', () => {
+      const noPriceWine = { ...mockWine, purchasePrice: null };
+      render(<WineCard {...defaultProps} wine={noPriceWine} />);
+      expect(screen.queryByText('$350.00')).not.toBeInTheDocument();
+      // Other fields still present
+      expect(screen.getByText('95')).toBeInTheDocument();
+      expect(screen.getByText('In Cellar')).toBeInTheDocument();
+    });
+  });
+
   describe('Null Field Handling', () => {
     it('handles null region gracefully', () => {
       const wineWithNullRegion = { ...mockWine, region: null };

@@ -357,7 +357,7 @@ export default function WineTable({
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
-                width: '90px',
+                width: '80px',
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.backgroundColor = '#5a0210';
@@ -380,7 +380,8 @@ export default function WineTable({
                 cursor: 'pointer',
                 userSelect: 'none',
                 transition: 'background-color 0.2s',
-                width: '80px',
+                width: '90px',
+                whiteSpace: 'nowrap',
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.backgroundColor = '#5a0210';

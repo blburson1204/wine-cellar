@@ -1507,7 +1507,7 @@ export default function WineDetailModal({
                       </div>
 
                       {/* Purchase Date - (4 cols) */}
-                      <div style={{ gridColumn: 'span 4' }}>
+                      <div style={{ gridColumn: 'span 4', minWidth: 0 }}>
                         <label
                           style={{
                             display: 'block',
@@ -1519,75 +1519,79 @@ export default function WineDetailModal({
                         >
                           Purchase Date
                         </label>
-                        <input
-                          type="date"
-                          value={
-                            editForm.purchaseDate
-                              ? (() => {
-                                  try {
-                                    return new Date(editForm.purchaseDate)
-                                      .toISOString()
-                                      .split('T')[0];
-                                  } catch {
-                                    return '';
-                                  }
-                                })()
-                              : ''
-                          }
-                          onChange={(e) => {
-                            // Only update if we have a valid value or user explicitly cleared it
-                            const inputValue = e.target.value;
+                        <div style={{ overflow: 'hidden', borderRadius: '4px' }}>
+                          <input
+                            type="date"
+                            value={
+                              editForm.purchaseDate
+                                ? (() => {
+                                    try {
+                                      return new Date(editForm.purchaseDate)
+                                        .toISOString()
+                                        .split('T')[0];
+                                    } catch {
+                                      return '';
+                                    }
+                                  })()
+                                : ''
+                            }
+                            onChange={(e) => {
+                              // Only update if we have a valid value or user explicitly cleared it
+                              const inputValue = e.target.value;
 
-                            if (inputValue === '') {
-                              // User cleared the field - set to null
-                              setEditForm({ ...editForm, purchaseDate: null });
-                            } else {
-                              // Try to parse the date
-                              const date = new Date(inputValue);
-                              if (!isNaN(date.getTime())) {
-                                setEditForm({
-                                  ...editForm,
-                                  purchaseDate: date.toISOString(),
+                              if (inputValue === '') {
+                                // User cleared the field - set to null
+                                setEditForm({ ...editForm, purchaseDate: null });
+                              } else {
+                                // Try to parse the date
+                                const date = new Date(inputValue);
+                                if (!isNaN(date.getTime())) {
+                                  setEditForm({
+                                    ...editForm,
+                                    purchaseDate: date.toISOString(),
+                                  });
+                                }
+                                // If invalid, don't update state (keep existing value)
+                              }
+                            }}
+                            onBlur={(e) => {
+                              // When user leaves the field, validate what's in the input
+                              if (e.target.validity && !e.target.validity.valid) {
+                                // Browser detected invalid date - show error
+                                setErrors((prev) => ({
+                                  ...prev,
+                                  purchaseDate: 'Please enter a valid date',
+                                }));
+                              } else {
+                                // Clear the error if it was previously set
+                                setErrors((prev) => {
+                                  const { purchaseDate: _removed, ...remainingErrors } = prev;
+                                  return remainingErrors;
                                 });
                               }
-                              // If invalid, don't update state (keep existing value)
-                            }
-                          }}
-                          onBlur={(e) => {
-                            // When user leaves the field, validate what's in the input
-                            if (e.target.validity && !e.target.validity.valid) {
-                              // Browser detected invalid date - show error
+                            }}
+                            onInvalid={(e) => {
+                              // Also catch invalid events (when user tries to submit with invalid date)
+                              e.preventDefault();
                               setErrors((prev) => ({
                                 ...prev,
                                 purchaseDate: 'Please enter a valid date',
                               }));
-                            } else {
-                              // Clear the error if it was previously set
-                              setErrors((prev) => {
-                                const { purchaseDate: _removed, ...remainingErrors } = prev;
-                                return remainingErrors;
-                              });
-                            }
-                          }}
-                          onInvalid={(e) => {
-                            // Also catch invalid events (when user tries to submit with invalid date)
-                            e.preventDefault();
-                            setErrors((prev) => ({
-                              ...prev,
-                              purchaseDate: 'Please enter a valid date',
-                            }));
-                          }}
-                          style={{
-                            padding: '8px',
-                            fontSize: '14px',
-                            border: errors.purchaseDate ? '1px solid #C73E3A' : 'none',
-                            borderRadius: '4px',
-                            width: '100%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                            color: 'rgba(0, 0, 0, 0.8)',
-                            boxSizing: 'border-box',
-                          }}
-                        />
+                            }}
+                            style={{
+                              padding: '8px',
+                              fontSize: '14px',
+                              border: errors.purchaseDate ? '1px solid #C73E3A' : 'none',
+                              borderRadius: '0',
+                              width: '100%',
+                              backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                              color: 'rgba(0, 0, 0, 0.8)',
+                              boxSizing: 'border-box',
+                              WebkitAppearance: 'none',
+                              appearance: 'none',
+                            }}
+                          />
+                        </div>
                         {errors.purchaseDate && (
                           <span
                             style={{
