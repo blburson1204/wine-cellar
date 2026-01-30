@@ -1,0 +1,397 @@
+# Skill Manifest - Trigger Conditions for Automatic Skill Discovery
+#
+# Purpose: Structured lookup table for commands like /specify, /plan, and
+# /implement to determine which skills are relevant for a given spec.
+#
+# Usage: When evaluating a spec, check each skill's triggers against the spec's
+# frontmatter fields, keywords, and current phase. If any trigger matches,
+# the skill should be consulted. Skills marked "always: true" apply universally.
+#
+# This file INFORMS skill selection -- it does not enforce it. AI judgment
+# still applies, but this manifest ensures skills aren't overlooked due to
+# gaps in frontmatter classification (e.g., Phase 5 accessibility gap).
+#
+# Schema version: 1.0
+# Last updated: 2026-01-30
+
+# =============================================================================
+# ALWAYS-ACTIVE SKILLS
+# These apply regardless of spec content or phase.
+# =============================================================================
+
+meta-skill-guide:
+  description: Check skill registry before any task
+  always: true
+  phases: [specify, plan, tasks, implement, verify]
+  note: Universal dispatcher -- ensures skills are considered on every turn
+
+workflow-verify-complete:
+  description: Evidence-based completion verification
+  always: true
+  phases: [implement, verify]
+  note: Fires before any claim of "done", "passing", or "complete"
+
+meta-context-optimize:
+  description: Context window management patterns
+  always: true
+  phases: [specify, plan, tasks, implement, verify]
+  note: Relevant when sessions run long (10+ tasks, 30+ minutes)
+
+feature-capture-idea:
+  description: Quick idea capture to future-work.md
+  always: true
+  phases: [specify, plan, tasks, implement, verify]
+  note: Asynchronous -- fires when ideas arise during any work
+
+coding-standards:
+  description: Code style, naming, lint, format conventions
+  always: true
+  phases: [implement, verify]
+  note: Applies to all code changes
+
+# =============================================================================
+# PHASE-GATE SKILLS
+# These fire at specific phase transitions in the SpecKit pipeline.
+# =============================================================================
+
+spec-validate:
+  description: Pre-planning spec completeness gate
+  phases: [plan]
+  triggers:
+    phase_gate: specify -> plan
+  note: MANDATORY before /plan begins; catches "connective tissue" gaps
+
+code-reuse-analysis:
+  description: Check for existing patterns before creating new ones
+  phases: [plan]
+  triggers:
+    phase_gate: plan (Phase 0.7.5)
+    keywords:
+      - new service
+      - new utility
+      - new component
+      - new pattern
+      - modify shared code
+      - refactor
+    frontmatter:
+      type: [feature-minor, feature-major, refactoring]
+
+feature-start:
+  description: Create feature branch and initialize context
+  phases: [implement]
+  triggers:
+    phase_gate: tasks -> implement
+  note: OPTIONAL -- only for feature branch workflow, not mainline
+
+feature-ship:
+  description: Test, merge --no-ff, cleanup feature branch
+  phases: [verify]
+  triggers:
+    phase_gate: implement -> verify (completion)
+  note: Feature branch workflow only; mainline just pushes to origin
+
+# =============================================================================
+# FRONTMATTER-TRIGGERED SKILLS
+# These match against spec frontmatter field values.
+# =============================================================================
+
+test-tdd:
+  description: Red-Green-Refactor TDD discipline
+  phases: [implement]
+  triggers:
+    frontmatter:
+      type: [bugfix, feature-minor, feature-major]
+    keywords:
+      - implement
+      - feature
+      - bugfix
+      - fix
+      - add function
+      - new endpoint
+      - new component
+  note: Write failing test FIRST, then implement
+
+debug-systematic:
+  description: Four-phase debugging framework
+  phases: [implement]
+  triggers:
+    frontmatter:
+      type: [bugfix]
+    keywords:
+      - bug
+      - error
+      - fail
+      - unexpected
+      - broken
+      - crash
+      - regression
+  note: Ensures understanding before attempting fixes
+
+debug-rca:
+  description: Root cause analysis -- trace bugs backward through call stack
+  phases: [implement]
+  triggers:
+    frontmatter:
+      type: [bugfix]
+    keywords:
+      - trace
+      - call stack
+      - deep error
+      - root cause
+      - data flow
+      - invalid data
+  note: Called from within debug-systematic Phase 1 for deep issues
+
+ui-accessibility:
+  description: WCAG 2.2 compliance validation
+  phases: [specify, implement, verify]
+  triggers:
+    frontmatter:
+      ui_changes: [minor, moderate, major]
+    keywords:
+      - accessibility
+      - a11y
+      - WCAG
+      - screen reader
+      - keyboard navigation
+      - focus management
+      - ARIA
+      - axe-core
+      - form
+      - modal
+      - dialog
+      - table
+      - interactive
+      - touch target
+  note: >
+    ANY spec with ui_changes != none should trigger this skill.
+    Also triggers on accessibility keywords even when ui_changes is not set --
+    this catches the Phase 5 gap where frontmatter said "none" but the spec
+    was entirely about accessibility testing.
+
+ui-design:
+  description: Wine Cellar UI patterns -- colors, typography, components
+  phases: [implement]
+  triggers:
+    frontmatter:
+      ui_changes: [minor, moderate, major]
+    keywords:
+      - button
+      - card
+      - form
+      - input
+      - table
+      - modal
+      - color
+      - layout
+      - responsive
+      - typography
+      - UI component
+      - design
+      - style
+      - spacing
+
+arch-decisions:
+  description: Architecture decisions with explicit tradeoffs
+  phases: [specify, plan]
+  triggers:
+    frontmatter:
+      type: [feature-major, refactoring]
+      ui_changes: [major]
+    keywords:
+      - architecture
+      - design decision
+      - tradeoff
+      - approach
+      - build vs buy
+      - scalability
+      - sync strategy
+      - tech debt
+      - pattern choice
+
+workflow-brainstorm:
+  description: Socratic design refinement for rough ideas
+  phases: [specify]
+  triggers:
+    frontmatter:
+      type: [feature-major]
+    keywords:
+      - brainstorm
+      - explore
+      - what if
+      - design options
+      - rough idea
+      - how should we
+  note: NOT for mechanical processes; for shaping ideas before specification
+
+db-prisma:
+  description: Prisma migration troubleshooting -- surgical fixes, never reset
+  phases: [implement, verify]
+  triggers:
+    frontmatter:
+      type: [feature-minor, feature-major]
+    keywords:
+      - prisma
+      - migration
+      - schema change
+      - database
+      - model
+      - table
+      - column
+      - field
+      - drift
+      - checksum
+
+security-review:
+  description: OWASP-based security validation
+  phases: [implement, verify]
+  triggers:
+    frontmatter:
+      type: [feature-minor, feature-major]
+    keywords:
+      - security
+      - authentication
+      - authorization
+      - injection
+      - XSS
+      - CSRF
+      - OWASP
+      - API endpoint
+      - middleware
+      - secrets
+      - credentials
+
+security-defense-depth:
+  description: Four-layer Express API validation pattern
+  phases: [implement]
+  triggers:
+    frontmatter:
+      type: [bugfix]
+    keywords:
+      - defense in depth
+      - multi-layer validation
+      - invalid data
+      - API boundary
+      - entry point validation
+
+error-handling:
+  description: AppError classes, Winston logging, Zod validation patterns
+  phases: [implement]
+  triggers:
+    frontmatter:
+      type: [feature-minor, feature-major, bugfix]
+    keywords:
+      - error handling
+      - error class
+      - logging
+      - logger
+      - Zod validation
+      - error boundary
+      - toast notification
+      - error response
+
+testing:
+  description: Vitest, RTL, Supertest patterns and strategies
+  phases: [implement]
+  triggers:
+    frontmatter:
+      type: [feature-minor, feature-major, bugfix]
+    keywords:
+      - test strategy
+      - coverage
+      - mock
+      - test factory
+      - unit test
+      - integration test
+      - component test
+      - supertest
+
+# =============================================================================
+# VERIFICATION / DOCUMENTATION SKILLS
+# These fire during the verify phase or at completion boundaries.
+# =============================================================================
+
+code-review:
+  description: Dispatch code-reviewer agent for implementation review
+  phases: [implement, verify]
+  triggers:
+    frontmatter:
+      ui_changes: [minor, moderate, major]
+    keywords:
+      - review
+      - merge
+      - pull request
+      - ship
+      - complete
+  note: Mandatory after major features and before merge to main
+
+code-search:
+  description: Structured code verification with checklists
+  phases: [plan, implement, verify]
+  triggers:
+    keywords:
+      - verify implementation
+      - audit
+      - compliance
+      - checklist
+      - validate code
+  note: Called by other skills (security-review, doc-gate, etc.); rarely invoked directly
+
+doc-gate:
+  description: Post-feature documentation gate
+  phases: [verify]
+  triggers:
+    frontmatter:
+      type: [feature-minor, feature-major]
+    keywords:
+      - new pattern
+      - new service
+      - new table
+      - behavior change
+      - breaking change
+      - architecture change
+
+doc-search:
+  description: Text-based documentation search
+  phases: [verify]
+  triggers:
+    keywords:
+      - search docs
+      - find documentation
+      - documentation coverage
+      - affected docs
+  note: Discovery primitive for doc-update; rarely invoked directly
+
+doc-update:
+  description: Systematic documentation maintenance
+  phases: [verify]
+  triggers:
+    frontmatter:
+      type: [feature-minor, feature-major, refactoring]
+    keywords:
+      - new service
+      - new endpoint
+      - new component
+      - API change
+      - schema change
+      - architecture change
+      - deprecate
+
+# =============================================================================
+# MAINTENANCE SKILLS
+# These run outside of active feature development.
+# =============================================================================
+
+meta-health-check:
+  description: Audit framework artifacts for staleness and bloat
+  phases: []
+  triggers:
+    keywords:
+      - health check
+      - maintenance
+      - cleanup
+      - audit artifacts
+      - stale context
+  note: >
+    Bi-weekly/monthly maintenance. Not triggered by specs -- triggered by
+    calendar cadence or when CLAUDE.md feels bloated.

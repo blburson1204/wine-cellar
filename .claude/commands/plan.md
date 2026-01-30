@@ -49,15 +49,27 @@ User input:
 
 $ARGUMENTS
 
-## Pre-Execution Assessment
+## Pre-Execution: Skill Manifest Check
 
-Before starting, which optional skills apply?
+Read `.specify/skill-manifest.yaml` and evaluate which skills are relevant for
+this spec's **plan** phase. Match against:
 
-- [ ] UI changes? → ui-design-system, figma
-- [ ] Debugging? → debug-systematic
-- [ ] Architecture decisions? → arch-decisions
-- [ ] Database changes? → db-prisma
-- [ ] Need to find existing docs? → doc-search (discovery phase)
+- The `critical_requirements` frontmatter in the spec (`type`, `ui_changes`)
+- Keywords found in the spec content
+- Phase-gate skills that fire at the specify → plan transition
+
+Append matched skills to `$SPECS_DIR/skill-log.md`:
+
+```markdown
+## /plan phase (YYYY-MM-DD)
+
+| Skill  | Trigger                                    | Reason           |
+| ------ | ------------------------------------------ | ---------------- |
+| [name] | [frontmatter\|keyword\|phase-gate\|always] | [why it matched] |
+```
+
+Consult matched skills during plan execution (e.g., read `ui-accessibility`
+SKILL.md if it matched, apply `arch-decisions` framework if it matched).
 
 Given the implementation details provided as an argument, do this:
 

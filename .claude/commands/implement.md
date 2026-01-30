@@ -94,6 +94,22 @@ Verify tasks.json exists:
 [ -f "$FEATURE_DIR/tasks.json" ] || error "No tasks.json found. Run /tasks first."
 ```
 
+### Step 1.5: Skill Manifest Check
+
+Read `.specify/skill-manifest.yaml` and evaluate which skills are relevant for
+this spec's **implement** phase. Match against the spec's frontmatter and
+keywords. Append matched skills to `$FEATURE_DIR/skill-log.md`:
+
+```markdown
+## /implement phase (YYYY-MM-DD)
+
+| Skill  | Trigger                                    | Reason           |
+| ------ | ------------------------------------------ | ---------------- |
+| [name] | [frontmatter\|keyword\|phase-gate\|always] | [why it matched] |
+```
+
+Report matched skills to the user before delegating to ralph.
+
 ### Step 2: Delegate to /ralph
 
 Invoke the `/ralph` command with the spec ID:

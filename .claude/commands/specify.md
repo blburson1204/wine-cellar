@@ -102,7 +102,31 @@ Given that feature description, do this:
 
    Extract these values from the corresponding spec sections as you write them.
 
-6. Report completion with feature directory name, spec file path, and readiness
+6. **Skill Manifest Check**
+
+   Read `.specify/skill-manifest.yaml` and evaluate which skills match this spec
+   based on:
+   - The `critical_requirements` frontmatter values just written (`type`,
+     `ui_changes`)
+   - Keywords found in the spec content
+   - Current phase: `specify`
+
+   Log matched skills to `$SPECS_DIR/skill-log.md`:
+
+   ```markdown
+   # Skill Log
+
+   ## /specify phase (YYYY-MM-DD)
+
+   | Skill  | Trigger                                    | Reason           |
+   | ------ | ------------------------------------------ | ---------------- |
+   | [name] | [frontmatter\|keyword\|phase-gate\|always] | [why it matched] |
+   ```
+
+   Report matched skills to the user as informational context for upcoming
+   phases.
+
+7. Report completion with feature directory name, spec file path, and readiness
    for the next phase (/plan).
 
 Note: This command creates the spec directory and initializes the spec file.

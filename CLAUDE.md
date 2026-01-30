@@ -40,7 +40,8 @@ packages/
 
 1. **TDD**: Write failing test first, then implement
 2. **Verify before claiming done**: Run commands, show evidence
-3. **Check skills first**: See `.claude/skills/` before any task
+3. **Check skills first**: See `.specify/skill-manifest.yaml` for trigger
+   conditions, `.claude/skills/` for full skill docs
 4. **SpecKit for larger features**: `/specify` → `/plan` → `/tasks` →
    `/implement`
 
@@ -52,6 +53,8 @@ packages/
   Development principles
 - [documents/error-handling-summary.md](documents/error-handling-summary.md) -
   Error patterns
+- [.specify/skill-manifest.yaml](.specify/skill-manifest.yaml) - Skill trigger
+  conditions (consult during SpecKit phases)
 
 ## Database Commands
 
