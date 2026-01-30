@@ -18,10 +18,10 @@ export default defineConfig({
         'src/**/_*.{js,jsx,ts,tsx}', // Exclude Next.js special files
       ],
       thresholds: {
-        branches: 35, // TODO: Increase to 70% - see TODO.md section 3
-        functions: 50, // TODO: Increase to 60% - see TODO.md section 3
-        lines: 50, // TODO: Increase to 70% - see TODO.md section 3
-        statements: 50, // TODO: Increase to 70% - see TODO.md section 3
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
       },
     },
   },

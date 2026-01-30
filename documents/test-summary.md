@@ -42,7 +42,7 @@ Tests       270 passed (270)
 Duration    ~5.6s
 ```
 
-**Phase 5 Tests (added Jan 2026):**
+**Accessibility, Focus Management & Viewport Tests (added Jan 2026):**
 
 ```
 ✓ apps/web/src/__tests__/accessibility/Combobox.a11y.test.tsx (5 tests) - Accessibility
@@ -686,17 +686,17 @@ Full lifecycle:
 
 **API Tests** (`apps/api/vitest.config.ts`):
 
-- **Functions**: 97.50% (target: 80%) ✅ **Exceeds by 22%**
-- **Branches**: 89.85% (target: 70%) ✅ **Exceeds by 28%**
-- **Lines**: 92.78% (target: 80%) ✅ **Exceeds by 16%**
-- **Statements**: 92.61% (target: 80%) ✅ **Exceeds by 16%**
+- **Functions**: 97.50% (target: 80%) ✅
+- **Branches**: 89.85% (target: 80%) ✅
+- **Lines**: 92.78% (target: 80%) ✅
+- **Statements**: 92.61% (target: 80%) ✅
 
 **Web Tests** (`apps/web/vitest.config.ts`):
 
-- **Functions**: 80.10% (target: 50%) ✅ **Exceeds by 60%**
-- **Branches**: 83.17% (target: 35%) ✅ **Exceeds by 138%**
-- **Lines**: 89.38% (target: 50%) ✅ **Exceeds by 79%**
-- **Statements**: 88.45% (target: 50%) ✅ **Exceeds by 77%**
+- **Functions**: 80.10% (target: 80%) ✅
+- **Branches**: 83.17% (target: 80%) ✅
+- **Lines**: 89.38% (target: 80%) ✅
+- **Statements**: 88.45% (target: 80%) ✅
 
 ### Component Coverage Breakdown
 
@@ -811,10 +811,10 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       exclude: ['src/**/*.d.ts'],
       thresholds: {
-        branches: 55,
-        functions: 75,
-        lines: 75,
-        statements: 75,
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
       },
     },
   },

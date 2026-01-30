@@ -15,7 +15,7 @@ interface for tracking wines with full CRUD operations.
 - **Framework**: Next.js 15.5.9 (App Router)
 - **UI Library**: React 18.3.1
 - **Language**: TypeScript 5.6.0
-- **Styling**: Inline styles with wine-themed color palette
+- **Styling**: TailwindCSS + inline styles with wine-themed color palette
 - **Font**: Inter (Google Fonts)
 
 ### Backend
@@ -631,7 +631,7 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 - Component tests for React UI (React Testing Library)
 - Error scenario testing (31 dedicated error tests)
 - Mock fetch for API calls
-- Coverage thresholds enforced (70% branches, 80% functions/lines/statements)
+- Coverage thresholds enforced (80% across all metrics)
 - Fast feedback loop with Vitest
 - Sequential test execution to prevent database race conditions
 - Isolated test database with cleanup between tests
@@ -642,7 +642,8 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 2. **No Pagination**: Large collections may have performance issues
 3. **Local Image Storage Only**: Wine images stored locally (AWS S3 planned for
    production)
-4. **Inline Styles**: No CSS modules or styled-components
+4. **Hybrid Styling**: Mix of TailwindCSS utility classes and inline styles (no
+   CSS modules or styled-components)
 5. **No Sentry Integration**: Error tracking service not configured
    (infrastructure ready)
 
