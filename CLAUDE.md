@@ -6,7 +6,7 @@ Personal wine collection manager. Full-stack TypeScript monorepo.
 
 ```bash
 npm run dev          # Start API (3001) + Web (3000)
-npm test             # Run all tests (479 tests)
+npm test             # Run all tests (752 tests)
 npm run lint         # ESLint check
 npm run type-check   # TypeScript check
 npm run format:check # Prettier check
@@ -27,7 +27,7 @@ packages/
 - **Frontend**: React 18, Next.js 15, TypeScript, TailwindCSS
 - **Backend**: Express, TypeScript, Zod validation
 - **Database**: PostgreSQL (Docker), Prisma ORM
-- **Testing**: Vitest, React Testing Library, Supertest
+- **Testing**: Vitest, React Testing Library, Supertest, vitest-axe
 
 ## Key Patterns
 
@@ -65,7 +65,7 @@ npm run db:studio    # Visual database editor
 
 ```bash
 npm run test:api        # API tests only (209)
-npm run test:web        # Web tests only (270)
+npm run test:web        # Web tests only (543)
 npm run test:coverage   # With coverage report
 ```
 

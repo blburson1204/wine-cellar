@@ -277,7 +277,7 @@ curl -X POST http://localhost:3001/api/wines \
   - Sequential execution to prevent race conditions
   - Isolated test database on port 5433
 
-- [x] **React Component Testing**: 270 tests with **83%+ coverage** ✅
+- [x] **React Component Testing**: 543 tests with **83%+ coverage** ✅
   - 23 API utility tests (fetchApi, ApiError, getErrorMessage)
   - 14 ErrorBoundary tests (normal rendering, error catching, Try Again)
   - 69 WineTable tests (empty state, sorting all columns, row clicks, color
@@ -297,7 +297,7 @@ curl -X POST http://localhost:3001/api/wines \
   - API: **90% branches**, **97% functions**, **93% lines/statements**
   - Web: **80% functions**, **83% branches**, **89% lines** (all exceed
     targets!)
-- Test duration: ~8s for full suite (479 tests)
+- Test duration: ~8s for full suite (752 tests)
 - Database URL configurable via environment variable for CI/local
 - **Isolated test directories**: Tests use separate `uploads-test/wines`
   directory to prevent cleanup from deleting real uploaded images
@@ -375,7 +375,12 @@ detailed test breakdown.
 - [x] **Modal Accessibility**: `role="dialog"`, `aria-modal="true"`,
       `aria-labelledby` linking to modal title
 - [x] **Escape Key Support**: Press Escape to close modals
-- [x] **Focus Trap**: Tab/Shift+Tab cycles within modal, preventing focus escape
+- [x] **Focus Trap**: Tab/Shift+Tab cycles within modal/drawer, preventing focus
+      escape
+- [x] **Focus Restoration**: Focus returns to trigger element when modal/drawer
+      closes
+- [x] **Automated Accessibility Testing**: vitest-axe integration with 36
+      axe-core tests across all components
 - [x] **Visible Focus Indicators**: Burgundy outline (`#7C2D3C`) on all
       interactive elements when focused via keyboard
   - Form inputs, selects, textareas: 2px outline with box-shadow
@@ -392,7 +397,9 @@ detailed test breakdown.
 
 **Files Modified for Accessibility:**
 
-- `WineDetailModal.tsx` - Modal ARIA attributes, Escape key, focus trap
+- `WineDetailModal.tsx` - Modal ARIA attributes, Escape key, focus trap, focus
+  restoration
+- `FilterDrawer.tsx` - Focus trap, auto-focus on open, focus restoration
 - `WineFilters.tsx` - Focus styles for inputs, selects, custom checkboxes
 - `WineTable.tsx` - Focus indicator on table rows with tabIndex
 - `layout.tsx` - aria-hidden on header emoji

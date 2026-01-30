@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { vi, expect } from 'vitest';
+import * as matchers from 'vitest-axe/matchers';
+
+// Extend Vitest matchers with axe-core accessibility matchers
+expect.extend(matchers);
 
 // Mock Next.js router
 vi.mock('next/navigation', () => ({

@@ -183,7 +183,7 @@ export default function WineTable({
                 width: '40px',
               }}
             >
-              {/* Favorite column header - no label */}
+              <span className="sr-only">Favorite</span>
             </th>
             <th
               onClick={() => onSort('vintage')}

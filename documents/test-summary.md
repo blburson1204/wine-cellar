@@ -1,6 +1,6 @@
 # Wine Cellar - Test Summary
 
-## ✅ All Tests Passing (479/479)
+## ✅ All Tests Passing (752/752)
 
 ### Test Suite Results
 
@@ -42,14 +42,36 @@ Tests       270 passed (270)
 Duration    ~5.6s
 ```
 
+**Phase 5 Tests (added Jan 2026):**
+
+```
+✓ apps/web/src/__tests__/accessibility/Combobox.a11y.test.tsx (5 tests) - Accessibility
+✓ apps/web/src/__tests__/accessibility/FilterDrawer.a11y.test.tsx (2 tests) - Accessibility
+✓ apps/web/src/__tests__/accessibility/SmallComponents.a11y.test.tsx (10 tests) - Accessibility
+✓ apps/web/src/__tests__/accessibility/WineCard.a11y.test.tsx (4 tests) - Accessibility
+✓ apps/web/src/__tests__/accessibility/WineDetailModal.a11y.test.tsx (5 tests) - Accessibility
+✓ apps/web/src/__tests__/accessibility/WineFilters.a11y.test.tsx (5 tests) - Accessibility
+✓ apps/web/src/__tests__/accessibility/WineTable.a11y.test.tsx (6 tests) - Accessibility
+✓ apps/web/src/__tests__/focus/Combobox.focus.test.tsx (8 tests) - Focus Management
+✓ apps/web/src/__tests__/focus/FilterDrawer.focus.test.tsx (6 tests) - Focus Management
+✓ apps/web/src/__tests__/focus/WineDetailModal.focus.test.tsx (6 tests) - Focus Management
+✓ apps/web/src/__tests__/integration/viewport-devices.test.tsx (21 tests) - Integration
+✓ + other existing tests with additional Phase 4-5 coverage
+
+Test Files  38 passed (38)
+Tests       543 passed (543)
+Duration    ~7.8s
+```
+
 ### Quick Stats
 
 - **Test Runner**: Vitest 4.0.16
-- **Total Tests**: 479 (209 API + 270 web)
+- **Total Tests**: 752 (209 API + 543 web)
 - **Pass Rate**: 100%
-- **Execution Time**: ~8.1s
-- **Test Files**: 20 (10 API + 10 web)
-- **Test Types**: Unit (100), Integration (68), Component (270)
+- **Execution Time**: ~8s
+- **Test Files**: 48 (10 API + 38 web)
+- **Test Types**: Unit (100), Integration (89), Component (270), Accessibility
+  (37), Focus Management (20)
 
 ---
 
@@ -820,10 +842,24 @@ export default defineConfig({
 - **Supertest**: 7.1.4 (HTTP assertion library for API tests)
 - **@testing-library/react**: 16.1.0 (React component testing)
 - **@testing-library/user-event**: 14.6.1 (User interaction simulation)
+- **vitest-axe**: 0.1.0 (automated accessibility testing with axe-core)
 - **Zod**: 3.25.76 (validation library - stable version)
 - **Prisma**: Database ORM with test database isolation
 
 ### Recent Changes
+
+- **January 29, 2026**: Phase 5 Testing & Refinement
+  - Added 273 new web tests (270 → 543 total web tests)
+  - **New test directories:**
+    - `__tests__/accessibility/` (7 files, 37 tests) - axe-core validation
+    - `__tests__/focus/` (3 files, 20 tests) - focus management
+    - `__tests__/integration/viewport-devices.test.tsx` (21 tests)
+  - **Source improvements:**
+    - FilterDrawer.tsx: Added focus trap, auto-focus, focus restoration
+    - WineDetailModal.tsx: Added focus restoration on close
+  - **New dependency:** vitest-axe for automated accessibility testing
+  - Total tests: 479 → 752 (+273 tests, +57% increase)
+  - All 752 tests passing
 
 - **January 24, 2026**: Coverage Improvement Sprint
   - Added 131 new tests to improve coverage above 80% thresholds

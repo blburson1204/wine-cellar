@@ -152,6 +152,18 @@ export default function WineDetailModal({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<Element | null>(null);
+
+  // Store previously focused element on mount, restore on unmount
+  useEffect(() => {
+    previouslyFocusedRef.current = document.activeElement;
+
+    return () => {
+      if (previouslyFocusedRef.current) {
+        (previouslyFocusedRef.current as HTMLElement).focus();
+      }
+    };
+  }, []);
 
   // Update currentImageUrl when wine prop changes
   useEffect(() => {
@@ -1251,6 +1263,7 @@ export default function WineDetailModal({
                       {/* Vintage - (3 cols) */}
                       <div style={{ gridColumn: 'span 3' }}>
                         <label
+                          htmlFor="vintage-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1262,6 +1275,7 @@ export default function WineDetailModal({
                           Vintage <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <input
+                          id="vintage-input"
                           ref={nameInputRef}
                           type="number"
                           value={editForm.vintage || ''}
@@ -1291,6 +1305,7 @@ export default function WineDetailModal({
                       {/* Wine Name - Wide (9 cols) */}
                       <div style={{ gridColumn: 'span 9' }}>
                         <label
+                          htmlFor="wine-name-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1302,6 +1317,7 @@ export default function WineDetailModal({
                           Wine Name <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <input
+                          id="wine-name-input"
                           type="text"
                           placeholder="Enter wine name"
                           value={editForm.name || ''}
@@ -1401,6 +1417,7 @@ export default function WineDetailModal({
                       {/* Blend Details - (8 cols) */}
                       <div style={{ gridColumn: 'span 8' }}>
                         <label
+                          htmlFor="blend-detail-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1412,6 +1429,7 @@ export default function WineDetailModal({
                           Blend Details
                         </label>
                         <input
+                          id="blend-detail-input"
                           type="text"
                           placeholder="e.g., Cabernet Sauvignon 60%, Merlot 30%, Cabernet Franc 10%"
                           value={editForm.blendDetail || ''}
@@ -1439,6 +1457,7 @@ export default function WineDetailModal({
                       {/* Rating - Narrow (4 cols) */}
                       <div style={{ gridColumn: 'span 4' }}>
                         <label
+                          htmlFor="rating-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1450,6 +1469,7 @@ export default function WineDetailModal({
                           Rating (1.0 - 5.0)
                         </label>
                         <input
+                          id="rating-input"
                           type="number"
                           step="0.1"
                           min="1.0"
@@ -1483,6 +1503,7 @@ export default function WineDetailModal({
                       {/* Purchase Price - Narrow (4 cols) */}
                       <div style={{ gridColumn: 'span 4' }}>
                         <label
+                          htmlFor="purchase-price-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1494,6 +1515,7 @@ export default function WineDetailModal({
                           Purchase Price
                         </label>
                         <input
+                          id="purchase-price-input"
                           type="number"
                           step="0.01"
                           value={editForm.purchasePrice ?? ''}
@@ -1524,6 +1546,7 @@ export default function WineDetailModal({
                       {/* Purchase Date - (4 cols) */}
                       <div style={{ gridColumn: 'span 4', minWidth: 0 }}>
                         <label
+                          htmlFor="purchase-date-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1536,6 +1559,7 @@ export default function WineDetailModal({
                         </label>
                         <div style={{ overflow: 'hidden', borderRadius: '4px' }}>
                           <input
+                            id="purchase-date-input"
                             type="date"
                             value={
                               editForm.purchaseDate
@@ -1624,6 +1648,7 @@ export default function WineDetailModal({
                       {/* Quantity - Narrow (3 cols) */}
                       <div style={{ gridColumn: 'span 3' }}>
                         <label
+                          htmlFor="quantity-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1635,6 +1660,7 @@ export default function WineDetailModal({
                           Quantity
                         </label>
                         <input
+                          id="quantity-input"
                           type="number"
                           value={editForm.quantity ?? 0}
                           onChange={(e) =>
@@ -1662,6 +1688,7 @@ export default function WineDetailModal({
                       {/* Wine Link - Wide (9 cols) */}
                       <div style={{ gridColumn: 'span 9' }}>
                         <label
+                          htmlFor="wine-link-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1673,6 +1700,7 @@ export default function WineDetailModal({
                           Wine Link
                         </label>
                         <input
+                          id="wine-link-input"
                           type="url"
                           value={editForm.wineLink || ''}
                           onChange={(e) =>
@@ -1715,6 +1743,7 @@ export default function WineDetailModal({
                       {/* Expert Ratings (8 cols) */}
                       <div style={{ gridColumn: 'span 8' }}>
                         <label
+                          htmlFor="expert-ratings-input"
                           style={{
                             display: 'block',
                             marginBottom: '2px',
@@ -1726,6 +1755,7 @@ export default function WineDetailModal({
                           Expert Ratings
                         </label>
                         <input
+                          id="expert-ratings-input"
                           type="text"
                           value={editForm.expertRatings || ''}
                           onChange={(e) =>
@@ -2042,6 +2072,7 @@ export default function WineDetailModal({
                 {/* Tasting Notes - Full Width Below */}
                 <div style={{ marginBottom: '8px' }}>
                   <label
+                    htmlFor="notes-input"
                     style={{
                       display: 'block',
                       marginBottom: '2px',
@@ -2053,6 +2084,7 @@ export default function WineDetailModal({
                     Tasting Notes
                   </label>
                   <textarea
+                    id="notes-input"
                     value={editForm.notes || ''}
                     onChange={(e) => setEditForm({ ...editForm, notes: e.target.value || null })}
                     maxLength={2000}

@@ -1,0 +1,217 @@
+{
+  "spec_id": "005",
+  "spec_name": "phase-5-testing",
+  "updated": "2026-01-29T00:00:00Z",
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Install vitest-axe as devDependency in apps/web",
+      "status": "pending",
+      "notes": "Phase: setup",
+      "target_file": "apps/web/package.json",
+      "gate": null,
+      "verify": "vitest-axe listed in devDependencies, node_modules/vitest-axe exists",
+      "parallel": false
+    },
+    {
+      "id": "T002",
+      "description": "Configure vitest-axe matchers in vitest.setup.ts and add vitest-axe.d.ts type declarations",
+      "status": "pending",
+      "notes": "Phase: setup",
+      "target_file": "apps/web/vitest.setup.ts",
+      "gate": "T001",
+      "verify": "vitest.setup.ts imports and extends vitest-axe matchers; vitest-axe.d.ts exists; npx vitest run --reporter=verbose passes with setup",
+      "parallel": false
+    },
+    {
+      "id": "T003",
+      "description": "Write axe-core accessibility tests for WineCard component",
+      "status": "pending",
+      "notes": "Phase: a11y-tests",
+      "target_file": "apps/web/src/__tests__/accessibility/WineCard.a11y.test.tsx",
+      "gate": "T002",
+      "verify": "Test file runs with vitest, toHaveNoViolations assertions pass",
+      "parallel": true
+    },
+    {
+      "id": "T004",
+      "description": "Write axe-core accessibility tests for WineTable (mobile card layout + desktop table layout)",
+      "status": "pending",
+      "notes": "Phase: a11y-tests",
+      "target_file": "apps/web/src/__tests__/accessibility/WineTable.a11y.test.tsx",
+      "gate": "T002",
+      "verify": "Test file runs, both mobile and desktop layout pass toHaveNoViolations",
+      "parallel": true
+    },
+    {
+      "id": "T005",
+      "description": "Write axe-core accessibility tests for WineDetailModal (view mode + edit/add mode)",
+      "status": "pending",
+      "notes": "Phase: a11y-tests",
+      "target_file": "apps/web/src/__tests__/accessibility/WineDetailModal.a11y.test.tsx",
+      "gate": "T002",
+      "verify": "Test file runs, view and edit modes pass toHaveNoViolations",
+      "parallel": true
+    },
+    {
+      "id": "T006",
+      "description": "Write axe-core accessibility tests for WineFilters component",
+      "status": "pending",
+      "notes": "Phase: a11y-tests",
+      "target_file": "apps/web/src/__tests__/accessibility/WineFilters.a11y.test.tsx",
+      "gate": "T002",
+      "verify": "Test file runs, toHaveNoViolations passes",
+      "parallel": true
+    },
+    {
+      "id": "T007",
+      "description": "Write axe-core accessibility tests for FilterDrawer component",
+      "status": "pending",
+      "notes": "Phase: a11y-tests",
+      "target_file": "apps/web/src/__tests__/accessibility/FilterDrawer.a11y.test.tsx",
+      "gate": "T002",
+      "verify": "Test file runs, toHaveNoViolations passes",
+      "parallel": true
+    },
+    {
+      "id": "T008",
+      "description": "Write axe-core accessibility tests for Combobox component",
+      "status": "pending",
+      "notes": "Phase: a11y-tests",
+      "target_file": "apps/web/src/__tests__/accessibility/Combobox.a11y.test.tsx",
+      "gate": "T002",
+      "verify": "Test file runs, toHaveNoViolations passes",
+      "parallel": true
+    },
+    {
+      "id": "T009",
+      "description": "Write axe-core accessibility tests for MobileFilterToggle, MobileSortSelector, LoadingSpinner, WineListSkeleton",
+      "status": "pending",
+      "notes": "Phase: a11y-tests",
+      "target_file": "apps/web/src/__tests__/accessibility/SmallComponents.a11y.test.tsx",
+      "gate": "T002",
+      "verify": "Test file runs, all 4 components pass toHaveNoViolations",
+      "parallel": true
+    },
+    {
+      "id": "T010",
+      "description": "Fix any axe-core accessibility violations discovered in T003-T009 (update source components)",
+      "status": "pending",
+      "notes": "Phase: a11y-fixes",
+      "target_file": null,
+      "gate": "T009",
+      "verify": "All a11y tests in T003-T009 pass with zero critical/serious violations; source components updated if needed",
+      "parallel": false
+    },
+    {
+      "id": "T011",
+      "description": "Write focus management tests for FilterDrawer (TDD: focus trap, auto-focus on open, focus restoration on close — expect failures)",
+      "status": "pending",
+      "notes": "Phase: focus-tests",
+      "target_file": "apps/web/src/__tests__/focus/FilterDrawer.focus.test.tsx",
+      "gate": "T002",
+      "verify": "Test file created; tests define expected focus trap + restoration behavior; tests fail (Red phase — FilterDrawer lacks focus management)",
+      "parallel": true
+    },
+    {
+      "id": "T012",
+      "description": "Write focus management tests for WineDetailModal (TDD: focus restoration on close — expect failures)",
+      "status": "pending",
+      "notes": "Phase: focus-tests",
+      "target_file": "apps/web/src/__tests__/focus/WineDetailModal.focus.test.tsx",
+      "gate": "T002",
+      "verify": "Test file created; tests define expected focus restoration; tests fail (Red phase — Modal lacks focus restoration)",
+      "parallel": true
+    },
+    {
+      "id": "T013",
+      "description": "Write focus management tests for Combobox (arrow key navigation, Escape returns focus to input)",
+      "status": "pending",
+      "notes": "Phase: focus-tests",
+      "target_file": "apps/web/src/__tests__/focus/Combobox.focus.test.tsx",
+      "gate": "T002",
+      "verify": "Test file created; tests verify Combobox focus behavior (should pass — Headless UI handles it)",
+      "parallel": true
+    },
+    {
+      "id": "T014",
+      "description": "Fix FilterDrawer.tsx: add focus trap (Tab/Shift+Tab cycling), auto-focus on open, focus restoration on close",
+      "status": "pending",
+      "notes": "Phase: focus-fixes",
+      "target_file": "apps/web/src/components/FilterDrawer.tsx",
+      "gate": "T011",
+      "verify": "FilterDrawer.focus.test.tsx passes (Green phase); focus trap cycles Tab within drawer; focus returns to MobileFilterToggle on close",
+      "parallel": false
+    },
+    {
+      "id": "T015",
+      "description": "Fix WineDetailModal.tsx: add focus restoration on close (store activeElement on open, restore on close)",
+      "status": "pending",
+      "notes": "Phase: focus-fixes",
+      "target_file": "apps/web/src/components/WineDetailModal.tsx",
+      "gate": "T012",
+      "verify": "WineDetailModal.focus.test.tsx passes (Green phase); focus returns to triggering element on close",
+      "parallel": false
+    },
+    {
+      "id": "T016",
+      "description": "Verify all focus management tests pass (FilterDrawer + WineDetailModal + Combobox)",
+      "status": "pending",
+      "notes": "Phase: focus-verify",
+      "target_file": null,
+      "gate": "T015",
+      "verify": "cd apps/web && npx vitest run src/__tests__/focus/ — all tests pass",
+      "parallel": false
+    },
+    {
+      "id": "T017",
+      "description": "Write cross-viewport integration tests at 375px (iPhone SE), 393px (iPhone 14 Pro), 768px (iPad), 1024px (Desktop)",
+      "status": "pending",
+      "notes": "Phase: viewport-tests",
+      "target_file": "apps/web/src/__tests__/integration/viewport-devices.test.tsx",
+      "gate": "T002",
+      "verify": "Test file verifies correct layout at each viewport; mobile viewports show cards + MobileSortSelector; desktop shows table + sidebar",
+      "parallel": false
+    },
+    {
+      "id": "T018",
+      "description": "Run next build in apps/web and document bundle size baseline in research.md",
+      "status": "pending",
+      "notes": "Phase: bundle",
+      "target_file": "specs/005-phase-5-testing/research.md",
+      "gate": "T016",
+      "verify": "next build completes successfully; bundle sizes documented in research.md; no page JS > 200kB gzipped (soft target)",
+      "parallel": false
+    },
+    {
+      "id": "T019",
+      "description": "Run full test suite to verify zero regressions (all 675+ existing tests + new tests pass)",
+      "status": "pending",
+      "notes": "Phase: regression",
+      "target_file": null,
+      "gate": "T018",
+      "verify": "npm test exits 0; total test count >= 710 (675 existing + ~35-45 new); zero failures",
+      "parallel": false
+    },
+    {
+      "id": "T-DOC-GATE",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "pending",
+      "notes": "Phase: verify",
+      "target_file": null,
+      "gate": "T019",
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "parallel": false
+    },
+    {
+      "id": "T-FINAL",
+      "description": "All verification gates passed - spec complete",
+      "status": "pending",
+      "notes": "Phase: verify",
+      "target_file": null,
+      "gate": "T-DOC-GATE",
+      "verify": "All composed_of checks pass",
+      "parallel": false
+    }
+  ]
+}
