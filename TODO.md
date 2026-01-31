@@ -2,7 +2,7 @@
 
 ## Recently Completed
 
-- [x] Mobile Responsive Design - Phases 1-3 (January 2026)
+- [x] Mobile Responsive Design - All 5 Phases (January 2026)
 - [x] Wine Favorites feature (January 2026)
 - [x] Wine Label Images - Phase 1 (December 2025 - January 2026)
 - [x] Claude Code Framework adoption - SpecKit (January 2026)
@@ -19,24 +19,37 @@ skills, agents, and commands (see CLAUDE.md)
 
 ## Up Next
 
-### Mobile Responsive - Phases 4-5 (Touch & Testing)
+### AWS Deployment (see `documents/aws-deployment-plan.md`)
 
-- [ ] Touch gesture optimizations (swipe, pull-to-refresh)
-- [ ] Skeleton loaders and enhanced loading states
-- [ ] Cross-device testing and performance audit
-- [ ] Accessibility audit for mobile interactions
+**Phase 1: Preparation**
 
-### Wine Label Images - Phase 2 (Thumbnails)
+- [ ] Environment configuration (database URL, API URL, S3, CORS)
+- [ ] Containerize API and web (Dockerfiles)
+- [ ] Update storage service for AWS S3 (includes wine label image migration)
+- [ ] Database migration strategy (export/import scripts)
 
-- [ ] Generate 200x200px thumbnails on upload
-- [ ] Display thumbnails in wine table
-- [ ] Lazy loading for thumbnails
+**Phase 2: Infrastructure Setup**
 
-### Wine Label Images - Phase 3 (Production Storage)
+- [ ] AWS account and IAM setup
+- [ ] Networking (VPC, subnets, security groups)
+- [ ] RDS PostgreSQL with Secrets Manager
+- [ ] S3 bucket for wine label images + CloudFront CDN
 
-- [ ] AWS S3 storage implementation
-- [ ] CloudFront CDN
-- [ ] Presigned URLs for security
+**Phase 3: Application Deployment**
+
+- [ ] Deploy API (App Runner, ECS Fargate, or EC2)
+- [ ] Deploy frontend (Amplify, S3+CloudFront, or ECS)
+- [ ] DNS and SSL certificates
+
+**Phase 4: CI/CD & Operations**
+
+- [ ] Extend GitHub Actions with deployment jobs
+- [ ] CloudWatch logging and monitoring
+- [ ] Backup strategy and disaster recovery
+
+**Low-Cost Alternative: Vercel + Railway**
+
+- [ ] Evaluate Vercel + Railway/Supabase ($0-5/month vs full AWS $50-110/month)
 
 ---
 
@@ -101,7 +114,7 @@ skills, agents, and commands (see CLAUDE.md)
 - [x] Coverage thresholds enforced
 - [x] Sequential execution for DB tests
 
-### Mobile Responsive Design (Phases 1-3)
+### Mobile Responsive Design (All 5 Phases)
 
 - [x] Tailwind CSS integration with design tokens
 - [x] useMediaQuery hook with useSyncExternalStore
@@ -112,6 +125,11 @@ skills, agents, and commands (see CLAUDE.md)
 - [x] Combobox components replacing datalist fields
 - [x] Full-screen modal on mobile with single-column layout
 - [x] 44px+ touch targets on all interactive elements
+- [x] Touch gestures (swipe-to-close filter drawer)
+- [x] Loading spinners and skeleton placeholders
+- [x] Accessibility tests (vitest-axe) across all components
+- [x] Focus management (focus trap, focus restoration)
+- [x] Cross-viewport integration tests (375px, 393px, 768px, 1024px)
 - [x] 140+ responsive/mobile tests added
 
 ### Accessibility
@@ -134,6 +152,20 @@ skills, agents, and commands (see CLAUDE.md)
 
 ## Backlog
 
+### Wine Intelligence
+
+- [ ] Drinking window recommendations
+- [ ] Food pairing suggestions
+- [ ] Similar wine suggestions
+- [ ] Integration with wine databases (Vivino, CellarTracker)
+
+### Authentication & Authorization
+
+- [ ] User registration and login
+- [ ] JWT-based authentication
+- [ ] User-specific wine collections
+- [ ] Role-based access control
+
 ### Security (Priority for Production)
 
 - [ ] Rate limiting on API endpoints
@@ -150,12 +182,11 @@ skills, agents, and commands (see CLAUDE.md)
 - [ ] Bundle size analysis
 - [ ] Load testing
 
-### Authentication & Authorization
+### Wine Label Images - Phase 2 (Thumbnails)
 
-- [ ] User registration and login
-- [ ] JWT-based authentication
-- [ ] User-specific wine collections
-- [ ] Role-based access control
+- [ ] Generate 200x200px thumbnails on upload
+- [ ] Display thumbnails in wine table
+- [ ] Lazy loading for thumbnails
 
 ### Cellar Management
 
@@ -164,26 +195,12 @@ skills, agents, and commands (see CLAUDE.md)
 - [ ] Visual cellar map/grid
 - [ ] Inventory alerts (low stock, drink-by reminders)
 
-### Wine Intelligence
-
-- [ ] Drinking window recommendations
-- [ ] Food pairing suggestions
-- [ ] Similar wine suggestions
-- [ ] Integration with wine databases (Vivino, CellarTracker)
-
 ### Analytics & Reporting
 
 - [ ] Collection value tracking
 - [ ] Consumption statistics
 - [ ] Spending analysis
 - [ ] Export reports to CSV/PDF
-
-### Deployment
-
-- [ ] Deploy frontend to Vercel
-- [ ] Deploy API to Railway or Fly.io
-- [ ] Production database (Supabase/Railway)
-- [ ] Error tracking (Sentry)
 
 ---
 
