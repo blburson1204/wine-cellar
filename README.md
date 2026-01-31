@@ -12,6 +12,8 @@ PostgreSQL, and Prisma.
   favorites
 - **Sortable Columns**: Sort by any column (name, vintage, producer, price,
   etc.)
+- **Mobile Responsive**: Card view on mobile, responsive layout, filter drawer,
+  touch-friendly controls (44px+ targets)
 - **Keyboard Navigation**: Arrow keys and Enter for efficient browsing
 - **Accessibility**: WCAG-compliant with focus indicators, ARIA labels, screen
   reader support

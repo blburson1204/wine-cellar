@@ -2,27 +2,29 @@
 
 ## Recently Completed
 
+- [x] Mobile Responsive Design - Phases 1-3 (January 2026)
 - [x] Wine Favorites feature (January 2026)
 - [x] Wine Label Images - Phase 1 (December 2025 - January 2026)
-- [x] Claude Code Framework adoption - SpecKit Lite (January 2026)
-- [x] Test coverage to 80%+ (479 tests passing)
+- [x] Claude Code Framework adoption - SpecKit (January 2026)
+- [x] Test coverage to 80%+ (752 tests passing)
 - [x] CLAUDE.md project context file
 
 ## Current Status
 
-**Test Suite**: 479 tests (209 API + 270 Web) - all passing **Coverage**: API
-90%+ / Web 80%+ (exceeding all targets) **Framework**: SpecKit Lite installed
-with 8 skills, 3 agents, 4 commands
+**Test Suite**: 752 tests (209 API + 543 Web) - all passing **Coverage**: API
+90%+ / Web 80%+ (exceeding all targets) **Framework**: SpecKit installed with
+skills, agents, and commands (see CLAUDE.md)
 
 ---
 
 ## Up Next
 
-### Mobile Responsive Design
+### Mobile Responsive - Phases 4-5 (Touch & Testing)
 
-Make the Wine Cellar app work well on mobile devices. Existing plan in
-`documents/mobile-responsive-plan.md`. Will be first real test of SpecKit Lite
-workflow.
+- [ ] Touch gesture optimizations (swipe, pull-to-refresh)
+- [ ] Skeleton loaders and enhanced loading states
+- [ ] Cross-device testing and performance audit
+- [ ] Accessibility audit for mobile interactions
 
 ### Wine Label Images - Phase 2 (Thumbnails)
 
@@ -98,6 +100,19 @@ workflow.
 - [x] Web tests (270) - React Testing Library
 - [x] Coverage thresholds enforced
 - [x] Sequential execution for DB tests
+
+### Mobile Responsive Design (Phases 1-3)
+
+- [x] Tailwind CSS integration with design tokens
+- [x] useMediaQuery hook with useSyncExternalStore
+- [x] Responsive layout (1024px breakpoint)
+- [x] Mobile filter drawer with backdrop overlay
+- [x] WineCard component for mobile card view
+- [x] MobileSortSelector for mobile sort controls
+- [x] Combobox components replacing datalist fields
+- [x] Full-screen modal on mobile with single-column layout
+- [x] 44px+ touch targets on all interactive elements
+- [x] 140+ responsive/mobile tests added
 
 ### Accessibility
 
@@ -178,11 +193,11 @@ workflow.
 - [ ] Barcode/QR scanning
 - [ ] OCR for wine labels
 - [ ] Dark mode
-- [ ] PWA / Mobile app
+- [ ] PWA (offline support, install prompt)
 - [ ] Wine journal with markdown
 - [ ] Multiple images per wine
 - [ ] Image crop/rotate
 
 ---
 
-**Last Updated**: January 25, 2026
+**Last Updated**: January 31, 2026
