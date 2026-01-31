@@ -12,6 +12,8 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "db:generate": "npm run generate --workspace=packages/database",
     "db:push": "npm run push --workspace=packages/database",
+    "db:push:force": "npm run push:force --workspace=packages/database",
+    "db:backup": "npm run backup --workspace=packages/database",
     "db:studio": "npm run studio --workspace=packages/database",
     "test": "npm run test:all",
     "test:all": "npm run test:api && npm run test:web",

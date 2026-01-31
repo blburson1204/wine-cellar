@@ -5,7 +5,9 @@
   "main": "./src/index.ts",
   "scripts": {
     "generate": "prisma generate",
-    "push": "prisma db push",
+    "push": "bash scripts/safe-db-push.sh",
+    "push:force": "prisma db push",
+    "backup": "bash scripts/db-backup.sh",
     "studio": "prisma studio"
   },
   "dependencies": {
