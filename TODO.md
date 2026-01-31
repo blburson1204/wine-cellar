@@ -6,12 +6,12 @@
 - [x] Wine Favorites feature (January 2026)
 - [x] Wine Label Images - Phase 1 (December 2025 - January 2026)
 - [x] Claude Code Framework adoption - SpecKit (January 2026)
-- [x] Test coverage to 80%+ (752 tests passing)
+- [x] Test coverage to 80%+ (799 tests passing)
 - [x] CLAUDE.md project context file
 
 ## Current Status
 
-**Test Suite**: 752 tests (209 API + 543 Web) - all passing **Coverage**: API
+**Test Suite**: 799 tests (209 API + 590 Web) - all passing **Coverage**: API
 90%+ / Web 80%+ (exceeding all targets) **Framework**: SpecKit installed with
 skills, agents, and commands (see CLAUDE.md)
 
@@ -110,7 +110,7 @@ skills, agents, and commands (see CLAUDE.md)
 ### Testing
 
 - [x] API tests (209) - Vitest + Supertest
-- [x] Web tests (270) - React Testing Library
+- [x] Web tests (590) - React Testing Library
 - [x] Coverage thresholds enforced
 - [x] Sequential execution for DB tests
 

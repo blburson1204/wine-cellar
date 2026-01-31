@@ -277,16 +277,17 @@ curl -X POST http://localhost:3001/api/wines \
   - Sequential execution to prevent race conditions
   - Isolated test database on port 5433
 
-- [x] **React Component Testing**: 543 tests with **83%+ coverage** ✅
+- [x] **React Component Testing**: 590 tests with **87%+ coverage** ✅
   - 23 API utility tests (fetchApi, ApiError, getErrorMessage)
   - 14 ErrorBoundary tests (normal rendering, error catching, Try Again)
-  - 69 WineTable tests (empty state, sorting all columns, row clicks, color
-    indicators, favorites, keyboard navigation)
+  - 85 WineTable tests (empty state, sorting all columns, row clicks, color
+    indicators, favorites, keyboard navigation, hover effects)
   - 29 WineFilters tests (search, wine types, country, rating, price ranges,
     favorites)
-  - 36 page.tsx tests (loading, empty state, add/delete wine, sorting, filters,
-    error handling edge cases)
-  - 59 WineDetailModal tests (view/edit/add modes, validation, save/update)
+  - 48 page.tsx tests (loading, empty state, add/delete wine, sorting, filters,
+    error handling edge cases, mobile view, filter drawer)
+  - 77 WineDetailModal tests (view/edit/add modes, validation, save/update,
+    hover effects, mobile footer)
   - 28 WineDetailModal image tests (upload, delete, preview, validation)
 
 **Test Configuration:**
@@ -295,9 +296,9 @@ curl -X POST http://localhost:3001/api/wines \
 - ESM module system for compatibility
 - **Coverage targets exceeded** ✅:
   - API: **90% branches**, **97% functions**, **93% lines/statements**
-  - Web: **80% functions**, **83% branches**, **89% lines** (all exceed
+  - Web: **93% functions**, **88% branches**, **94% lines** (all exceed
     targets!)
-- Test duration: ~8s for full suite (752 tests)
+- Test duration: ~9s for full suite (799 tests)
 - Database URL configurable via environment variable for CI/local
 - **Isolated test directories**: Tests use separate `uploads-test/wines`
   directory to prevent cleanup from deleting real uploaded images
@@ -322,17 +323,18 @@ curl -X POST http://localhost:3001/api/wines \
 
 **Web Coverage:**
 
-- Functions: 80.10% (target: 50%) ✅ **Exceeds by 60%**
-- Branches: 83.17% (target: 35%) ✅ **Exceeds by 138%**
-- Lines: 89.38% (target: 50%) ✅ **Exceeds by 79%**
-- Statements: 88.45% (target: 50%) ✅ **Exceeds by 77%**
+- Functions: 92.79% (target: 80%) ✅ **Exceeds by 16%**
+- Branches: 87.57% (target: 80%) ✅ **Exceeds by 9%**
+- Lines: 94.44% (target: 80%) ✅ **Exceeds by 18%**
+- Statements: 93.64% (target: 80%) ✅ **Exceeds by 17%**
 
 **Component Coverage Breakdown:**
 
-- page.tsx: 96.66% lines, 80% branches (36 tests)
-- WineTable.tsx: 84% lines (69 tests)
+- page.tsx: 97.46% lines, 85.33% branches (48 tests)
+- WineTable.tsx: 98.73% lines, 100% functions (85 tests)
 - WineFilters.tsx: 96.29% lines (29 tests)
-- WineDetailModal.tsx: 84.84% lines (59 tests combined)
+- WineDetailModal.tsx: 89.31% lines, 83.09% functions (77 tests combined)
+- WineCard.tsx: 100% lines, 100% functions (45 tests)
 - ErrorBoundary.tsx: 100% lines (14 tests)
 - api.ts utils: 100% lines (23 tests)
 - server.ts: 100% lines (4 tests)

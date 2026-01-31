@@ -1,6 +1,6 @@
 # Wine Cellar - Project Metrics Snapshot
 
-Last updated: January 30, 2026
+Last updated: January 31, 2026
 
 ## Codebase Statistics
 
@@ -8,10 +8,10 @@ Last updated: January 30, 2026
 
 | Category                 | Lines  |
 | ------------------------ | ------ |
-| **Total TypeScript/TSX** | 21,796 |
-| Application source code  | 7,943  |
-| Test code                | 13,853 |
-| Test-to-source ratio     | 1.74:1 |
+| **Total TypeScript/TSX** | 22,616 |
+| Application source code  | 7,638  |
+| Test code                | 14,978 |
+| Test-to-source ratio     | 1.96:1 |
 | Prisma schema            | 69     |
 | Config files             | 289    |
 
@@ -19,16 +19,16 @@ Last updated: January 30, 2026
 
 |           | Source | Tests  | Total  |
 | --------- | ------ | ------ | ------ |
-| **API**   | 2,549  | 3,074  | 5,623  |
-| **Web**   | 5,199  | 10,779 | 15,978 |
-| **Total** | 7,943  | 13,853 | 21,796 |
+| **API**   | 2,439  | 3,074  | 5,513  |
+| **Web**   | 5,199  | 11,904 | 17,103 |
+| **Total** | 7,638  | 14,978 | 22,616 |
 
 ### File Counts
 
 | Category                | Count |
 | ----------------------- | ----- |
-| TypeScript source files | 39    |
-| Test files              | 48    |
+| TypeScript source files | 33    |
+| Test files              | 51    |
 | React components (.tsx) | 14    |
 
 ### API Surface
@@ -76,9 +76,9 @@ Last updated: January 30, 2026
 
 | Metric          | Value                       |
 | --------------- | --------------------------- |
-| Total tests     | 752 (all passing)           |
+| Total tests     | 799 (all passing)           |
 | API tests       | 209                         |
-| Web tests       | 543                         |
+| Web tests       | 590                         |
 | Coverage target | 80%+ (all targets exceeded) |
 
 ### Development Framework (SpecKit)
@@ -94,8 +94,8 @@ Last updated: January 30, 2026
 
 ## Development Session History
 
-**29 sessions** over 41 calendar days (Dec 21, 2025 -- Jan 30, 2026). 116
-commits. 27 active days (66% of calendar days).
+**30 sessions** over 42 calendar days (Dec 21, 2025 -- Jan 31, 2026). 119
+commits. 30 active days (71% of calendar days).
 
 | #   | Date   | Est. Duration | Commits | Summary                                                        |
 | --- | ------ | ------------- | ------- | -------------------------------------------------------------- |
@@ -127,7 +127,8 @@ commits. 27 active days (66% of calendar days).
 | 26  | Jan 27 | ~5 hrs        | 4       | Framework v2 (27 skills, 13 commands, 6 agents)                |
 | 27  | Jan 28 | ~10 hrs       | 6       | Mobile responsive Phases 1-3 via SpecKit                       |
 | 28  | Jan 29 | ~10 hrs       | 8       | Mobile responsive Phases 4-5 (touch, a11y, coverage)           |
-| 29  | Jan 30 | ~2 hrs        | 1       | Ralph loop script + skill manifest                             |
+| 29  | Jan 30 | ~2 hrs        | 2       | Ralph loop script, skill manifest, project metrics             |
+| 30  | Jan 31 | ~2 hrs        | 2       | Test coverage improvements (799 tests), documentation updates  |
 
 ### Development Phases
 
@@ -145,9 +146,9 @@ commits. 27 active days (66% of calendar days).
    framework adoption — Sessions 20-22, 6 commits
 7. **New Fields & Framework** (Jan 23-25): Expert ratings, sortable columns,
    SpecKit Lite adoption — Sessions 23-25, 14 commits
-8. **Framework v2 & Mobile Responsive** (Jan 27-30): Framework v2 upgrade, full
-   mobile responsive via SpecKit (5 specs), Ralph script — Sessions 26-29, 19
-   commits
+8. **Framework v2 & Mobile Responsive** (Jan 27-31): Framework v2 upgrade, full
+   mobile responsive via SpecKit (5 specs), Ralph script, test coverage push —
+   Sessions 26-30, 22 commits
 
 ---
 

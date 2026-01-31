@@ -24,7 +24,7 @@ PostgreSQL, and Prisma.
 - **Frontend**: Next.js 15, React 18, TypeScript
 - **Backend**: Express, TypeScript, Zod validation
 - **Database**: PostgreSQL with Prisma ORM
-- **Testing**: Vitest, React Testing Library, Supertest, vitest-axe (752 tests,
+- **Testing**: Vitest, React Testing Library, Supertest, vitest-axe (799 tests,
   80%+ coverage)
 - **Code Quality**: ESLint, Prettier, Husky, commitlint
 - **CI/CD**: GitHub Actions
@@ -87,7 +87,7 @@ wine-cellar/
 | Command              | Description               |
 | -------------------- | ------------------------- |
 | `npm run dev`        | Start API and web servers |
-| `npm test`           | Run all tests (752 tests) |
+| `npm test`           | Run all tests (799 tests) |
 | `npm run lint`       | Run ESLint                |
 | `npm run type-check` | TypeScript checking       |
 | `npm run db:studio`  | Open Prisma Studio        |

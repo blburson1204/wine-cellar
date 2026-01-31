@@ -1,6 +1,6 @@
 # Wine Cellar - Test Summary
 
-## ✅ All Tests Passing (752/752)
+## ✅ All Tests Passing (799/799)
 
 ### Test Suite Results
 
@@ -58,19 +58,28 @@ Duration    ~5.6s
 ✓ apps/web/src/__tests__/integration/viewport-devices.test.tsx (21 tests) - Integration
 ✓ + other existing tests with additional Phase 4-5 coverage
 
-Test Files  38 passed (38)
-Tests       543 passed (543)
-Duration    ~7.8s
+Test Files  41 passed (41)
+Tests       590 passed (590)
+Duration    ~9s
+```
+
+**Coverage Improvement Tests (added Jan 2026):**
+
+```
+✓ apps/web/__tests__/page.mobile.test.tsx (12 tests) - Component
+✓ apps/web/src/__tests__/components/WineCard.interaction.test.tsx (16 tests) - Component
+✓ apps/web/src/__tests__/components/WineTable.hover.test.tsx (14 tests) - Component
+✓ apps/web/src/__tests__/components/WineDetailModal.hover.test.tsx (18 tests) - Component
 ```
 
 ### Quick Stats
 
 - **Test Runner**: Vitest 4.0.16
-- **Total Tests**: 752 (209 API + 543 web)
+- **Total Tests**: 799 (209 API + 590 web)
 - **Pass Rate**: 100%
-- **Execution Time**: ~8s
-- **Test Files**: 48 (10 API + 38 web)
-- **Test Types**: Unit (100), Integration (89), Component (270), Accessibility
+- **Execution Time**: ~9s
+- **Test Files**: 51 (10 API + 41 web)
+- **Test Types**: Unit (100), Integration (89), Component (317), Accessibility
   (37), Focus Management (20)
 
 ---
@@ -693,27 +702,27 @@ Full lifecycle:
 
 **Web Tests** (`apps/web/vitest.config.ts`):
 
-- **Functions**: 80.10% (target: 80%) ✅
-- **Branches**: 83.17% (target: 80%) ✅
-- **Lines**: 89.38% (target: 80%) ✅
-- **Statements**: 88.45% (target: 80%) ✅
+- **Functions**: 92.79% (target: 80%) ✅
+- **Branches**: 87.57% (target: 80%) ✅
+- **Lines**: 94.44% (target: 80%) ✅
+- **Statements**: 93.64% (target: 80%) ✅
 
 ### Component Coverage Breakdown
 
 **API Components:**
 
-- server.ts: 100% lines ✅ (4 tests) - **NEW**
-- errorHandler.ts: 100% lines, 95.23% branches ✅ (10 tests) - **+38% branches**
+- server.ts: 100% lines ✅ (4 tests)
+- errorHandler.ts: 100% lines, 95.23% branches ✅ (10 tests)
 - app.ts: 86.89% statements, 82.5% branches ✅
 - All error classes: 100% coverage ✅
 
 **Web Components:**
 
-- page.tsx: 96.66% lines, 80% branches ✅ (36 tests) - **+13% lines, +17%
-  branches**
-- WineTable.tsx: 84% lines ✅ (69 tests)
+- page.tsx: 97.46% lines, 85.33% branches ✅ (48 tests)
+- WineTable.tsx: 98.73% lines, 100% functions ✅ (85 tests)
 - WineFilters.tsx: 96.29% lines ✅ (29 tests)
-- WineDetailModal.tsx: 84.84% lines ✅ (59 tests combined)
+- WineDetailModal.tsx: 89.31% lines, 83.09% functions ✅ (77 tests combined)
+- WineCard.tsx: 100% lines, 100% functions ✅ (45 tests)
 - ErrorBoundary.tsx: 100% lines ✅ (14 tests)
 - api.ts utils: 100% lines ✅ (23 tests)
 - layout.tsx: 100% coverage ✅
@@ -847,6 +856,26 @@ export default defineConfig({
 - **Prisma**: Database ORM with test database isolation
 
 ### Recent Changes
+
+- **January 31, 2026**: Coverage Gap Fix Sprint
+  - Added 47 new web tests (543 → 590 total web tests)
+  - **New test files:**
+    - `page.mobile.test.tsx` (12 tests) - Mobile view, filter drawer close,
+      color filter, price range filter
+    - `WineCard.interaction.test.tsx` (16 tests) - Keyboard navigation, event
+      propagation, touch targets
+    - `WineTable.hover.test.tsx` (14 tests) - Column header and star hover
+      effects
+    - `WineDetailModal.hover.test.tsx` (18 tests) - Button hovers, favorite
+      star, wine link, image button hovers, mobile footer
+  - **Coverage improvements:**
+    - page.tsx: 85.33% branches (was 70%), 97.46% lines
+    - WineCard.tsx: 100% all metrics (was 75% statements)
+    - WineDetailModal.tsx: 83.09% functions (was 66%)
+    - WineTable.tsx: 100% functions (was 76%)
+    - Overall web: 93.64% statements, 87.57% branches
+  - Total tests: 752 → 799 (+47 tests)
+  - All 799 tests passing
 
 - **January 29, 2026**: Phase 5 Testing & Refinement
   - Added 273 new web tests (270 → 543 total web tests)

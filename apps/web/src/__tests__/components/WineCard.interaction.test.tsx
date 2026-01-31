@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WineCard from '../../components/WineCard';
 
@@ -163,6 +163,38 @@ describe('WineCard Interactions', () => {
       const card = screen.getByRole('article');
       // Card should have focus-visible ring styles
       expect(card.className).toMatch(/focus-visible:/);
+    });
+  });
+
+  describe('Favorite Button Keyboard Navigation', () => {
+    it('triggers onToggleFavorite on favorite button Enter key', () => {
+      const onToggleFavorite = vi.fn();
+      render(<WineCard {...defaultProps} onToggleFavorite={onToggleFavorite} />);
+
+      const favoriteButton = screen.getByRole('button', { name: /favorite/i });
+      fireEvent.keyDown(favoriteButton, { key: 'Enter' });
+
+      expect(onToggleFavorite).toHaveBeenCalledWith(mockWine);
+    });
+
+    it('triggers onToggleFavorite on favorite button Space key', () => {
+      const onToggleFavorite = vi.fn();
+      render(<WineCard {...defaultProps} onToggleFavorite={onToggleFavorite} />);
+
+      const favoriteButton = screen.getByRole('button', { name: /favorite/i });
+      fireEvent.keyDown(favoriteButton, { key: ' ' });
+
+      expect(onToggleFavorite).toHaveBeenCalledWith(mockWine);
+    });
+
+    it('does not trigger onToggleFavorite on other keys', () => {
+      const onToggleFavorite = vi.fn();
+      render(<WineCard {...defaultProps} onToggleFavorite={onToggleFavorite} />);
+
+      const favoriteButton = screen.getByRole('button', { name: /favorite/i });
+      fireEvent.keyDown(favoriteButton, { key: 'Escape' });
+
+      expect(onToggleFavorite).not.toHaveBeenCalled();
     });
   });
 
