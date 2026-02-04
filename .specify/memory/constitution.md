@@ -1,5 +1,11 @@
 # Wine Cellar Project Constitution
 
+**"Evidence over confidence, discipline over speed"**
+
+You cannot claim something works without proof. Rationalizations are explicitly
+forbidden. Skills encode hard-won lessons — skipping them means repeating
+mistakes.
+
 ## Core Principles
 
 ### I. Test-First Development (NON-NEGOTIABLE)

@@ -645,7 +645,14 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 3. **Local Image Storage Only**: Wine images stored locally (AWS S3 planned for
    production)
 4. **Hybrid Styling**: Mix of TailwindCSS utility classes and inline styles (no
-   CSS modules or styled-components)
+   CSS modules or styled-components). Newer components (Combobox, FilterDrawer,
+   MobileFilterToggle) use Tailwind classes; original components (page.tsx,
+   layout.tsx, WineTable, WineDetailModal) use inline React styles. Full
+   migration to Tailwind would improve consistency and make responsive design
+   easier via utility prefixes (`md:`, `lg:`), but is a cleanup task — no
+   performance or functional benefit. Worth doing before significant UI work;
+   fine to defer if UI is stable. See `documents/mobile-responsive-plan.md`
+   Option B for the original analysis.
 5. **No Sentry Integration**: Error tracking service not configured
    (infrastructure ready)
 
