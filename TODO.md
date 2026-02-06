@@ -213,6 +213,8 @@ skills, agents, and commands (see CLAUDE.md)
 - [ ] Custom MCP server for Jira (tailored to SpecKit Epic→Task hierarchy)
 - [ ] Lovable integration - Import generated components into codebase; explore
       bidirectional sync for prototyping workflow
+- [ ] Slack integration - Progress notifications for SpecKit phases/tasks
+      (webhook for personal, MCP server for team use)
 
 ### Wine Cellar Features
 
