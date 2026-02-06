@@ -2,6 +2,8 @@
 
 Personal wine collection manager. Full-stack TypeScript monorepo.
 
+**Developer**: Brian
+
 ## Quick Start
 
 ```bash

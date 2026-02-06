@@ -206,6 +206,16 @@ skills, agents, and commands (see CLAUDE.md)
 
 ## Nice-to-Have Ideas
 
+### SpecKit / Development Tooling
+
+- [ ] Jira integration - Map `/tasks` output to Jira tickets (Spec → Epic, Tasks
+      → Stories)
+- [ ] Custom MCP server for Jira (tailored to SpecKit Epic→Task hierarchy)
+- [ ] Lovable integration - Import generated components into codebase; explore
+      bidirectional sync for prototyping workflow
+
+### Wine Cellar Features
+
 - [ ] Wine recommendation engine (ML)
 - [ ] Barcode/QR scanning
 - [ ] OCR for wine labels
@@ -217,4 +227,4 @@ skills, agents, and commands (see CLAUDE.md)
 
 ---
 
-**Last Updated**: January 31, 2026
+**Last Updated**: February 5, 2026
