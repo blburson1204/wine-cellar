@@ -44,8 +44,8 @@ packages/
 2. **Verify before claiming done**: Run commands, show evidence
 3. **Check skills first**: See `.specify/skill-manifest.yaml` for trigger
    conditions, `.claude/skills/` for full skill docs
-4. **SpecKit for larger features**: `/specify` → `/plan` → `/tasks` →
-   `/implement`
+4. **SpecKit for larger features**: `/specify` → `/clarify` → `/plan` → `/tasks`
+   → `/implement`
 
 ## Key Documentation
 
@@ -159,6 +159,27 @@ Located in `.claude/commands/`:
 - `/checkpoint` - Save session state at SpecKit phase boundary
 - `/resume-spec` - Load checkpoint and resume work
 - `/handoff` - Create resume prompt for new sessions
+
+## Hooks Active
+
+Located in `.claude/hooks/`, registered in `.claude/settings.json`. All hooks
+are fail-open (errors allow through). See `.claude/docs/atom.md` for details.
+
+### ATOM Hooks (Context & Verification)
+
+- `pre-edit-verify.sh` - Blocks edits when `old_string` not found in file (stale
+  file prevention)
+- `precompact.sh` - Snapshots spec/task context before compaction
+- `session-start.sh` - Restores context after compaction, cleans old task files
+- `record-verification.sh` - Blocks session end if T-VERIFY evidence is
+  missing/stale (only during active specs)
+
+### Safety Hooks
+
+- `forbidden-command-blocker.sh` - Blocks `npx prisma db push` (use
+  `npm run db:push`), `git push --force` to main/master, `git reset --hard`
+- `file-placement-guard.sh` - Blocks `.sh`/`.sql`/`.py` file creation in repo
+  root (place in `scripts/`)
 
 ## Agents Available
 

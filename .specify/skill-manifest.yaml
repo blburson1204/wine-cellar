@@ -395,3 +395,40 @@ meta-health-check:
   note: >
     Bi-weekly/monthly maintenance. Not triggered by specs -- triggered by
     calendar cadence or when CLAUDE.md feels bloated.
+    Review checklist includes: documents/bryan-framework-v3-adoption-plan.md
+    Tier 2/3 items for potential adoption.
+
+# =============================================================================
+# ADVISORY ENTRIES (Tier 2/3 — Bryan Framework v3)
+# These are not skills yet. They surface this adoption plan when specs
+# mention relevant keywords, so Tier 2/3 components aren't forgotten.
+# See: documents/bryan-framework-v3-adoption-plan.md
+# =============================================================================
+
+# Tier 2: Preflight system, code review orchestrator, full-stack tracer,
+#          compliance auditor, evidence system v2
+# Tier 3: Agent Teams, tenant isolation, auth middleware, RBAC, db-advisor,
+#          security-audit agent, defense-depth-checker, pattern registry,
+#          acceptance-tester, react-reviewer
+
+v3-adoption-advisory:
+  description: Bryan Framework v3 components available for adoption
+  phases: [specify, plan]
+  triggers:
+    keywords:
+      - deployment
+      - server migration
+      - AWS
+      - RDS
+      - authentication
+      - authorization
+      - security audit
+      - compliance
+      - preflight
+      - spec drift
+      - parallel execution
+      - agent teams
+  note: >
+    NOT a skill -- advisory entry only. When these keywords appear in a spec,
+    review documents/bryan-framework-v3-adoption-plan.md Tier 2/3 sections
+    for components that may be worth adopting for the current work.

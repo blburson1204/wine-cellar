@@ -46,9 +46,13 @@ adequate test coverage.
 ### SpecKit Workflow (for larger features)
 
 1. `/specify [name]` - Create specification with requirements
-2. `/plan` - Create implementation plan
-3. `/tasks` - Generate task list with verification gates
-4. `/implement` - Execute tasks with verification
+2. `/clarify [name]` - Clarify requirements through questioning
+3. `/plan` - Create implementation plan
+4. `/tasks` - Generate task list with verification gates
+5. `/implement` - Execute tasks with verification
+
+Manual creation of plan.md, tasks.json, or other SpecKit artifacts is forbidden
+— always use the pipeline commands to ensure validation gates are applied.
 
 ### TDD Workflow
 
@@ -65,6 +69,7 @@ adequate test coverage.
 2. Include meaningful commit message
 3. Never commit failing tests
 4. Never commit secrets or credentials (.env files)
+5. Reference specification number in commit message if applicable
 
 ## Quality Gates
 
