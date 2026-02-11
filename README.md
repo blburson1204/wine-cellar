@@ -79,7 +79,7 @@ wine-cellar/
 ├── packages/
 │   └── database/     # Prisma schema and client
 ├── documents/        # Project documentation
-└── .claude/          # AI assistant skills and agents
+└── .claude/          # AI assistant skills, agents, hooks, and commands
 ```
 
 ## Available Scripts
@@ -158,6 +158,10 @@ For detailed documentation, see:
 - **Husky**: Pre-commit hooks for quality checks
 - **commitlint**: Conventional commit messages
 - **GitHub Actions**: Automated CI/CD pipeline
+- **ATOM Hooks**: Stale-file prevention, compaction recovery, T-VERIFY evidence
+  enforcement
+- **Safety Hooks**: Block dangerous commands (`git reset --hard`, force-push to
+  main), enforce file placement conventions
 
 ## License
 

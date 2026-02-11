@@ -1,6 +1,7 @@
 # Bryan's Framework v2 Adoption Plan
 
-**Created**: January 27, 2026 **Status**: INSTALLED (Phases A-I complete)
+**Created**: January 27, 2026 **Status**: ARCHIVED (Phases A-I complete)
+**Superseded by**: [v3](bryan-framework-v3-adoption-plan.md)
 
 ## Overview
 

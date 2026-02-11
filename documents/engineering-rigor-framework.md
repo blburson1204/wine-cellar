@@ -75,14 +75,16 @@ The Red-Green-Refactor cycle is non-negotiable:
 4. Refactor if needed
 5. Repeat
 
-| Gate                 | What It Catches                                      |
-| -------------------- | ---------------------------------------------------- |
-| **TDD Enforcement**  | Tests written first, must fail before implementation |
-| **Verify-Complete**  | Must show command output before claiming done        |
-| **Code Review**      | Security and compliance check before commit          |
-| **Spec Validation**  | Incomplete specs caught before planning              |
-| **Pre-commit Hooks** | Lint, format, type-check, commit message format      |
-| **CI/CD Pipeline**   | Full test suite on every push                        |
+| Gate                  | What It Catches                                      |
+| --------------------- | ---------------------------------------------------- |
+| **TDD Enforcement**   | Tests written first, must fail before implementation |
+| **Verify-Complete**   | Must show command output before claiming done        |
+| **Code Review**       | Security and compliance check before commit          |
+| **Spec Validation**   | Incomplete specs caught before planning              |
+| **Pre-commit Hooks**  | Lint, format, type-check, commit message format      |
+| **CI/CD Pipeline**    | Full test suite on every push                        |
+| **ATOM Hooks**        | Stale-file edits, dangerous commands, file placement |
+| **T-VERIFY Evidence** | Session blocked if verification evidence is stale    |
 
 **Why it matters:** No "trust me, it works" - everything requires proof.
 
@@ -146,12 +148,14 @@ mistakes. The small upfront cost prevents large downstream costs.
 
 ### Agents (Automated Tasks)
 
-| Agent          | Purpose                                           |
-| -------------- | ------------------------------------------------- |
-| Code Reviewer  | Automated review against standards                |
-| Test Analyzer  | Categorize failures, identify flaky tests         |
-| Auto-Fixer     | Fix TypeScript, lint, import issues automatically |
-| Spec Validator | Check spec completeness before planning           |
+| Agent                        | Purpose                                           |
+| ---------------------------- | ------------------------------------------------- |
+| Code Reviewer                | Automated review against standards                |
+| Test Analyzer                | Categorize failures, identify flaky tests         |
+| Auto-Fixer                   | Fix TypeScript, lint, import issues automatically |
+| Spec Validator               | Check spec completeness before planning           |
+| Capture Idea                 | Feature idea capture to future-work.md            |
+| Documentation Reconciliation | Documentation drift detection                     |
 
 ---
 
@@ -218,7 +222,10 @@ Consistent patterns across the codebase:
 
 ### Phase 4: Automation (Week 7+)
 
-- [ ] Add specialized agents (code review, test analysis)
+- [x] Add specialized agents (code review, test analysis, auto-fixer, etc.)
+- [x] Install ATOM hooks (stale-file prevention, compaction recovery, evidence
+      enforcement)
+- [x] Install safety hooks (dangerous command blocking, file placement guards)
 - [ ] Integrate with project management (Jira, etc.)
 - [ ] Add progress notifications (Slack, etc.)
 - [ ] Continuous refinement based on team feedback
@@ -240,15 +247,18 @@ Consistent patterns across the codebase:
 
 ### Mitigations Built Into This Framework
 
-| Risk             | Mitigation                                      |
-| ---------------- | ----------------------------------------------- |
-| No review        | PR requirement, pre-commit hooks                |
-| Blind trust      | Verify-complete requires evidence               |
-| Security gaps    | Security review skill, expert review gate       |
-| Missing tests    | TDD enforcement, coverage targets               |
-| Skill atrophy    | Developer-in-control for learning opportunities |
-| Bad dependencies | Code review catches, security scanning          |
-| Context leakage  | Clear data handling policies                    |
+| Risk             | Mitigation                                                  |
+| ---------------- | ----------------------------------------------------------- |
+| No review        | PR requirement, pre-commit hooks                            |
+| Blind trust      | Verify-complete requires evidence                           |
+| Security gaps    | Security review skill, expert review gate                   |
+| Missing tests    | TDD enforcement, coverage targets                           |
+| Skill atrophy    | Developer-in-control for learning opportunities             |
+| Bad dependencies | Code review catches, security scanning                      |
+| Context leakage  | Clear data handling policies                                |
+| Stale edits      | ATOM pre-edit-verify hook blocks edits on outdated files    |
+| Dangerous cmds   | Safety hook blocks force-push, hard reset, raw db push      |
+| Missing evidence | T-VERIFY Stop hook blocks session end without fresh results |
 
 ---
 

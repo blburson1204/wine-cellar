@@ -13,7 +13,7 @@
 
 **Test Suite**: 799 tests (209 API + 590 Web) - all passing **Coverage**: API
 90%+ / Web 80%+ (exceeding all targets) **Framework**: SpecKit installed with
-skills, agents, and commands (see CLAUDE.md)
+skills, agents, commands, and ATOM hooks (see CLAUDE.md)
 
 ---
 

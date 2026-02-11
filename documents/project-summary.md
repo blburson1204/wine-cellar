@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: January 24, 2026
+**Last Updated**: February 11, 2026
 
 ## Project Overview
 
@@ -102,11 +102,15 @@ wine-cellar/
 │   └── PULL_REQUEST_TEMPLATE.md  # Pull request template
 │
 ├── .claude/
-│   └── skills/
-│       ├── error-handling/     # Error handling skill
-│       ├── testing/            # Testing skill
-│       ├── code-review/        # Code review skill
-│       └── ui-design/          # UI design skill
+│   ├── skills/                 # 23 skills (see CLAUDE.md for full list)
+│   ├── agents/                 # 6 agents (code-reviewer, test-analyzer, etc.)
+│   ├── commands/               # 13 commands (/specify, /clarify, /plan, etc.)
+│   ├── hooks/                  # ATOM and safety hooks
+│   │   ├── atom/               # Context & verification (4 hooks)
+│   │   └── safety/             # Command blocking & file guards (2 hooks)
+│   ├── docs/                   # Framework documentation (ATOM, gates, context)
+│   ├── session-context/        # Session state (current-work.md, etc.)
+│   └── settings.json           # Hook registration config
 │
 ├── .husky/                     # Git hooks
 │   ├── pre-commit             # Pre-commit hooks
