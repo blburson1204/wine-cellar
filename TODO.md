@@ -215,6 +215,16 @@ skills, agents, commands, and ATOM hooks (see CLAUDE.md)
       bidirectional sync for prototyping workflow
 - [ ] Slack integration - Progress notifications for SpecKit phases/tasks
       (webhook for personal, MCP server for team use)
+- [ ] Hook audit log - Append-only NDJSON log
+      (`.claude/session-context/audit-log.ndjson`) recording hook invocations
+      with timestamp, event type, hook name, and allow/deny decision. Low
+      effort, covers the most invisible activity.
+- [ ] Command execution log - Extend skill-log pattern to SpecKit commands; each
+      command appends an entry to `command-log.md` in the spec directory with
+      timestamp and phase, giving a full pipeline timeline.
+- [ ] Full observability layer - PostToolUse hook logging agent spawns, command
+      invocations, and hook decisions to a central audit file. More
+      comprehensive but noisier; build on top of hook audit log and command log.
 
 ### Wine Cellar Features
 
@@ -229,4 +239,4 @@ skills, agents, commands, and ATOM hooks (see CLAUDE.md)
 
 ---
 
-**Last Updated**: February 5, 2026
+**Last Updated**: February 14, 2026
