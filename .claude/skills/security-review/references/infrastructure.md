@@ -5,7 +5,7 @@ name: infrastructure
 
 # Infrastructure Security Reference
 
-> Docker, ECS/Fargate, and AWS security patterns for Retryvr
+> Docker, ECS/Fargate, and AWS security patterns for Wine Cellar
 
 ---
 
@@ -71,7 +71,7 @@ CMD ["node", "dist/server.js"]
 ```yaml
 services:
   api:
-    image: retryvr-api:latest
+    image: wine-cellar-api:latest
     read_only: true
     security_opt:
       - no-new-privileges:true
@@ -94,15 +94,15 @@ services:
 
 ```json
 {
-  "family": "retryvr-api",
+  "family": "wine-cellar-api",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
   "executionRoleArn": "arn:aws:iam::ACCOUNT:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::ACCOUNT:role/retryvrApiTaskRole",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT:role/wineCellarApiTaskRole",
   "containerDefinitions": [
     {
       "name": "api",
-      "image": "ACCOUNT.dkr.ecr.REGION.amazonaws.com/retryvr-api:latest",
+      "image": "ACCOUNT.dkr.ecr.REGION.amazonaws.com/wine-cellar-api:latest",
       "essential": true,
       "readonlyRootFilesystem": true,
       "user": "1001:1001",
@@ -115,7 +115,7 @@ services:
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/retryvr-api",
+          "awslogs-group": "/ecs/wine-cellar-api",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "api"
         }
@@ -123,7 +123,7 @@ services:
       "secrets": [
         {
           "name": "DATABASE_URL",
-          "valueFrom": "arn:aws:ssm:REGION:ACCOUNT:parameter/retryvr/production/database-url"
+          "valueFrom": "arn:aws:ssm:REGION:ACCOUNT:parameter/wine-cellar/production/database-url"
         }
       ]
     }
@@ -133,11 +133,11 @@ services:
 
 ### IAM Role Separation
 
-| Role                   | Purpose                 | Permissions                      |
-| ---------------------- | ----------------------- | -------------------------------- |
-| `ecsTaskExecutionRole` | Pull images, write logs | ECR read, CloudWatch Logs write  |
-| `retryvrApiTaskRole`   | Application runtime     | SSM GetParameter, S3 (if needed) |
-| `retryvrDeployRole`    | CI/CD deployment        | ECS update, ECR push             |
+| Role                    | Purpose                 | Permissions                      |
+| ----------------------- | ----------------------- | -------------------------------- |
+| `ecsTaskExecutionRole`  | Pull images, write logs | ECR read, CloudWatch Logs write  |
+| `wineCellarApiTaskRole` | Application runtime     | SSM GetParameter, S3 (if needed) |
+| `wineCellarDeployRole`  | CI/CD deployment        | ECS update, ECR push             |
 
 **Principle of Least Privilege:**
 
@@ -148,7 +148,7 @@ services:
     {
       "Effect": "Allow",
       "Action": ["ssm:GetParameter", "ssm:GetParameters"],
-      "Resource": ["arn:aws:ssm:*:*:parameter/retryvr/production/*"]
+      "Resource": ["arn:aws:ssm:*:*:parameter/wine-cellar/production/*"]
     }
   ]
 }
@@ -159,7 +159,7 @@ services:
 ```hcl
 # Security Group - Minimal ingress
 resource "aws_security_group" "ecs_tasks" {
-  name        = "retryvr-ecs-tasks"
+  name        = "wine-cellar-ecs-tasks"
   description = "Allow inbound from ALB only"
   vpc_id      = var.vpc_id
 
@@ -195,16 +195,16 @@ resource "aws_security_group" "ecs_tasks" {
 ```bash
 # Secure parameter creation
 aws ssm put-parameter \
-  --name "/retryvr/production/database-url" \
+  --name "/wine-cellar/production/database-url" \
   --value "postgresql://..." \
   --type "SecureString" \
-  --key-id "alias/retryvr-secrets"
+  --key-id "alias/wine-cellar-secrets"
 
 # Access in ECS task definition
 "secrets": [
   {
     "name": "DATABASE_URL",
-    "valueFrom": "arn:aws:ssm:us-east-1:ACCOUNT:parameter/retryvr/production/database-url"
+    "valueFrom": "arn:aws:ssm:us-east-1:ACCOUNT:parameter/wine-cellar/production/database-url"
   }
 ]
 ```
@@ -236,10 +236,10 @@ DATABASE_URL="postgresql://user:pass@host:5432/db?sslmode=verify-full&sslrootcer
 ALTER SYSTEM SET password_encryption = 'scram-sha-256';
 
 -- Create application-specific role
-CREATE ROLE retryvr_api WITH LOGIN PASSWORD 'strong_password';
-GRANT CONNECT ON DATABASE retryvr TO retryvr_api;
-GRANT USAGE ON SCHEMA public TO retryvr_api;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO retryvr_api;
+CREATE ROLE wine_cellar_api WITH LOGIN PASSWORD 'strong_password';
+GRANT CONNECT ON DATABASE wine_cellar TO wine_cellar_api;
+GRANT USAGE ON SCHEMA public TO wine_cellar_api;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO wine_cellar_api;
 
 -- ❌ NEVER grant SUPERUSER or CREATE to application roles
 ```
@@ -294,7 +294,7 @@ resource "aws_flow_log" "ecs" {
   log_destination = aws_cloudwatch_log_group.flow_logs.arn
 
   tags = {
-    Name = "retryvr-vpc-flow-logs"
+    Name = "wine-cellar-vpc-flow-logs"
   }
 }
 ```
@@ -308,12 +308,12 @@ resource "aws_flow_log" "ecs" {
 ```bash
 # Enable scan on push
 aws ecr put-image-scanning-configuration \
-  --repository-name retryvr-api \
+  --repository-name wine-cellar-api \
   --image-scanning-configuration scanOnPush=true
 
 # Check scan results
 aws ecr describe-image-scan-findings \
-  --repository-name retryvr-api \
+  --repository-name wine-cellar-api \
   --image-id imageTag=latest
 ```
 
@@ -322,7 +322,7 @@ aws ecr describe-image-scan-findings \
 ```bash
 # Docker Content Trust
 export DOCKER_CONTENT_TRUST=1
-docker push ACCOUNT.dkr.ecr.REGION.amazonaws.com/retryvr-api:latest
+docker push ACCOUNT.dkr.ecr.REGION.amazonaws.com/wine-cellar-api:latest
 ```
 
 ### Vulnerability Thresholds
@@ -340,7 +340,7 @@ docker push ACCOUNT.dkr.ecr.REGION.amazonaws.com/retryvr-api:latest
 
 ```bash
 # Check ECS task security settings
-aws ecs describe-task-definition --task-definition retryvr-api \
+aws ecs describe-task-definition --task-definition wine-cellar-api \
   | jq '.taskDefinition.containerDefinitions[0] | {
     readonlyRootFilesystem,
     user,
@@ -354,18 +354,18 @@ aws ec2 describe-security-groups \
 
 # Check RDS encryption
 aws rds describe-db-instances \
-  --db-instance-identifier retryvr-production \
+  --db-instance-identifier wine-cellar-production \
   --query 'DBInstances[0].{Encrypted:StorageEncrypted,SSL:CACertificateIdentifier}'
 
 # Check SSM parameters are encrypted
 aws ssm describe-parameters \
-  --parameter-filters "Key=Path,Values=/retryvr/production" \
+  --parameter-filters "Key=Path,Values=/wine-cellar/production" \
   --query 'Parameters[*].{Name:Name,Type:Type}'
 ```
 
 ---
 
-## Retryvr Current State
+## Project Current State
 
 ### Implemented
 

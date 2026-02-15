@@ -3,7 +3,7 @@ parent: code-review-compliance
 name: STACK-PATTERNS
 ---
 
-# Stack Patterns - Retryvr Platform
+# Stack Patterns - Wine Cellar
 
 Anti-patterns and fixes for Express/Prisma/Next.js stack.
 
@@ -199,7 +199,7 @@ import { AdminNav } from '../admin/AdminNav'; // CROSS-PORTAL!
 ```typescript
 // In components/app/Dashboard.tsx
 import { AppNav } from './AppNav'; // Same portal
-import { Button } from '@retryvr/ui'; // Shared OK
+import { Button } from '@/components/ui'; // Shared OK
 ```
 
 ### Feature Access

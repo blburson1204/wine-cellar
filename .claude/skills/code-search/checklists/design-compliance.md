@@ -2,7 +2,7 @@
 
 ## Component Usage
 
-- [ ] Components imported from `@retryvr/ui`
+- [ ] Components use existing TailwindCSS components
 - [ ] No duplicate component implementations
 - [ ] Existing components used before creating new ones
 - [ ] Component props match design system API

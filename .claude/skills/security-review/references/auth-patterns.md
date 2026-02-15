@@ -5,7 +5,7 @@ name: auth-patterns
 
 # Authentication & Authorization Patterns Reference
 
-> JWT, OAuth 2.0, and session security patterns for Retryvr platform.
+> JWT, OAuth 2.0, and session security patterns for Wine Cellar.
 
 ## JWT Security (RFC 9700 - January 2025)
 
@@ -30,7 +30,7 @@ interface JWTPayload {
   iat: number; // Issued at timestamp
   jti: string; // JWT ID (for revocation)
 
-  // Retryvr custom claims
+  // Application custom claims
   userId: string;
   email: string;
   role: UserRole;
@@ -57,8 +57,8 @@ function verifyToken(token: string): JWTPayload {
   try {
     return jwt.verify(token, publicKey, {
       algorithms: ['RS256'], // Whitelist algorithms
-      audience: 'api.retryvr.com', // Validate audience
-      issuer: 'https://auth.retryvr.com',
+      audience: 'api.example.com', // Validate audience
+      issuer: 'https://auth.example.com',
       maxAge: '15m', // Enforce expiration
       complete: false,
     }) as JWTPayload;
@@ -77,7 +77,7 @@ function verifyToken(token: string): JWTPayload {
 // jwt.decode() does NOT verify signature!
 ```
 
-### Retryvr Auth Middleware
+### Auth Middleware
 
 ```typescript
 // apps/api/src/middleware/auth-middleware.ts

@@ -51,7 +51,7 @@
 
 ## Design System Compliance
 
-- [ ] Components from @retryvr/ui
+- [ ] Components from project UI components
 - [ ] No raw Tailwind colors
 - [ ] Design tokens used consistently
 - [ ] No arbitrary values

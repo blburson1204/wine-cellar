@@ -16,7 +16,7 @@
 
 ## Design System
 
-- [ ] Components imported from `@retryvr/ui`
+- [ ] Components use existing TailwindCSS components
 - [ ] No raw Tailwind colors (use design tokens)
 - [ ] No arbitrary values without justification
 - [ ] Typography uses design system scale

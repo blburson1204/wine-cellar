@@ -112,5 +112,5 @@ accessibility_validation:
 ## Reference
 
 WCAG 2.2 Quick Reference: https://www.w3.org/WAI/WCAG22/quickref/ Existing
-pattern: `@retryvr/ui` components handle most accessibility - validate they're
-being used.
+pattern: project TailwindCSS components handle most accessibility - validate
+they're being used.

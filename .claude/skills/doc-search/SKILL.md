@@ -73,7 +73,7 @@ Grep: pattern="ServiceModule" path=".claude/docs/" output_mode="files_with_match
 | Code Term       | Documentation Terms                                                |
 | --------------- | ------------------------------------------------------------------ |
 | Service Module  | "Service Module", "Service Modules", "services/", "business logic" |
-| React Component | "component", "UI component", "@retryvr/ui", "design system"        |
+| React Component | "component", "UI component", "TailwindCSS", "design system"        |
 | API Endpoint    | "API", "endpoint", "route", "/api/v1"                              |
 | Database Schema | "schema", "Prisma", "database", "migration"                        |
 | Authentication  | "auth", "authentication", "session", "login"                       |

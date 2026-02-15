@@ -5,7 +5,7 @@ name: backend-review
 
 # Backend Security Review Checklist
 
-> Express.js, Node.js, and Prisma security review for Retryvr API
+> Express.js, Node.js, and Prisma security review for Wine Cellar API
 
 **Usage:** Create TodoWrite items for each section when reviewing backend code.
 
@@ -187,7 +187,7 @@ grep -rn "helmet(" apps/api/src/server.ts
 
 ---
 
-## Retryvr-Specific Checks
+## Project-Specific Checks
 
 ### API Versioning
 

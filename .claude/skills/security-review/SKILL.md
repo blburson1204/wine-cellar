@@ -8,7 +8,7 @@ description:
 model: claude-sonnet-4-5-20250929
 ---
 
-# Security Review - Retryvr Platform
+# Security Review - Wine Cellar
 
 ## Overview
 

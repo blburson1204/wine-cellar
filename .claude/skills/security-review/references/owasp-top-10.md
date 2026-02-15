@@ -5,8 +5,8 @@ name: owasp-top-10
 
 # OWASP Top 10 2025 Reference
 
-> Quick reference for OWASP Top 10 2025 vulnerabilities adapted to Retryvr tech
-> stack.
+> Quick reference for OWASP Top 10 2025 vulnerabilities adapted to Wine Cellar
+> tech stack.
 
 ## A01: Broken Access Control (40% of attacks)
 
@@ -36,7 +36,7 @@ router.get('/orders/:orderId', authenticate, async (req, res) => {
 });
 ```
 
-### Retryvr Controls
+### Project Controls
 
 - Use `requireFeatureAccess()` middleware, not hardcoded role checks
 - Always add `userId` or `organizationId` to WHERE clauses
@@ -57,11 +57,11 @@ router.get('/orders/:orderId', authenticate, async (req, res) => {
 | Tokens    | N/A                 | HTTP-only cookies |
 | API keys  | SSM Parameter Store | Never in code     |
 
-### Retryvr Implementation
+### Project Implementation
 
 ```typescript
 // Passwords - use existing auth module
-import { hashPassword, verifyPassword } from '@retryvr/auth';
+import { hashPassword, verifyPassword } from './auth';
 
 // Secrets - from SSM, never hardcoded
 const secret = process.env.JWT_SECRET; // Loaded from SSM at deploy

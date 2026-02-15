@@ -84,7 +84,7 @@ router.post('/login', async (req, res) => { ... });
 const token = `user_${Date.now()}`;
 ```
 
-### Retryvr Standard
+### Project Standard
 
 ```typescript
 // JWT with proper validation
@@ -211,7 +211,7 @@ router.delete('/api/v1/users/:id', authenticate, async (req, res) => {
 });
 ```
 
-### Retryvr Pattern
+### Project Pattern
 
 ```typescript
 import { requireRole, requireFeatureAccess } from './middleware/auth-middleware';

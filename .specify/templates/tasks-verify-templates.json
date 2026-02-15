@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
-  "$id": "retryvr-tasks-verify-templates-v1",
+  "$id": "wine-cellar-tasks-verify-templates-v1",
   "title": "T-VERIFY Gate Templates",
   "description": "Standard and conditional gate definitions for auto-generating T-VERIFY tasks",
   "version": "1.0.0",

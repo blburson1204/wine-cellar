@@ -5,7 +5,7 @@ name: frontend-review
 
 # Frontend Security Review Checklist
 
-> Next.js, React, and NextAuth.js security review for Retryvr Web
+> Next.js, React, and NextAuth.js security review for Wine Cellar Web
 
 **Usage:** Create TodoWrite items for each section when reviewing frontend code.
 
@@ -177,7 +177,7 @@ async headers() {
 
 ---
 
-## Retryvr-Specific Checks
+## Project-Specific Checks
 
 ### Three-Portal Architecture
 
@@ -195,7 +195,7 @@ async headers() {
 
 ### Design System Compliance
 
-- [ ] Using `@retryvr/ui` components (security-audited)
+- [ ] Using existing TailwindCSS components (security-audited)
 - [ ] No raw HTML inputs for sensitive fields
 - [ ] Form validation using approved patterns
 

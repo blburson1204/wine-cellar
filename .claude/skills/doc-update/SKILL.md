@@ -64,7 +64,7 @@ Pass the component name and related terms as search queries.
 | Service Module  | Service name, "Service Module"   | architecture.md, architecture.md, CLAUDE.md |
 | API Endpoint    | Endpoint path, "API"             | api/\*.md, architecture.md                  |
 | Database Schema | Model name, "Prisma", "database" | database.md, architecture.md                |
-| UI Component    | Component name, "@retryvr/ui"    | design-system.md                            |
+| UI Component    | Component name, "UI components"  | design-system.md                            |
 | Job/ETL         | Job name, "data pipeline"        | data-pipeline/_.md, jobs/_.md               |
 
 **Example doc-search invocation**:

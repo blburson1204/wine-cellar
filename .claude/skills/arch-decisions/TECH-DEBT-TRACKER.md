@@ -5,7 +5,7 @@ name: TECH-DEBT-TRACKER
 
 # Tech Debt Tracker
 
-Template for tracking architectural debt in Retryvr.
+Template for tracking architectural debt in Wine Cellar.
 
 ## How to Use This File
 

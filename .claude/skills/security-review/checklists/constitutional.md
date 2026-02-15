@@ -3,7 +3,7 @@ parent: code-review-compliance
 name: REVIEW-CHECKLIST
 ---
 
-# Code Review Checklist - Retryvr Platform
+# Code Review Checklist - Wine Cellar
 
 Expanded checklist for thorough reviews. SKILL.md has quick commands.
 
@@ -38,7 +38,7 @@ Expanded checklist for thorough reviews. SKILL.md has quick commands.
 
 ```
 [ ] No raw hex colors (#NNNNNN)
-[ ] Using @retryvr/ui components
+[ ] Using project UI components (TailwindCSS)
 [ ] Color tokens from tailwind.config.js
 [ ] ApplicationShell for layout pages
 ```

@@ -5,7 +5,7 @@ name: deployment-review
 
 # Deployment Security Review Checklist
 
-> CI/CD, Docker, AWS, and infrastructure security review for Retryvr
+> CI/CD, Docker, AWS, and infrastructure security review for Wine Cellar
 
 **Usage:** Create TodoWrite items for each section when reviewing deployment
 changes or pre-production.
@@ -96,7 +96,7 @@ HEALTHCHECK ...                 # Health check
 
 ```bash
 # Check for overly permissive IAM
-aws iam get-role-policy --role-name retryvrApiTaskRole --policy-name ... \
+aws iam get-role-policy --role-name wineCellarApiTaskRole --policy-name ... \
   | grep -E '"Resource":\s*"\*"'
 ```
 
@@ -203,7 +203,7 @@ npm run test:full-docker
 npm audit --production
 
 # 3. Scan container
-docker scan retryvr-api:latest
+docker scan wine-cellar-api:latest
 
 # 4. Verify no secrets
 grep -rn "password\|secret" apps/ --include="*.ts" | grep -v "\.test\." | wc -l
@@ -227,7 +227,7 @@ grep -rn "password\|secret" apps/ --include="*.ts" | grep -v "\.test\." | wc -l
 
 ---
 
-## Retryvr-Specific
+## Project-Specific
 
 ### ECS Deployment
 
@@ -256,7 +256,7 @@ grep -rn "password\|secret" apps/ --include="*.ts" | grep -v "\.test\." | wc -l
 
 ```bash
 # Check ECS task security
-aws ecs describe-task-definition --task-definition retryvr-api \
+aws ecs describe-task-definition --task-definition wine-cellar-api \
   --query 'taskDefinition.containerDefinitions[0].{
     User:user,
     ReadOnly:readonlyRootFilesystem,
@@ -264,7 +264,7 @@ aws ecs describe-task-definition --task-definition retryvr-api \
   }'
 
 # Check RDS encryption
-aws rds describe-db-instances --db-instance-identifier retryvr-production \
+aws rds describe-db-instances --db-instance-identifier wine-cellar-production \
   --query 'DBInstances[0].{
     Encrypted:StorageEncrypted,
     PublicAccess:PubliclyAccessible,
@@ -280,7 +280,7 @@ aws ec2 describe-security-groups \
 
 # Check SSM parameters are encrypted
 aws ssm describe-parameters \
-  --parameter-filters "Key=Path,Values=/retryvr/production" \
+  --parameter-filters "Key=Path,Values=/wine-cellar/production" \
   --query 'Parameters[*].{Name:Name,Type:Type}'
 ```
 

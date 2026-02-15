@@ -41,7 +41,7 @@ npx prisma migrate diff \
   --to-schema-datamodel packages/database/schema.prisma
 
 # Step 3: Query migration table
-docker exec -it retryvr-db psql -U postgres -d retryvr -c "
+docker exec -it wine-cellar-db psql -U postgres -d wine_cellar -c "
 SELECT migration_name, started_at, finished_at, rolled_back_at
 FROM \"_prisma_migrations\" ORDER BY started_at DESC LIMIT 10;"
 

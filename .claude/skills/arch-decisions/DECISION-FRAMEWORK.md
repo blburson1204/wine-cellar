@@ -80,7 +80,7 @@ YYYY-MM-DD **Context:** [One sentence on what prompted this decision]
 | Complex custom code  | -          | -             | --          | Last resort          |
 | Multiple services    | --         | --            | ---         | Almost never         |
 
-## Retryvr-Specific Considerations
+## Project-Specific Considerations
 
 ### Constitution Compliance Check
 
@@ -137,8 +137,8 @@ From Constitution Principle XII (Pre-Implementation Sanity Checks):
 | Well-understood domain? | Yes   | No               |
 | Maintenance acceptable? | Yes   | No               |
 
-For Retryvr: SAM.gov/FPDS integration = build (core value). Auth = buy
-(NextAuth). Email = buy (SES).
+Example: Wine database/CellarTracker integration = build (core value). Auth =
+buy. Email = buy.
 
 ### When to Add Abstraction
 
@@ -158,5 +158,5 @@ Almost never. But consider if:
 - Team boundary (future)
 - Completely different tech requirements
 
-For Retryvr: job-dispatcher is separate because it runs on EC2, not ECS. That's
-a valid reason.
+Example: a background worker is separate because it runs on a different compute
+target. That's a valid reason.

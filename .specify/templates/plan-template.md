@@ -278,9 +278,9 @@ Phase 0.5
 
 ### Mockup Review
 
-| FR     | UI Element | Mockup? | @retryvr/ui Component |
-| ------ | ---------- | ------- | --------------------- |
-| FR-001 | [element]  | Yes/No  | [component or GAP]    |
+| FR     | UI Element | Mockup? | existing TailwindCSS Component |
+| ------ | ---------- | ------- | ------------------------------ |
+| FR-001 | [element]  | Yes/No  | [component or GAP]             |
 
 ### Component Gaps
 
@@ -315,7 +315,7 @@ _CONDITIONAL - Skip if no infra changes, migrations, or deprecations_
 | -------- | ------- | -------- |
 | [name]   | api/web | SSM/.env |
 
-**SSM Pattern**: `/retryvr/{env}/[name]`
+**SSM Pattern**: `/wine-cellar/{env}/[name]`
 
 ### Migrations (if applicable)
 
