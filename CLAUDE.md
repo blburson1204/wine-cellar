@@ -125,7 +125,6 @@ Located in `.claude/skills/`:
 - `ui-accessibility` - WCAG 2.2 compliance
 - `error-handling` - Project error patterns
 - `testing` - Testing patterns and utilities
-- `coding-standards` - Code style conventions
 - `ui-design` - UI design patterns
 
 ### Meta / Framework

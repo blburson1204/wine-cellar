@@ -94,6 +94,17 @@ mainline development, see the Mainline Workflow section above.
 - This prevents the common bug where db:push changes work locally but break
   production
 
+### Step 1.7: Tech Debt Review
+
+- Read `documents/tech-debt.md` for open P3/P4 items
+- If open items exist:
+  - Display count and summary to user
+  - Ask: "There are N open tech debt items. Review them now before shipping?
+    (Y/n)"
+  - If Y: Display items, let user decide which to fix or defer
+  - If N: Continue — items remain tracked for next review
+- This ensures accumulated debt is surfaced at shipping boundaries
+
 ### Step 2: Full Test Suite
 
 - Run: `npm test`

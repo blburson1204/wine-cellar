@@ -43,11 +43,6 @@ feature-capture-idea:
   phases: [specify, plan, tasks, implement, verify]
   note: Asynchronous -- fires when ideas arise during any work
 
-coding-standards:
-  description: Code style, naming, lint, format conventions
-  always: true
-  phases: [implement, verify]
-  note: Applies to all code changes
 
 # =============================================================================
 # PHASE-GATE SKILLS
@@ -317,13 +312,19 @@ code-review:
   triggers:
     frontmatter:
       ui_changes: [minor, moderate, major]
+      type: [feature-major, feature-minor]
     keywords:
       - review
       - merge
       - pull request
       - ship
       - complete
-  note: Mandatory after major features and before merge to main
+      - api
+      - backend
+      - endpoint
+      - database
+      - migration
+  note: Mandatory for all feature work (frontend and backend) and before merge to main
 
 code-search:
   description: Structured code verification with checklists

@@ -116,6 +116,12 @@ git diff {BASE_SHA}..{HEAD_SHA}
 
 [Improvements for code quality, architecture, or process]
 
+### Tech Debt (P3/P4)
+
+Append any Minor (Nice to Have) findings to `documents/tech-debt.md` under
+`## Open Items` using the format documented there. Use source `code-review` and
+include the spec number if applicable. Non-blocking but must be tracked.
+
 ### Assessment
 
 **Ready to merge?** [Yes/No/With fixes]

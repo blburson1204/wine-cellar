@@ -106,13 +106,33 @@ P2 High: [PASS/FAIL]
   - Access control: [status]
   - Input validation: [status]
 
-P3/P4 Debt: [count items logged]
+P3/P4 Debt: [count items logged to tech-debt.md]
 
 OVERALL: [PASS/FAIL]
 Blocking violations: [list or "none"]
 ```
 
 **If ANY P1/P2 violation: STOP. Block commit/deployment.**
+
+### Step 4: Log P3/P4 Items to Tech Debt Register
+
+Any P3 or P4 findings **must** be appended to `documents/tech-debt.md` under the
+`## Open Items` section using this format:
+
+```markdown
+### [P3|P4] Title
+
+- **Found:** YYYY-MM-DD
+- **Source:** security-review --[mode]
+- **Spec:** NNN (if applicable)
+- **Location:** file:line
+- **Issue:** Description of the finding
+- **Suggested fix:** How to address it
+```
+
+This ensures debt is tracked persistently and reviewed at deployment boundaries.
+Do NOT skip this step even if the overall review passes — P3/P4 items are
+non-blocking but must not be silently dropped.
 
 ---
 
