@@ -1,6 +1,6 @@
 # Wine Cellar - Project Metrics Snapshot
 
-Last updated: January 31, 2026
+Last updated: February 19, 2026
 
 ## Codebase Statistics
 
@@ -8,10 +8,10 @@ Last updated: January 31, 2026
 
 | Category                 | Lines  |
 | ------------------------ | ------ |
-| **Total TypeScript/TSX** | 22,616 |
+| **Total TypeScript/TSX** | 19,652 |
 | Application source code  | 7,638  |
-| Test code                | 14,978 |
-| Test-to-source ratio     | 1.96:1 |
+| Test code                | 12,014 |
+| Test-to-source ratio     | 1.57:1 |
 | Prisma schema            | 69     |
 | Config files             | 289    |
 
@@ -19,16 +19,16 @@ Last updated: January 31, 2026
 
 |           | Source | Tests  | Total  |
 | --------- | ------ | ------ | ------ |
-| **API**   | 2,439  | 3,074  | 5,513  |
-| **Web**   | 5,199  | 11,904 | 17,103 |
-| **Total** | 7,638  | 14,978 | 22,616 |
+| **API**   | 2,439  | 2,812  | 5,251  |
+| **Web**   | 5,199  | 9,202  | 14,401 |
+| **Total** | 7,638  | 12,014 | 19,652 |
 
 ### File Counts
 
 | Category                | Count |
 | ----------------------- | ----- |
 | TypeScript source files | 33    |
-| Test files              | 51    |
+| Test files              | 49    |
 | React components (.tsx) | 14    |
 
 ### API Surface
@@ -76,9 +76,9 @@ Last updated: January 31, 2026
 
 | Metric          | Value                       |
 | --------------- | --------------------------- |
-| Total tests     | 799 (all passing)           |
-| API tests       | 209                         |
-| Web tests       | 590                         |
+| Total tests     | 604 (all passing)           |
+| API tests       | 191                         |
+| Web tests       | 413                         |
 | Coverage target | 80%+ (all targets exceeded) |
 
 ### Development Framework (SpecKit)
@@ -128,7 +128,7 @@ commits. 30 active days (71% of calendar days).
 | 27  | Jan 28 | ~10 hrs       | 6       | Mobile responsive Phases 1-3 via SpecKit                       |
 | 28  | Jan 29 | ~10 hrs       | 8       | Mobile responsive Phases 4-5 (touch, a11y, coverage)           |
 | 29  | Jan 30 | ~2 hrs        | 2       | Ralph loop script, skill manifest, project metrics             |
-| 30  | Jan 31 | ~2 hrs        | 2       | Test coverage improvements (799 tests), documentation updates  |
+| 30  | Jan 31 | ~2 hrs        | 2       | Test coverage improvements, documentation updates              |
 
 ### Development Phases
 

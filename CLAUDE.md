@@ -8,7 +8,7 @@ Personal wine collection manager. Full-stack TypeScript monorepo.
 
 ```bash
 npm run dev          # Start API (3001) + Web (3000)
-npm test             # Run all tests (799 tests)
+npm test             # Run all tests (604 tests)
 npm run lint         # ESLint check
 npm run type-check   # TypeScript check
 npm run format:check # Prettier check
@@ -69,8 +69,8 @@ npm run db:studio    # Visual database editor
 ## Testing
 
 ```bash
-npm run test:api        # API tests only (209)
-npm run test:web        # Web tests only (590)
+npm run test:api        # API tests only (191)
+npm run test:web        # Web tests only (413)
 npm run test:coverage   # With coverage report
 ```
 
