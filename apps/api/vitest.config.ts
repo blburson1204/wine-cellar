@@ -1,9 +1,19 @@
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
-// Set test database URL if not already set (allows CI to override)
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
+const TEST_DATABASE_URL = 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
+
+// In CI, allow DATABASE_URL override but verify it points to a test database.
+// Locally, always force the test database URL to prevent accidental dev data deletion.
+if (process.env.CI && process.env.DATABASE_URL) {
+  if (!process.env.DATABASE_URL.includes('_test')) {
+    throw new Error(
+      `SAFETY: DATABASE_URL does not point to a test database: ${process.env.DATABASE_URL}\n` +
+        'Test database URLs must contain "_test" to prevent accidental data deletion.'
+    );
+  }
+} else {
+  process.env.DATABASE_URL = TEST_DATABASE_URL;
 }
 
 // Use a separate upload directory for tests to avoid deleting real uploaded images

@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import request from 'supertest';
 import { prisma, WineColor } from '@wine-cellar/database';
 import { createApp } from '../src/app';
@@ -17,8 +16,20 @@ const createWineData = (overrides: any = {}): any => ({
   ...overrides,
 });
 
+// Safety: verify we're connected to a test database before wiping data
+function assertTestDatabase(): void {
+  const url = process.env.DATABASE_URL || '';
+  if (!url.includes('_test')) {
+    throw new Error(
+      `SAFETY: Refusing to deleteMany() against non-test database: ${url}\n` +
+        'Tests must run against a database with "_test" in the URL.'
+    );
+  }
+}
+
 // Clean up database before each test
 beforeEach(async () => {
+  assertTestDatabase();
   await prisma.wine.deleteMany();
 });
 

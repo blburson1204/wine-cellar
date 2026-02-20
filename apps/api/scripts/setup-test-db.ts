@@ -4,9 +4,18 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-// Use DATABASE_URL from environment if set (for CI), otherwise default to local test DB on port 5433
+// In CI, allow DATABASE_URL override but verify it's a test database.
+// Locally, always use the test database URL.
+const DEFAULT_TEST_URL = 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
 const TEST_DATABASE_URL =
-  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/wine_cellar_test';
+  process.env.CI && process.env.DATABASE_URL ? process.env.DATABASE_URL : DEFAULT_TEST_URL;
+
+if (!TEST_DATABASE_URL.includes('_test')) {
+  throw new Error(
+    `SAFETY: DATABASE_URL does not point to a test database: ${TEST_DATABASE_URL}\n` +
+      'Test database URLs must contain "_test" to prevent accidental data deletion.'
+  );
+}
 
 /* eslint-disable no-console */
 async function setupTestDatabase(): Promise<void> {
