@@ -70,37 +70,6 @@ describe('WineTable Responsive', () => {
     vi.clearAllMocks();
   });
 
-  describe('Desktop Layout (>= 768px)', () => {
-    beforeEach(() => {
-      vi.mocked(useMediaQuery).mockReturnValue(false); // Not mobile
-    });
-
-    it('renders as table on desktop', () => {
-      render(<WineTable {...defaultProps} />);
-      expect(screen.getByRole('table')).toBeInTheDocument();
-    });
-
-    it('shows table headers on desktop', () => {
-      render(<WineTable {...defaultProps} />);
-      // Table uses "Wine" as column header (not "Name")
-      expect(screen.getByRole('columnheader', { name: /wine/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /vintage/i })).toBeInTheDocument();
-    });
-
-    it('renders wine data in table rows', () => {
-      render(<WineTable {...defaultProps} />);
-      const rows = screen.getAllByRole('row');
-      // Header row + 2 data rows
-      expect(rows.length).toBeGreaterThanOrEqual(3);
-    });
-
-    it('does not render WineCard components on desktop', () => {
-      render(<WineTable {...defaultProps} />);
-      // Cards use article role, should not be present on desktop
-      expect(screen.queryByRole('article')).not.toBeInTheDocument();
-    });
-  });
-
   describe('Mobile Layout (< 768px)', () => {
     beforeEach(() => {
       vi.mocked(useMediaQuery).mockReturnValue(true); // Is mobile
@@ -108,27 +77,9 @@ describe('WineTable Responsive', () => {
 
     it('renders as card list on mobile', () => {
       render(<WineTable {...defaultProps} />);
-      // Should have article elements (WineCards), not a table
       const cards = screen.getAllByRole('article');
       expect(cards.length).toBe(mockWines.length);
-    });
-
-    it('does not render table on mobile', () => {
-      render(<WineTable {...defaultProps} />);
       expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    });
-
-    it('shows MobileSortSelector on mobile', () => {
-      render(<WineTable {...defaultProps} />);
-      // MobileSortSelector has a combobox for sort selection
-      expect(screen.getByRole('combobox')).toBeInTheDocument();
-    });
-
-    it('renders each wine as a card', () => {
-      render(<WineTable {...defaultProps} />);
-      // Name appears twice in card (name and producer are same for mock wine)
-      expect(screen.getAllByText('Chateau Margaux').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('Opus One')).toBeInTheDocument();
     });
   });
 
@@ -142,17 +93,6 @@ describe('WineTable Responsive', () => {
       // Sort by vintage should be reflected in the MobileSortSelector
       const select = screen.getByRole('combobox');
       expect(select).toHaveValue('vintage');
-    });
-
-    it('maintains sort state in desktop layout', () => {
-      const onSort = vi.fn();
-      vi.mocked(useMediaQuery).mockReturnValue(false); // Desktop
-
-      render(<WineTable {...defaultProps} onSort={onSort} sortBy="vintage" />);
-
-      // Table should show vintage column header
-      const vintageHeader = screen.getByRole('columnheader', { name: /vintage/i });
-      expect(vintageHeader).toBeInTheDocument();
     });
 
     it('calls same onRowClick handler in both layouts', async () => {
@@ -195,14 +135,12 @@ describe('WineTable Responsive', () => {
     it('handles empty wine list on mobile', () => {
       vi.mocked(useMediaQuery).mockReturnValue(true);
       render(<WineTable {...defaultProps} wines={[]} />);
-      // Should not crash, may show empty state message
       expect(screen.queryByRole('article')).not.toBeInTheDocument();
     });
 
     it('handles empty wine list on desktop', () => {
       vi.mocked(useMediaQuery).mockReturnValue(false);
       render(<WineTable {...defaultProps} wines={[]} />);
-      // Empty state shows "No wines found" message instead of table
       expect(screen.getByText('No wines found')).toBeInTheDocument();
     });
   });

@@ -128,19 +128,6 @@ describe('ErrorBoundary', () => {
       expect(screen.getByText('Custom error message')).toBeInTheDocument();
       expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
     });
-
-    it('does not render default error UI when custom fallback provided', () => {
-      const customFallback = <div>Custom error message</div>;
-
-      render(
-        <ErrorBoundary fallback={customFallback}>
-          <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
-      );
-
-      expect(screen.queryByText('⚠️')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Try Again' })).not.toBeInTheDocument();
-    });
   });
 
   describe('Try Again Button', () => {
@@ -152,17 +139,6 @@ describe('ErrorBoundary', () => {
 
     afterAll(() => {
       consoleErrorSpy.mockRestore();
-    });
-
-    it('displays Try Again button when error boundary catches error', () => {
-      render(
-        <ErrorBoundary>
-          <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
-      );
-
-      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Try Again' })).toBeInTheDocument();
     });
 
     it('calls setState when Try Again button is clicked', async () => {

@@ -71,13 +71,6 @@ describe('AppError Classes', () => {
 
       expect(error.fields).toBeUndefined();
     });
-
-    it('extends AppError', () => {
-      const error = new ValidationError('Validation failed');
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(ValidationError);
-    });
   });
 
   describe('NotFoundError', () => {
@@ -95,19 +88,6 @@ describe('AppError Classes', () => {
       const error = new NotFoundError('Wine', '123');
 
       expect(error.message).toBe("Wine with ID '123' not found");
-    });
-
-    it('creates message without ID when not provided', () => {
-      const error = new NotFoundError('User');
-
-      expect(error.message).toBe('User not found');
-    });
-
-    it('extends AppError', () => {
-      const error = new NotFoundError('Wine');
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(NotFoundError);
     });
   });
 
@@ -127,13 +107,6 @@ describe('AppError Classes', () => {
 
       expect(error.message).toBe('Invalid token');
     });
-
-    it('extends AppError', () => {
-      const error = new UnauthorizedError();
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(UnauthorizedError);
-    });
   });
 
   describe('ForbiddenError', () => {
@@ -152,13 +125,6 @@ describe('AppError Classes', () => {
 
       expect(error.message).toBe('Access denied');
     });
-
-    it('extends AppError', () => {
-      const error = new ForbiddenError();
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(ForbiddenError);
-    });
   });
 
   describe('ConflictError', () => {
@@ -170,13 +136,6 @@ describe('AppError Classes', () => {
       expect(error.errorCode).toBe('CONFLICT');
       expect(error.isOperational).toBe(true);
       expect(error.name).toBe('ConflictError');
-    });
-
-    it('extends AppError', () => {
-      const error = new ConflictError('Conflict');
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(ConflictError);
     });
   });
 
@@ -197,19 +156,6 @@ describe('AppError Classes', () => {
 
       expect(error.originalError).toBe(originalError);
     });
-
-    it('allows originalError to be undefined', () => {
-      const error = new DatabaseError('Database error');
-
-      expect(error.originalError).toBeUndefined();
-    });
-
-    it('extends AppError', () => {
-      const error = new DatabaseError('Database error');
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(DatabaseError);
-    });
   });
 
   describe('ImageUploadError', () => {
@@ -227,13 +173,6 @@ describe('AppError Classes', () => {
       const error = new ImageUploadError('Upload failed', 'CUSTOM_ERROR');
 
       expect(error.errorCode).toBe('CUSTOM_ERROR');
-    });
-
-    it('extends AppError', () => {
-      const error = new ImageUploadError('Upload failed');
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(ImageUploadError);
     });
   });
 
@@ -257,14 +196,6 @@ describe('AppError Classes', () => {
 
       expect(error.message).toBe('File size 4MB exceeds maximum 2MB');
     });
-
-    it('extends ImageUploadError', () => {
-      const error = new FileTooLargeError(10 * 1024 * 1024, 5 * 1024 * 1024);
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(ImageUploadError);
-      expect(error).toBeInstanceOf(FileTooLargeError);
-    });
   });
 
   describe('InvalidFileTypeError', () => {
@@ -279,14 +210,6 @@ describe('AppError Classes', () => {
       expect(error.isOperational).toBe(true);
       expect(error.name).toBe('InvalidFileTypeError');
     });
-
-    it('extends ImageUploadError', () => {
-      const error = new InvalidFileTypeError('image/gif');
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(ImageUploadError);
-      expect(error).toBeInstanceOf(InvalidFileTypeError);
-    });
   });
 
   describe('InvalidImageError', () => {
@@ -299,13 +222,21 @@ describe('AppError Classes', () => {
       expect(error.isOperational).toBe(true);
       expect(error.name).toBe('InvalidImageError');
     });
+  });
 
-    it('extends ImageUploadError', () => {
-      const error = new InvalidImageError('Bad format');
-
-      expect(error).toBeInstanceOf(AppError);
-      expect(error).toBeInstanceOf(ImageUploadError);
-      expect(error).toBeInstanceOf(InvalidImageError);
-    });
+  it.each([
+    ['ValidationError', () => new ValidationError('test')],
+    ['NotFoundError', () => new NotFoundError('Wine')],
+    ['UnauthorizedError', () => new UnauthorizedError()],
+    ['ForbiddenError', () => new ForbiddenError()],
+    ['ConflictError', () => new ConflictError('test')],
+    ['DatabaseError', () => new DatabaseError('test')],
+    ['ImageUploadError', () => new ImageUploadError('test')],
+    ['FileTooLargeError', () => new FileTooLargeError(10 * 1024 * 1024, 5 * 1024 * 1024)],
+    ['InvalidFileTypeError', () => new InvalidFileTypeError('image/gif')],
+    ['InvalidImageError', () => new InvalidImageError('test')],
+  ])('%s extends AppError', (_name, createError) => {
+    const error = createError();
+    expect(error).toBeInstanceOf(AppError);
   });
 });

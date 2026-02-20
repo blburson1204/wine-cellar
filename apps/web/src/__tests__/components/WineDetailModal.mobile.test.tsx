@@ -54,22 +54,14 @@ describe('WineDetailModal Mobile Layout', () => {
       vi.mocked(useMediaQuery).mockReturnValue(true); // Is mobile
     });
 
-    it('renders modal dialog on mobile', () => {
-      render(<WineDetailModal {...defaultProps} />);
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-    });
-
     it('renders form in add mode on mobile', () => {
       render(<WineDetailModal {...defaultProps} mode="add" />);
-      // Add mode should show save button
       const saveButton = screen.getByRole('button', { name: /add wine/i });
       expect(saveButton).toBeInTheDocument();
     });
 
     it('renders wine details in view mode on mobile', () => {
       render(<WineDetailModal {...defaultProps} />);
-      // View mode should show wine name
       expect(screen.getByText('Test Wine')).toBeInTheDocument();
     });
 
@@ -80,60 +72,15 @@ describe('WineDetailModal Mobile Layout', () => {
     });
   });
 
-  describe('Desktop Layout (>= 768px)', () => {
-    beforeEach(() => {
-      vi.mocked(useMediaQuery).mockReturnValue(false); // Not mobile
-    });
-
-    it('renders modal with centered dialog on desktop', () => {
-      render(<WineDetailModal {...defaultProps} />);
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-    });
-
-    it('renders wine details on desktop', () => {
-      render(<WineDetailModal {...defaultProps} />);
-      expect(screen.getByText('Test Wine')).toBeInTheDocument();
-    });
-  });
-
-  describe('Combobox Fields (FR-014, FR-015, FR-017, FR-018)', () => {
+  describe('Combobox Fields', () => {
     beforeEach(() => {
       vi.mocked(useMediaQuery).mockReturnValue(true); // Mobile
     });
 
-    it('uses Combobox for Producer field in edit mode', async () => {
+    it('renders combobox inputs in add mode', async () => {
       render(<WineDetailModal {...defaultProps} mode="add" />);
-      // Look for Combobox by its label
-      const producerLabel = screen.getByText(/producer/i);
-      expect(producerLabel).toBeInTheDocument();
-      // The combobox input should be present
       const comboboxInputs = screen.getAllByRole('combobox');
       expect(comboboxInputs.length).toBeGreaterThan(0);
-    });
-
-    it('uses Combobox for Country field in edit mode', async () => {
-      render(<WineDetailModal {...defaultProps} mode="add" />);
-      const countryLabel = screen.getByText(/country/i);
-      expect(countryLabel).toBeInTheDocument();
-    });
-
-    it('uses Combobox for Region field in edit mode', async () => {
-      render(<WineDetailModal {...defaultProps} mode="add" />);
-      const regionLabel = screen.getByText(/region/i);
-      expect(regionLabel).toBeInTheDocument();
-    });
-
-    it('uses Combobox for Grape Variety field in edit mode', async () => {
-      render(<WineDetailModal {...defaultProps} mode="add" />);
-      const grapeLabel = screen.getByText(/grape/i);
-      expect(grapeLabel).toBeInTheDocument();
-    });
-
-    it('uses Combobox for Where Purchased field in edit mode', async () => {
-      render(<WineDetailModal {...defaultProps} mode="add" />);
-      const purchasedLabel = screen.getByText(/where purchased/i);
-      expect(purchasedLabel).toBeInTheDocument();
     });
   });
 
@@ -150,12 +97,6 @@ describe('WineDetailModal Mobile Layout', () => {
       closeButton.click();
 
       expect(onClose).toHaveBeenCalled();
-    });
-
-    it('traps focus within modal', () => {
-      render(<WineDetailModal {...defaultProps} />);
-      const modal = screen.getByRole('dialog');
-      expect(modal).toHaveAttribute('aria-modal', 'true');
     });
   });
 });

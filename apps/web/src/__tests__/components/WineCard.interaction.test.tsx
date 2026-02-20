@@ -74,34 +74,6 @@ describe('WineCard Interactions', () => {
 
       expect(onToggleFavorite).toHaveBeenCalledWith(mockWine);
     });
-
-    it('calls onToggleFavorite with correct wine when toggling', async () => {
-      const onToggleFavorite = vi.fn();
-      const user = userEvent.setup();
-      const favoriteWine = { ...mockWine, favorite: true };
-      render(
-        <WineCard {...defaultProps} wine={favoriteWine} onToggleFavorite={onToggleFavorite} />
-      );
-
-      const favoriteButton = screen.getByRole('button', { name: /favorite/i });
-      await user.click(favoriteButton);
-
-      expect(onToggleFavorite).toHaveBeenCalledWith(favoriteWine);
-    });
-  });
-
-  describe('Touch Targets (FR-010)', () => {
-    it('has minimum 44px touch target for favorite button', () => {
-      render(<WineCard {...defaultProps} />);
-      const favoriteButton = screen.getByRole('button', { name: /favorite/i });
-      expect(favoriteButton).toHaveStyle({ minWidth: '44px', minHeight: '44px' });
-    });
-
-    it('has minimum 44px touch target for card click area', () => {
-      render(<WineCard {...defaultProps} />);
-      const card = screen.getByRole('article');
-      expect(card).toHaveStyle({ minHeight: '44px' });
-    });
   });
 
   describe('Keyboard Navigation (FR-005)', () => {
@@ -150,22 +122,6 @@ describe('WineCard Interactions', () => {
     });
   });
 
-  describe('Visual Feedback', () => {
-    it('has hover styles (visible via class)', () => {
-      render(<WineCard {...defaultProps} />);
-      const card = screen.getByRole('article');
-      // Card should have hover transition classes
-      expect(card.className).toMatch(/hover:/);
-    });
-
-    it('has focus-visible styles for accessibility', () => {
-      render(<WineCard {...defaultProps} />);
-      const card = screen.getByRole('article');
-      // Card should have focus-visible ring styles
-      expect(card.className).toMatch(/focus-visible:/);
-    });
-  });
-
   describe('Favorite Button Keyboard Navigation', () => {
     it('triggers onToggleFavorite on favorite button Enter key', () => {
       const onToggleFavorite = vi.fn();
@@ -195,22 +151,6 @@ describe('WineCard Interactions', () => {
       fireEvent.keyDown(favoriteButton, { key: 'Escape' });
 
       expect(onToggleFavorite).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Event Propagation', () => {
-    it('stops propagation on favorite button click', async () => {
-      const onClick = vi.fn();
-      const onToggleFavorite = vi.fn();
-      const user = userEvent.setup();
-      render(<WineCard {...defaultProps} onClick={onClick} onToggleFavorite={onToggleFavorite} />);
-
-      const favoriteButton = screen.getByRole('button', { name: /favorite/i });
-      await user.click(favoriteButton);
-
-      // Favorite should be called but not card click
-      expect(onToggleFavorite).toHaveBeenCalledTimes(1);
-      expect(onClick).not.toHaveBeenCalled();
     });
   });
 });

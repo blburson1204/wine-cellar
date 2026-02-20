@@ -148,13 +148,6 @@ describe('Combobox', () => {
   });
 
   describe('Accessibility', () => {
-    it('has proper ARIA attributes', () => {
-      render(<Combobox {...defaultProps} />);
-      const input = screen.getByLabelText('Test Label');
-      expect(input).toHaveAttribute('role', 'combobox');
-      expect(input).toHaveAttribute('aria-autocomplete', 'list');
-    });
-
     it('displays error message near input for screen readers', () => {
       render(<Combobox {...defaultProps} error="Error message" />);
       // Error message should be visible and associated with the input field

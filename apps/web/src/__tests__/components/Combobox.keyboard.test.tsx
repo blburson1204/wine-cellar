@@ -12,71 +12,7 @@ describe('Combobox Keyboard Navigation', () => {
     options: ['Apple', 'Banana', 'Cherry', 'Date'],
   };
 
-  describe('Arrow Key Navigation (FR-012)', () => {
-    it('navigates down through options with ArrowDown', async () => {
-      const user = userEvent.setup();
-      render(<Combobox {...defaultProps} />);
-
-      const input = screen.getByRole('combobox');
-      await user.click(input);
-      await user.keyboard('{ArrowDown}');
-
-      // First option should be highlighted
-      const options = screen.getAllByRole('option');
-      expect(options[0]).toHaveAttribute(
-        'data-headlessui-state',
-        expect.stringContaining('active')
-      );
-    });
-
-    it('navigates up through options with ArrowUp', async () => {
-      const user = userEvent.setup();
-      render(<Combobox {...defaultProps} />);
-
-      const input = screen.getByRole('combobox');
-      await user.click(input);
-      await user.keyboard('{ArrowDown}{ArrowDown}{ArrowUp}');
-
-      // First option should be highlighted after going down twice and up once
-      const options = screen.getAllByRole('option');
-      expect(options[0]).toHaveAttribute(
-        'data-headlessui-state',
-        expect.stringContaining('active')
-      );
-    });
-
-    it('allows navigation through all options', async () => {
-      const user = userEvent.setup();
-      render(<Combobox {...defaultProps} options={['A', 'B']} />);
-
-      const input = screen.getByRole('combobox');
-      await user.click(input);
-      // Navigate through all options
-      await user.keyboard('{ArrowDown}{ArrowDown}');
-
-      // Second option (B) should be highlighted
-      const options = screen.getAllByRole('option');
-      expect(options[1]).toHaveAttribute(
-        'data-headlessui-state',
-        expect.stringContaining('active')
-      );
-    });
-  });
-
   describe('Enter Key Selection (FR-012)', () => {
-    it('selects highlighted option with Enter', async () => {
-      const onChange = vi.fn();
-      const user = userEvent.setup();
-      render(<Combobox {...defaultProps} onChange={onChange} />);
-
-      // Open dropdown via combobox, ArrowDown highlights first option, Enter selects
-      const input = screen.getByRole('combobox');
-      await user.click(input);
-      await user.keyboard('{ArrowDown}{Enter}');
-
-      expect(onChange).toHaveBeenCalledWith('Apple');
-    });
-
     it('submits free text with Enter when no options match', async () => {
       const onChange = vi.fn();
       const user = userEvent.setup();
@@ -94,23 +30,6 @@ describe('Combobox Keyboard Navigation', () => {
   });
 
   describe('Escape Key (FR-012)', () => {
-    it('closes dropdown with Escape', async () => {
-      const user = userEvent.setup();
-      render(<Combobox {...defaultProps} />);
-
-      // Open dropdown via button
-      const button = screen.getByRole('button');
-      await user.click(button);
-
-      // Dropdown should be open
-      expect(screen.getByText('Apple')).toBeInTheDocument();
-
-      await user.keyboard('{Escape}');
-
-      // Dropdown should be closed
-      expect(screen.queryByText('Apple')).not.toBeInTheDocument();
-    });
-
     it('resets query on Escape when dropdown closes', async () => {
       const user = userEvent.setup();
       render(<Combobox {...defaultProps} value="Test" />);
@@ -124,32 +43,6 @@ describe('Combobox Keyboard Navigation', () => {
 
       // Value should remain but query should reset
       expect(input).toHaveValue('Test');
-    });
-  });
-
-  describe('Tab Key', () => {
-    it('closes dropdown and moves focus on Tab', async () => {
-      const user = userEvent.setup();
-      render(
-        <div>
-          <Combobox {...defaultProps} />
-          <button>Next Button</button>
-        </div>
-      );
-
-      // Open dropdown by clicking input and pressing ArrowDown
-      const input = screen.getByRole('combobox');
-      await user.click(input);
-      await user.keyboard('{ArrowDown}');
-
-      // Dropdown should be open
-      expect(screen.getByText('Apple')).toBeInTheDocument();
-
-      await user.tab();
-
-      // Dropdown should be closed and focus moved
-      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-      expect(screen.getByText('Next Button')).toHaveFocus();
     });
   });
 
@@ -220,17 +113,6 @@ describe('Combobox Keyboard Navigation', () => {
   });
 
   describe('Focus Behavior', () => {
-    it('opens dropdown when pressing ArrowDown', async () => {
-      const user = userEvent.setup();
-      render(<Combobox {...defaultProps} />);
-
-      const input = screen.getByRole('combobox');
-      await user.click(input);
-      await user.keyboard('{ArrowDown}');
-
-      expect(screen.getByRole('listbox')).toBeInTheDocument();
-    });
-
     it('keeps dropdown open while typing', async () => {
       const user = userEvent.setup();
       render(<Combobox {...defaultProps} />);

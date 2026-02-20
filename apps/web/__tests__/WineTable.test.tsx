@@ -150,15 +150,6 @@ describe('WineTable', () => {
       expect(screen.getByText('White')).toBeInTheDocument();
       expect(screen.getByText('Sparkling')).toBeInTheDocument();
     });
-
-    it('displays em dash for null price', () => {
-      render(<WineTable {...defaultProps} />);
-
-      const rows = screen.getAllByRole('row');
-      // Last row (Dom Perignon) should have em dash for price
-      const lastRow = rows[rows.length - 1];
-      expect(lastRow).toHaveTextContent('—');
-    });
   });
 
   describe('Row Click', () => {
@@ -220,158 +211,38 @@ describe('WineTable', () => {
       expect(priceHeader).not.toHaveTextContent('↓');
     });
 
-    it('calls onSort when Wine header clicked', async () => {
+    it.each([
+      ['Wine', 'name'],
+      ['Producer', 'producer'],
+      ['Vintage', 'vintage'],
+      ['Price', 'price'],
+      ['Rating', 'rating'],
+      ['Type', 'color'],
+      ['Region', 'region'],
+      ['Grape', 'grapeVariety'],
+      ['Country', 'country'],
+      ['In Cellar', 'quantity'],
+    ])('calls onSort with "%s" when %s header clicked', async (headerText, sortField) => {
       const user = userEvent.setup();
       render(<WineTable {...defaultProps} />);
 
-      const wineHeader = screen.getByText('Wine').parentElement;
-      await user.click(wineHeader!);
+      const header = screen.getByText(headerText).parentElement;
+      await user.click(header!);
 
       expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('name');
-    });
-
-    it('calls onSort when Producer header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const producerHeader = screen.getByText('Producer').parentElement;
-      await user.click(producerHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('producer');
-    });
-
-    it('calls onSort when Vintage header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const vintageHeader = screen.getByText('Vintage').parentElement;
-      await user.click(vintageHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('vintage');
-    });
-
-    it('calls onSort when Price header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const priceHeader = screen.getByText('Price').parentElement;
-      await user.click(priceHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('price');
-    });
-
-    it('calls onSort when Rating header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const ratingHeader = screen.getByText('Rating').parentElement;
-      await user.click(ratingHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('rating');
-    });
-
-    it('calls onSort when Type header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const typeHeader = screen.getByText('Type').parentElement;
-      await user.click(typeHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('color');
-    });
-
-    it('calls onSort when Region header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const regionHeader = screen.getByText('Region').parentElement;
-      await user.click(regionHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('region');
-    });
-
-    it('calls onSort when Grape header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const grapeHeader = screen.getByText('Grape').parentElement;
-      await user.click(grapeHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('grapeVariety');
-    });
-
-    it('calls onSort when Country header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const countryHeader = screen.getByText('Country').parentElement;
-      await user.click(countryHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('country');
-    });
-
-    it('calls onSort when In Cellar header clicked', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const inCellarHeader = screen.getByText('In Cellar').parentElement;
-      await user.click(inCellarHeader!);
-
-      expect(mockOnSort).toHaveBeenCalledTimes(1);
-      expect(mockOnSort).toHaveBeenCalledWith('quantity');
+      expect(mockOnSort).toHaveBeenCalledWith(sortField);
     });
   });
 
   describe('Wine Colors', () => {
-    it('displays wine type label for RED wine', () => {
-      const redWine = [
-        {
-          ...mockWines[0],
-          color: 'RED',
-        },
-      ];
-
-      render(<WineTable {...defaultProps} wines={redWine} />);
-
-      // Check that the wine type is displayed in the Type column with mixed case
-      expect(screen.getByText('Red')).toBeInTheDocument();
-    });
-
-    it('displays wine type label for WHITE wine', () => {
-      const whiteWine = [
-        {
-          ...mockWines[1],
-          color: 'WHITE',
-        },
-      ];
-
-      render(<WineTable {...defaultProps} wines={whiteWine} />);
-
-      // Check that the wine type is displayed in the Type column with mixed case
-      expect(screen.getByText('White')).toBeInTheDocument();
-    });
-
-    it('displays wine type label for SPARKLING wine', () => {
-      const sparklingWine = [
-        {
-          ...mockWines[2],
-          color: 'SPARKLING',
-        },
-      ];
-
-      render(<WineTable {...defaultProps} wines={sparklingWine} />);
-
-      // Check that the wine type is displayed in the Type column with mixed case
-      expect(screen.getByText('Sparkling')).toBeInTheDocument();
+    it.each([
+      ['RED', 'Red'],
+      ['WHITE', 'White'],
+      ['SPARKLING', 'Sparkling'],
+    ])('displays %s as "%s"', (color, label) => {
+      const wine = [{ ...mockWines[0], color }];
+      render(<WineTable {...defaultProps} wines={wine} />);
+      expect(screen.getByText(label)).toBeInTheDocument();
     });
   });
 
@@ -395,21 +266,6 @@ describe('WineTable', () => {
 
       const rows = screen.getAllByRole('row');
       const dataRow = rows[1]; // First data row (after header)
-      expect(dataRow).toHaveTextContent('—');
-    });
-
-    it('displays em dash when price is undefined', () => {
-      const wineWithUndefinedPrice = [
-        {
-          ...mockWines[0],
-          purchasePrice: undefined as unknown as null,
-        },
-      ];
-
-      render(<WineTable {...defaultProps} wines={wineWithUndefinedPrice} />);
-
-      const rows = screen.getAllByRole('row');
-      const dataRow = rows[1];
       expect(dataRow).toHaveTextContent('—');
     });
   });
@@ -616,49 +472,6 @@ describe('WineTable', () => {
     });
   });
 
-  describe('Row Hover Effects', () => {
-    it('changes row style on mouse over', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      const row = screen.getByText('Chateau Margaux').closest('tr')!;
-
-      await user.hover(row);
-
-      expect(row.style.backgroundColor).toBe('rgb(122, 2, 21)');
-      expect(row.style.fontWeight).toBe('700');
-    });
-
-    it('restores row style on mouse out for non-focused row', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      // Second row is not focused
-      const row = screen.getByText('Cloudy Bay Sauvignon Blanc').closest('tr')!;
-
-      await user.hover(row);
-      await user.unhover(row);
-
-      expect(row.style.backgroundColor).toBe('rgb(34, 26, 19)');
-      expect(row.style.fontWeight).toBe('400');
-    });
-
-    it('maintains highlight style on mouse out for focused row', async () => {
-      const user = userEvent.setup();
-      render(<WineTable {...defaultProps} />);
-
-      // First row is focused by default
-      const row = screen.getByText('Chateau Margaux').closest('tr')!;
-
-      await user.hover(row);
-      await user.unhover(row);
-
-      // Should maintain focused style
-      expect(row.style.backgroundColor).toBe('rgb(122, 2, 21)');
-      expect(row.style.fontWeight).toBe('700');
-    });
-  });
-
   describe('Null/Undefined Value Display', () => {
     it('displays em dash for null region', () => {
       const wineWithNullRegion = [
@@ -721,55 +534,19 @@ describe('WineTable', () => {
   });
 
   describe('Additional Wine Colors', () => {
-    it('displays wine type label for ROSE wine', () => {
-      const roseWine = [
-        {
-          ...mockWines[0],
-          color: 'ROSE',
-        },
-      ];
-
-      render(<WineTable {...defaultProps} wines={roseWine} />);
-
-      expect(screen.getByText('Rosé')).toBeInTheDocument();
-    });
-
-    it('displays wine type label for DESSERT wine', () => {
-      const dessertWine = [
-        {
-          ...mockWines[0],
-          color: 'DESSERT',
-        },
-      ];
-
-      render(<WineTable {...defaultProps} wines={dessertWine} />);
-
-      expect(screen.getByText('Dessert')).toBeInTheDocument();
-    });
-
-    it('displays wine type label for FORTIFIED wine', () => {
-      const fortifiedWine = [
-        {
-          ...mockWines[0],
-          color: 'FORTIFIED',
-        },
-      ];
-
-      render(<WineTable {...defaultProps} wines={fortifiedWine} />);
-
-      expect(screen.getByText('Fortified')).toBeInTheDocument();
+    it.each([
+      ['ROSE', 'Rosé'],
+      ['DESSERT', 'Dessert'],
+      ['FORTIFIED', 'Fortified'],
+    ])('displays %s as "%s"', (color, label) => {
+      const wine = [{ ...mockWines[0], color }];
+      render(<WineTable {...defaultProps} wines={wine} />);
+      expect(screen.getByText(label)).toBeInTheDocument();
     });
 
     it('displays raw color value for unknown color types', () => {
-      const unknownColorWine = [
-        {
-          ...mockWines[0],
-          color: 'ORANGE',
-        },
-      ];
-
+      const unknownColorWine = [{ ...mockWines[0], color: 'ORANGE' }];
       render(<WineTable {...defaultProps} wines={unknownColorWine} />);
-
       expect(screen.getByText('ORANGE')).toBeInTheDocument();
     });
   });

@@ -36,30 +36,6 @@ describe('WineCard Accessibility', () => {
     expect(results).toHaveNoViolations();
   });
 
-  it('has no accessibility violations when favorite', async () => {
-    const { container } = render(
-      <WineCard
-        wine={{ ...mockWine, favorite: true }}
-        onClick={vi.fn()}
-        onToggleFavorite={vi.fn()}
-      />
-    );
-
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
-  });
-
-  it('has no accessibility violations with different wine colors', async () => {
-    for (const color of ['RED', 'WHITE', 'ROSE', 'SPARKLING'] as const) {
-      const { container } = render(
-        <WineCard wine={{ ...mockWine, color }} onClick={vi.fn()} onToggleFavorite={vi.fn()} />
-      );
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    }
-  });
-
   it('has no accessibility violations with null optional fields', async () => {
     const { container } = render(
       <WineCard

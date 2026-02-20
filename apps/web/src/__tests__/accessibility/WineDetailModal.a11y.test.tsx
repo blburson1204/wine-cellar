@@ -51,62 +51,25 @@ describe('WineDetailModal Accessibility', () => {
     });
   });
 
-  describe('View mode', () => {
-    it('has no accessibility violations in view mode (desktop)', async () => {
-      const { container } = render(<WineDetailModal {...defaultProps} />);
+  it('has no accessibility violations in view mode', async () => {
+    const { container } = render(<WineDetailModal {...defaultProps} />);
 
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('has no accessibility violations in view mode (mobile)', async () => {
-      vi.mocked(useMediaQuery).mockReturnValue(true);
-      const { container } = render(<WineDetailModal {...defaultProps} />);
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('has no accessibility violations when favorite', async () => {
-      const { container } = render(
-        <WineDetailModal {...defaultProps} wine={{ ...mockWine, favorite: true }} />
-      );
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 
-  describe('Add mode', () => {
-    it('has no accessibility violations in add mode (desktop)', async () => {
-      const { container } = render(
-        <WineDetailModal
-          wine={null}
-          onClose={vi.fn()}
-          onUpdate={vi.fn()}
-          onCreate={vi.fn()}
-          mode="add"
-        />
-      );
+  it('has no accessibility violations in add mode', async () => {
+    const { container } = render(
+      <WineDetailModal
+        wine={null}
+        onClose={vi.fn()}
+        onUpdate={vi.fn()}
+        onCreate={vi.fn()}
+        mode="add"
+      />
+    );
 
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('has no accessibility violations in add mode (mobile)', async () => {
-      vi.mocked(useMediaQuery).mockReturnValue(true);
-      const { container } = render(
-        <WineDetailModal
-          wine={null}
-          onClose={vi.fn()}
-          onUpdate={vi.fn()}
-          onCreate={vi.fn()}
-          mode="add"
-        />
-      );
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 });

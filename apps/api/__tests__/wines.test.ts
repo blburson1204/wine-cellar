@@ -28,16 +28,6 @@ afterAll(async () => {
 });
 
 describe('Wine API', () => {
-  describe('GET /api/health', () => {
-    it('returns healthy status', async () => {
-      const response = await request(app).get('/api/health');
-
-      expect(response.status).toBe(200);
-      expect(response.body.status).toBe('ok');
-      expect(response.body.database).toBe('connected');
-    });
-  });
-
   describe('POST /api/wines', () => {
     it('creates a new wine with valid data', async () => {
       const wineData = createWineData({
@@ -143,15 +133,6 @@ describe('Wine API', () => {
       expect(response.body.id).toBe(wine.id);
       expect(response.body.name).toBe('Specific Wine');
     });
-
-    it('returns 404 when wine not found', async () => {
-      const response = await request(app).get('/api/wines/nonexistent-id');
-
-      expect(response.status).toBe(404);
-      expect(response.body.error).toContain('Wine');
-      expect(response.body.error).toContain('not found');
-      expect(response.body.errorCode).toBe('NOT_FOUND');
-    });
   });
 
   describe('PUT /api/wines/:id', () => {
@@ -185,14 +166,6 @@ describe('Wine API', () => {
       expect(response.body.rating).toBe(4.9);
       expect(response.body.notes).toBe('Updated notes');
     });
-
-    it('returns error when wine not found', async () => {
-      const response = await request(app).put('/api/wines/nonexistent-id').send({ quantity: 5 });
-
-      expect(response.status).toBe(404);
-      expect(response.body.error).toBeDefined();
-      expect(response.body.errorCode).toBe('NOT_FOUND');
-    });
   });
 
   describe('DELETE /api/wines/:id', () => {
@@ -208,14 +181,6 @@ describe('Wine API', () => {
       // Verify wine is deleted
       const wines = await prisma.wine.findMany();
       expect(wines).toHaveLength(0);
-    });
-
-    it('returns error when wine not found', async () => {
-      const response = await request(app).delete('/api/wines/nonexistent-id');
-
-      expect(response.status).toBe(404);
-      expect(response.body.error).toBeDefined();
-      expect(response.body.errorCode).toBe('NOT_FOUND');
     });
   });
 

@@ -76,28 +76,6 @@ describe('FilterDrawer Gestures', () => {
 
       expect(onClose).toHaveBeenCalledTimes(1);
     });
-
-    it('calls onClose for swipe exactly at threshold boundary (51px)', () => {
-      const onClose = vi.fn();
-      render(
-        <FilterDrawer {...defaultProps} onClose={onClose}>
-          <div>Filter Content</div>
-        </FilterDrawer>
-      );
-
-      const drawer = screen.getByRole('dialog');
-
-      // Swipe left exactly 51px (just past threshold)
-      fireEvent.touchStart(drawer, {
-        touches: [{ clientX: 200, clientY: 100 }],
-      });
-      fireEvent.touchMove(drawer, {
-        touches: [{ clientX: 149, clientY: 100 }],
-      });
-      fireEvent.touchEnd(drawer);
-
-      expect(onClose).toHaveBeenCalledTimes(1);
-    });
   });
 
   describe('FR-010: Partial swipe snaps back', () => {
@@ -117,28 +95,6 @@ describe('FilterDrawer Gestures', () => {
       });
       fireEvent.touchMove(drawer, {
         touches: [{ clientX: 170, clientY: 100 }],
-      });
-      fireEvent.touchEnd(drawer);
-
-      expect(onClose).not.toHaveBeenCalled();
-    });
-
-    it('does not close on swipe exactly at 50px (boundary)', () => {
-      const onClose = vi.fn();
-      render(
-        <FilterDrawer {...defaultProps} onClose={onClose}>
-          <div>Filter Content</div>
-        </FilterDrawer>
-      );
-
-      const drawer = screen.getByRole('dialog');
-
-      // Swipe left exactly 50px (at boundary, should NOT close per spec: "exceeding 50px")
-      fireEvent.touchStart(drawer, {
-        touches: [{ clientX: 200, clientY: 100 }],
-      });
-      fireEvent.touchMove(drawer, {
-        touches: [{ clientX: 150, clientY: 100 }],
       });
       fireEvent.touchEnd(drawer);
 

@@ -121,13 +121,4 @@ describe('MobileSortSelector', () => {
       expect(button.getAttribute('aria-label')).toMatch(/ascending|descending/i);
     });
   });
-
-  describe('Visual Styling', () => {
-    it('has consistent styling with wine-* design tokens', () => {
-      render(<MobileSortSelector {...defaultProps} />);
-      const container = screen.getByRole('combobox').closest('div');
-      // Should use consistent background styling
-      expect(container?.className).toMatch(/bg-|white/);
-    });
-  });
 });

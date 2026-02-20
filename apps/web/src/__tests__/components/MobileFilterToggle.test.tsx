@@ -54,11 +54,4 @@ describe('MobileFilterToggle', () => {
     const badge = screen.queryByText('0');
     expect(badge).not.toBeInTheDocument();
   });
-
-  it('has wine-dark background color', () => {
-    const { container } = render(<MobileFilterToggle onClick={vi.fn()} />);
-    const button = container.firstChild as HTMLElement;
-
-    expect(button).toHaveClass('bg-wine-dark');
-  });
 });

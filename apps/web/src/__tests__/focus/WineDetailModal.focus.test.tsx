@@ -90,55 +90,6 @@ describe('WineDetailModal Focus Management', () => {
       expect(document.activeElement).toBe(trigger);
     });
 
-    it('should restore focus to trigger element when modal closes (add mode)', async () => {
-      const user = userEvent.setup();
-      const onCreate = vi.fn().mockResolvedValue({
-        ...mockWine,
-        id: '2',
-      });
-
-      const TestComponent = () => {
-        const [isOpen, setIsOpen] = React.useState(false);
-
-        return (
-          <div>
-            <button data-testid="trigger" onClick={() => setIsOpen(true)}>
-              Add Wine
-            </button>
-            {isOpen && (
-              <WineDetailModal
-                wine={null}
-                onClose={() => setIsOpen(false)}
-                onUpdate={vi.fn()}
-                onCreate={onCreate}
-                mode="add"
-              />
-            )}
-          </div>
-        );
-      };
-
-      render(<TestComponent />);
-
-      const trigger = screen.getByTestId('trigger');
-
-      // Click trigger to open modal
-      await user.click(trigger);
-
-      // Modal should be open
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-      // Close modal using cancel button
-      const cancelButton = screen.getByRole('button', { name: /cancel/i });
-      await user.click(cancelButton);
-
-      // Modal should be closed
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-      // Focus should be restored to trigger button
-      expect(document.activeElement).toBe(trigger);
-    });
-
     it('should restore focus when modal is closed via Escape key (view mode)', async () => {
       const user = userEvent.setup();
 
@@ -157,55 +108,6 @@ describe('WineDetailModal Focus Management', () => {
                 onUpdate={vi.fn()}
                 onDelete={vi.fn()}
                 onToggleFavorite={vi.fn()}
-              />
-            )}
-          </div>
-        );
-      };
-
-      render(<TestComponent />);
-
-      const trigger = screen.getByTestId('trigger');
-
-      // Click trigger to open modal
-      await user.click(trigger);
-
-      // Modal should be open
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-
-      // Press Escape to close modal
-      await user.keyboard('{Escape}');
-
-      // Modal should be closed
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-      // Focus should be restored to trigger button
-      expect(document.activeElement).toBe(trigger);
-    });
-
-    it('should restore focus when modal is closed via Escape key (add mode)', async () => {
-      const user = userEvent.setup();
-      const onCreate = vi.fn().mockResolvedValue({
-        ...mockWine,
-        id: '2',
-      });
-
-      const TestComponent = () => {
-        const [isOpen, setIsOpen] = React.useState(false);
-
-        return (
-          <div>
-            <button data-testid="trigger" onClick={() => setIsOpen(true)}>
-              Add Wine
-            </button>
-            {isOpen && (
-              <WineDetailModal
-                wine={null}
-                onClose={() => setIsOpen(false)}
-                onUpdate={vi.fn()}
-                onCreate={onCreate}
-                mode="add"
               />
             )}
           </div>

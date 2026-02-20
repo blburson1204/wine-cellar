@@ -46,13 +46,6 @@ describe('LocalStorageService', () => {
     it('should create upload directory on initialization', async () => {
       expect(fs.mkdir).toHaveBeenCalledWith(testUploadDir, { recursive: true });
     });
-
-    it('should log error when directory creation fails', async () => {
-      // This test verifies that mkdir is attempted, but we can't easily test
-      // the error handling since it's fire-and-forget in the constructor
-      // The real behavior is tested in integration tests
-      expect(fs.mkdir).toHaveBeenCalled();
-    });
   });
 
   describe('uploadImage', () => {

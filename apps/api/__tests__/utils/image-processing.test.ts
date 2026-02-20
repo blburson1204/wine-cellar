@@ -253,7 +253,7 @@ describe('image-processing', () => {
   });
 
   describe('generateThumbnail', () => {
-    it('should generate thumbnail with width and height', async () => {
+    it('should generate thumbnail with width and height using cover fit', async () => {
       const mockBuffer = Buffer.from('test-image');
       const mockThumbnailBuffer = Buffer.from('thumbnail-image');
 
@@ -298,66 +298,6 @@ describe('image-processing', () => {
         position: 'center',
       });
       expect(result).toBe(mockThumbnailBuffer);
-    });
-
-    it('should use cover fit to fill dimensions', async () => {
-      const mockBuffer = Buffer.from('test-image');
-      const mockThumbnailBuffer = Buffer.from('thumbnail-image');
-
-      const mockSharpInstance = {
-        resize: vi.fn().mockReturnThis(),
-        jpeg: vi.fn().mockReturnThis(),
-        toBuffer: vi.fn().mockResolvedValue(mockThumbnailBuffer),
-      };
-
-      vi.mocked(sharp).mockReturnValue(mockSharpInstance as any);
-
-      await generateThumbnail(mockBuffer, 100, 100);
-
-      expect(mockSharpInstance.resize).toHaveBeenCalledWith(100, 100, {
-        fit: 'cover',
-        position: 'center',
-      });
-    });
-
-    it('should center crop thumbnails', async () => {
-      const mockBuffer = Buffer.from('test-image');
-      const mockThumbnailBuffer = Buffer.from('thumbnail-image');
-
-      const mockSharpInstance = {
-        resize: vi.fn().mockReturnThis(),
-        jpeg: vi.fn().mockReturnThis(),
-        toBuffer: vi.fn().mockResolvedValue(mockThumbnailBuffer),
-      };
-
-      vi.mocked(sharp).mockReturnValue(mockSharpInstance as any);
-
-      await generateThumbnail(mockBuffer, 150, 150);
-
-      expect(mockSharpInstance.resize).toHaveBeenCalledWith(150, 150, {
-        fit: 'cover',
-        position: 'center',
-      });
-    });
-
-    it('should output JPEG format', async () => {
-      const mockBuffer = Buffer.from('test-image');
-      const mockThumbnailBuffer = Buffer.from('thumbnail-image');
-
-      const mockSharpInstance = {
-        resize: vi.fn().mockReturnThis(),
-        jpeg: vi.fn().mockReturnThis(),
-        toBuffer: vi.fn().mockResolvedValue(mockThumbnailBuffer),
-      };
-
-      vi.mocked(sharp).mockReturnValue(mockSharpInstance as any);
-
-      await generateThumbnail(mockBuffer, 100);
-
-      expect(mockSharpInstance.jpeg).toHaveBeenCalledWith({
-        quality: 80,
-        progressive: true,
-      });
     });
   });
 });

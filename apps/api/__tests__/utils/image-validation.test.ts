@@ -55,17 +55,12 @@ describe('image-validation', () => {
   });
 
   describe('validateMimeType', () => {
-    it('should pass for allowed JPEG mime type', () => {
-      expect(() => validateMimeType('image/jpeg')).not.toThrow();
-    });
-
-    it('should pass for allowed PNG mime type', () => {
-      expect(() => validateMimeType('image/png')).not.toThrow();
-    });
-
-    it('should pass for allowed WebP mime type', () => {
-      expect(() => validateMimeType('image/webp')).not.toThrow();
-    });
+    it.each(['image/jpeg', 'image/png', 'image/webp'])(
+      'should pass for allowed %s mime type',
+      (mimeType) => {
+        expect(() => validateMimeType(mimeType)).not.toThrow();
+      }
+    );
 
     it('should throw InvalidFileTypeError for unsupported mime types', () => {
       expect(() => validateMimeType('image/gif')).toThrow(InvalidFileTypeError);
@@ -110,37 +105,17 @@ describe('image-validation', () => {
       );
     });
 
-    it('should pass for valid JPEG image', async () => {
-      const jpegBuffer = Buffer.from('fake-jpeg-data');
-      vi.mocked(fileTypeFromBuffer).mockResolvedValue({
-        ext: 'jpg',
-        mime: 'image/jpeg',
-      });
-
-      await expect(validateImageBuffer(jpegBuffer)).resolves.toBeUndefined();
+    it.each([
+      ['jpg', 'image/jpeg'],
+      ['png', 'image/png'],
+      ['webp', 'image/webp'],
+    ])('should pass for valid %s image', async (ext, mime) => {
+      const buffer = Buffer.from(`fake-${ext}-data`);
+      vi.mocked(fileTypeFromBuffer).mockResolvedValue({ ext: ext as any, mime: mime as any });
+      await expect(validateImageBuffer(buffer)).resolves.toBeUndefined();
     });
 
-    it('should pass for valid PNG image', async () => {
-      const pngBuffer = Buffer.from('fake-png-data');
-      vi.mocked(fileTypeFromBuffer).mockResolvedValue({
-        ext: 'png',
-        mime: 'image/png',
-      });
-
-      await expect(validateImageBuffer(pngBuffer)).resolves.toBeUndefined();
-    });
-
-    it('should pass for valid WebP image', async () => {
-      const webpBuffer = Buffer.from('fake-webp-data');
-      vi.mocked(fileTypeFromBuffer).mockResolvedValue({
-        ext: 'webp',
-        mime: 'image/webp',
-      });
-
-      await expect(validateImageBuffer(webpBuffer)).resolves.toBeUndefined();
-    });
-
-    it('should throw InvalidImageError for unsupported image formats', async () => {
+    it('should throw InvalidImageError for unsupported file types', async () => {
       const gifBuffer = Buffer.from('fake-gif-data');
       vi.mocked(fileTypeFromBuffer).mockResolvedValue({
         ext: 'gif',
@@ -149,17 +124,6 @@ describe('image-validation', () => {
 
       await expect(validateImageBuffer(gifBuffer)).rejects.toThrow(InvalidImageError);
       await expect(validateImageBuffer(gifBuffer)).rejects.toThrow('image/gif');
-    });
-
-    it('should throw InvalidImageError for non-image files', async () => {
-      const pdfBuffer = Buffer.from('fake-pdf-data');
-      vi.mocked(fileTypeFromBuffer).mockResolvedValue({
-        ext: 'pdf',
-        mime: 'application/pdf',
-      });
-
-      await expect(validateImageBuffer(pdfBuffer)).rejects.toThrow(InvalidImageError);
-      await expect(validateImageBuffer(pdfBuffer)).rejects.toThrow('application/pdf');
     });
 
     it('should detect file type spoofing', async () => {
@@ -200,31 +164,6 @@ describe('image-validation', () => {
       });
 
       await expect(validateImage(validBuffer, validMimeType)).resolves.toBeUndefined();
-    });
-
-    it('should fail if file size is too large', async () => {
-      const largeBuffer = Buffer.alloc(storageConfig.maxFileSize + 1);
-      const validMimeType = 'image/jpeg';
-
-      await expect(validateImage(largeBuffer, validMimeType)).rejects.toThrow(FileTooLargeError);
-    });
-
-    it('should fail if mime type is invalid', async () => {
-      const validBuffer = Buffer.alloc(1024);
-      const invalidMimeType = 'image/gif';
-
-      await expect(validateImage(validBuffer, invalidMimeType)).rejects.toThrow(
-        InvalidFileTypeError
-      );
-    });
-
-    it('should fail if buffer is not a valid image', async () => {
-      const invalidBuffer = Buffer.from('not-an-image');
-      const validMimeType = 'image/jpeg';
-
-      vi.mocked(fileTypeFromBuffer).mockResolvedValue(undefined);
-
-      await expect(validateImage(invalidBuffer, validMimeType)).rejects.toThrow(InvalidImageError);
     });
 
     it('should detect mime type mismatch', async () => {

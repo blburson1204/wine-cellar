@@ -33,47 +33,14 @@ describe('WineCard', () => {
   };
 
   describe('Rendering - 4-Line Layout (FR-001, FR-002)', () => {
-    it('renders wine name on line 1', () => {
+    it('renders all wine fields', () => {
       render(<WineCard {...defaultProps} />);
-      // Name appears in both line 1 and line 2 (producer) since mock wine has same name/producer
-      const nameElements = screen.getAllByText('Chateau Margaux');
-      expect(nameElements.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('renders favorite icon on line 1', () => {
-      render(<WineCard {...defaultProps} />);
-      // Favorite button should be present
+      expect(screen.getAllByText('Chateau Margaux').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByRole('button', { name: /favorite/i })).toBeInTheDocument();
-    });
-
-    it('renders vintage on line 2', () => {
-      render(<WineCard {...defaultProps} />);
       expect(screen.getByText('2019')).toBeInTheDocument();
-    });
-
-    it('renders producer on line 2', () => {
-      render(<WineCard {...defaultProps} />);
-      // Producer appears twice (name and producer field), check it exists
-      expect(screen.getAllByText(/Chateau Margaux/i).length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('renders wine type (color) on line 3', () => {
-      render(<WineCard {...defaultProps} />);
       expect(screen.getByText('Red')).toBeInTheDocument();
-    });
-
-    it('renders grape variety on line 3', () => {
-      render(<WineCard {...defaultProps} />);
       expect(screen.getByText('Cabernet Sauvignon')).toBeInTheDocument();
-    });
-
-    it('renders region on line 4', () => {
-      render(<WineCard {...defaultProps} />);
       expect(screen.getByText('Bordeaux')).toBeInTheDocument();
-    });
-
-    it('renders country on line 4', () => {
-      render(<WineCard {...defaultProps} />);
       expect(screen.getByText('France')).toBeInTheDocument();
     });
   });
@@ -136,27 +103,15 @@ describe('WineCard', () => {
   });
 
   describe('Color Display', () => {
-    it('displays Red for color RED', () => {
-      render(<WineCard {...defaultProps} />);
-      expect(screen.getByText('Red')).toBeInTheDocument();
-    });
-
-    it('displays White for color WHITE', () => {
-      const whiteWine = { ...mockWine, color: 'WHITE' };
-      render(<WineCard {...defaultProps} wine={whiteWine} />);
-      expect(screen.getByText('White')).toBeInTheDocument();
-    });
-
-    it('displays Rosé for color ROSE', () => {
-      const roseWine = { ...mockWine, color: 'ROSE' };
-      render(<WineCard {...defaultProps} wine={roseWine} />);
-      expect(screen.getByText('Rosé')).toBeInTheDocument();
-    });
-
-    it('displays Sparkling for color SPARKLING', () => {
-      const sparklingWine = { ...mockWine, color: 'SPARKLING' };
-      render(<WineCard {...defaultProps} wine={sparklingWine} />);
-      expect(screen.getByText('Sparkling')).toBeInTheDocument();
+    it.each([
+      ['RED', 'Red'],
+      ['WHITE', 'White'],
+      ['ROSE', 'Rosé'],
+      ['SPARKLING', 'Sparkling'],
+    ])('displays %s as "%s"', (color, label) => {
+      const wine = { ...mockWine, color };
+      render(<WineCard {...defaultProps} wine={wine} />);
+      expect(screen.getByText(label)).toBeInTheDocument();
     });
   });
 
@@ -190,11 +145,6 @@ describe('WineCard', () => {
   });
 
   describe('Accessibility', () => {
-    it('has article role for semantic structure', () => {
-      render(<WineCard {...defaultProps} />);
-      expect(screen.getByRole('article')).toBeInTheDocument();
-    });
-
     it('includes wine name in accessible label', () => {
       render(<WineCard {...defaultProps} />);
       const card = screen.getByRole('article');

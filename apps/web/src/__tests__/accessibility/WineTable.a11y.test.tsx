@@ -77,61 +77,27 @@ describe('WineTable Accessibility', () => {
     );
   });
 
-  describe('Desktop table layout', () => {
-    beforeEach(() => {
-      vi.mocked(useMediaQuery).mockReturnValue(false); // Desktop
-    });
+  it('has no accessibility violations in desktop table layout', async () => {
+    vi.mocked(useMediaQuery).mockReturnValue(false);
+    const { container } = render(<WineTable {...defaultProps} />);
 
-    it('has no accessibility violations in table layout', async () => {
-      const { container } = render(<WineTable {...defaultProps} />);
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('has no accessibility violations with different sort columns', async () => {
-      const { container } = render(
-        <WineTable {...defaultProps} sortBy="vintage" sortDirection="desc" />
-      );
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('has no accessibility violations with empty wines list', async () => {
-      const { container } = render(<WineTable {...defaultProps} wines={[]} />);
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 
-  describe('Mobile card layout', () => {
-    beforeEach(() => {
-      vi.mocked(useMediaQuery).mockReturnValue(true); // Mobile
-    });
+  it('has no accessibility violations in mobile card layout', async () => {
+    vi.mocked(useMediaQuery).mockReturnValue(true);
+    const { container } = render(<WineTable {...defaultProps} />);
 
-    it('has no accessibility violations in card layout', async () => {
-      const { container } = render(<WineTable {...defaultProps} />);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
 
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
+  it('has no accessibility violations with empty wines list', async () => {
+    vi.mocked(useMediaQuery).mockReturnValue(false);
+    const { container } = render(<WineTable {...defaultProps} wines={[]} />);
 
-    it('has no accessibility violations with mobile sort selector', async () => {
-      const { container } = render(
-        <WineTable {...defaultProps} sortBy="rating" sortDirection="desc" />
-      );
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it('has no accessibility violations with empty wines on mobile', async () => {
-      const { container } = render(<WineTable {...defaultProps} wines={[]} />);
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
   });
 });

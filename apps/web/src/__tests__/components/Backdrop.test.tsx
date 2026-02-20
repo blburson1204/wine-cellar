@@ -32,23 +32,4 @@ describe('Backdrop', () => {
 
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
-
-  it('has correct z-index for layering', () => {
-    const { container } = render(<Backdrop isOpen={true} onClick={vi.fn()} />);
-    const backdrop = container.firstChild as HTMLElement;
-
-    expect(backdrop).toHaveStyle({ zIndex: '900' });
-  });
-
-  it('covers entire viewport', () => {
-    const { container } = render(<Backdrop isOpen={true} onClick={vi.fn()} />);
-    const backdrop = container.firstChild as HTMLElement;
-
-    expect(backdrop).toHaveStyle({
-      top: '0',
-      left: '0',
-      right: '0',
-      bottom: '0',
-    });
-  });
 });

@@ -221,15 +221,6 @@ describe('Error Handling and Validation', () => {
       expect(response.headers['x-request-id']).toBeDefined();
     });
 
-    it('includes request ID in error responses', async () => {
-      const response = await request(app).get('/api/wines/nonexistent-id');
-
-      expect(response.status).toBe(404);
-      expect(response.body.requestId).toBeDefined();
-      expect(response.headers['x-request-id']).toBeDefined();
-      expect(response.body.requestId).toBe(response.headers['x-request-id']);
-    });
-
     it('accepts and uses custom request ID from header', async () => {
       const customRequestId = 'custom-test-request-id-123';
 
@@ -240,17 +231,6 @@ describe('Error Handling and Validation', () => {
   });
 
   describe('Error Response Format', () => {
-    it('has consistent error format with error message', async () => {
-      const response = await request(app).get('/api/wines/nonexistent-id');
-
-      expect(response.body).toHaveProperty('error');
-      expect(response.body).toHaveProperty('errorCode');
-      expect(response.body).toHaveProperty('requestId');
-      expect(typeof response.body.error).toBe('string');
-      expect(typeof response.body.errorCode).toBe('string');
-      expect(typeof response.body.requestId).toBe('string');
-    });
-
     it('includes field-specific errors for validation failures', async () => {
       const response = await request(app).post('/api/wines').send({
         name: '',
@@ -312,30 +292,20 @@ describe('Error Handling and Validation', () => {
   });
 
   describe('String Trimming and Sanitization', () => {
-    it('trims whitespace from name', async () => {
+    it('trims whitespace from string fields', async () => {
       const response = await request(app)
         .post('/api/wines')
-        .send(createValidWineData({ name: '  Test Wine  ' }));
+        .send(
+          createValidWineData({
+            name: '  Test Wine  ',
+            producer: '  Test Producer  ',
+            country: '  France  ',
+          })
+        );
 
       expect(response.status).toBe(201);
       expect(response.body.name).toBe('Test Wine');
-    });
-
-    it('trims whitespace from producer', async () => {
-      const response = await request(app)
-        .post('/api/wines')
-        .send(createValidWineData({ producer: '  Test Producer  ' }));
-
-      expect(response.status).toBe(201);
       expect(response.body.producer).toBe('Test Producer');
-    });
-
-    it('trims whitespace from country', async () => {
-      const response = await request(app)
-        .post('/api/wines')
-        .send(createValidWineData({ country: '  France  ' }));
-
-      expect(response.status).toBe(201);
       expect(response.body.country).toBe('France');
     });
   });

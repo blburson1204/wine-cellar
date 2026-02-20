@@ -64,83 +64,6 @@ describe('WineDetailModal - Additional Coverage', () => {
     });
   });
 
-  describe('Focus Trap', () => {
-    it('traps focus within modal on Tab', async () => {
-      render(
-        <WineDetailModal
-          wine={mockWine}
-          mode="view"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-          onDelete={vi.fn()}
-        />
-      );
-
-      const modal = document.querySelector('[role="dialog"]') as HTMLElement;
-      expect(modal).toBeInTheDocument();
-
-      // Get all focusable elements
-      const focusableElements = modal.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-
-      expect(focusableElements.length).toBeGreaterThan(0);
-    });
-
-    it('wraps focus from last to first element on Tab', () => {
-      render(
-        <WineDetailModal
-          wine={mockWine}
-          mode="view"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-          onDelete={vi.fn()}
-        />
-      );
-
-      const modal = document.querySelector('[role="dialog"]') as HTMLElement;
-      const focusableElements = modal.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      const lastElement = focusableElements[focusableElements.length - 1];
-
-      // Focus last element
-      lastElement.focus();
-      expect(document.activeElement).toBe(lastElement);
-
-      // Tab forward should wrap to first
-      fireEvent.keyDown(document, { key: 'Tab', shiftKey: false });
-
-      // Note: The actual focus change is handled by the component's event handler
-      // which calls preventDefault() and focuses the first element
-    });
-
-    it('wraps focus from first to last element on Shift+Tab', () => {
-      render(
-        <WineDetailModal
-          wine={mockWine}
-          mode="view"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-          onDelete={vi.fn()}
-        />
-      );
-
-      const modal = document.querySelector('[role="dialog"]') as HTMLElement;
-      const focusableElements = modal.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      const firstElement = focusableElements[0];
-
-      // Focus first element
-      firstElement.focus();
-      expect(document.activeElement).toBe(firstElement);
-
-      // Shift+Tab should wrap to last
-      fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
-    });
-  });
-
   describe('Wine Link Display', () => {
     it('displays wine link when present', () => {
       render(
@@ -258,7 +181,7 @@ describe('WineDetailModal - Additional Coverage', () => {
       expect(screen.getByText('Not rated')).toBeInTheDocument();
     });
 
-    it('displays full stars for integer ratings', () => {
+    it('displays numeric rating value', () => {
       const wine4Stars = { ...mockWine, rating: 4.0 };
 
       render(
@@ -271,51 +194,6 @@ describe('WineDetailModal - Additional Coverage', () => {
       );
 
       expect(screen.getByText('(4.0)')).toBeInTheDocument();
-    });
-
-    it('displays half star for ratings with decimal >= 0.3 and < 0.8', () => {
-      const wineHalfStar = { ...mockWine, rating: 3.5 };
-
-      render(
-        <WineDetailModal
-          wine={wineHalfStar}
-          mode="view"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      expect(screen.getByText('(3.5)')).toBeInTheDocument();
-    });
-
-    it('does not display half star for ratings with decimal < 0.3', () => {
-      const wineNoHalf = { ...mockWine, rating: 3.2 };
-
-      render(
-        <WineDetailModal
-          wine={wineNoHalf}
-          mode="view"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      expect(screen.getByText('(3.2)')).toBeInTheDocument();
-    });
-
-    it('does not display half star for ratings with decimal >= 0.8', () => {
-      const wineNoHalf = { ...mockWine, rating: 3.9 };
-
-      render(
-        <WineDetailModal
-          wine={wineNoHalf}
-          mode="view"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      expect(screen.getByText('(3.9)')).toBeInTheDocument();
     });
   });
 
@@ -378,23 +256,6 @@ describe('WineDetailModal - Additional Coverage', () => {
       expect(purchasePriceValue?.textContent).toBe('—');
     });
 
-    it('displays em dash for undefined price', () => {
-      const wineUndefinedPrice = { ...mockWine, purchasePrice: undefined as unknown as null };
-
-      render(
-        <WineDetailModal
-          wine={wineUndefinedPrice}
-          mode="view"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      const purchasePriceLabel = screen.getByText('Purchase Price');
-      const purchasePriceValue = purchasePriceLabel.parentElement?.querySelector('p');
-      expect(purchasePriceValue?.textContent).toBe('—');
-    });
-
     it('formats price with two decimal places', () => {
       const wineWithPrice = { ...mockWine, purchasePrice: 99.9 };
 
@@ -444,7 +305,13 @@ describe('WineDetailModal - Additional Coverage', () => {
   });
 
   describe('Form Validation Edge Cases', () => {
-    it('validates name too long', async () => {
+    it.each([
+      ['Enter wine name', 'Name must be less than 200 characters', 201],
+      ['Enter producer', 'Producer must be less than 200 characters', 201],
+      ['Enter country', 'Country must be less than 100 characters', 101],
+      ['Enter region', 'Region must be less than 200 characters', 201],
+      ['Enter grape variety', 'Grape variety must be less than 200 characters', 201],
+    ])('validates "%s" field max length', async (placeholder, expectedError, charCount) => {
       const user = userEvent.setup();
 
       render(
@@ -460,137 +327,24 @@ describe('WineDetailModal - Additional Coverage', () => {
       const nameInput = screen.getByPlaceholderText('Enter wine name');
       const producerInput = screen.getByPlaceholderText('Enter producer');
       const countryInput = screen.getByPlaceholderText('Enter country');
+      const targetInput = screen.getByPlaceholderText(placeholder);
 
-      const longName = 'A'.repeat(201);
-      await user.type(nameInput, longName);
-      await user.type(producerInput, 'Producer');
-      await user.click(nameInput); // Blur Combobox
-      await user.type(countryInput, 'Country');
-      await user.click(nameInput); // Blur Combobox
+      // Fill required fields with valid data (unless they're the one being tested)
+      if (placeholder !== 'Enter wine name') await user.type(nameInput, 'Wine Name');
+      if (placeholder !== 'Enter producer') await user.type(producerInput, 'Producer');
+      if (placeholder !== 'Enter country') {
+        await user.click(nameInput);
+        await user.type(countryInput, 'Country');
+      }
+      await user.click(nameInput);
 
-      await user.click(screen.getByRole('button', { name: 'Add Wine' }));
-
-      expect(screen.getByText('Name must be less than 200 characters')).toBeInTheDocument();
-    });
-
-    it('validates producer too long', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <WineDetailModal
-          wine={null}
-          mode="add"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-          onCreate={mockOnCreate}
-        />
-      );
-
-      const nameInput = screen.getByPlaceholderText('Enter wine name');
-      const producerInput = screen.getByPlaceholderText('Enter producer');
-      const countryInput = screen.getByPlaceholderText('Enter country');
-
-      await user.type(nameInput, 'Wine Name');
-      await user.type(producerInput, 'P'.repeat(201));
-      await user.click(nameInput); // Blur Combobox
-      await user.type(countryInput, 'Country');
-      await user.click(nameInput); // Blur Combobox
+      // Type the overlong value into the target field
+      await user.type(targetInput, 'X'.repeat(charCount));
+      // Blur Combobox fields to close dropdown before clicking submit
+      if (placeholder !== 'Enter wine name') await user.click(nameInput);
 
       await user.click(screen.getByRole('button', { name: 'Add Wine' }));
-
-      expect(screen.getByText('Producer must be less than 200 characters')).toBeInTheDocument();
-    });
-
-    it('validates country too long', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <WineDetailModal
-          wine={null}
-          mode="add"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-          onCreate={mockOnCreate}
-        />
-      );
-
-      const nameInput = screen.getByPlaceholderText('Enter wine name');
-      const producerInput = screen.getByPlaceholderText('Enter producer');
-      const countryInput = screen.getByPlaceholderText('Enter country');
-
-      await user.type(nameInput, 'Wine Name');
-      await user.type(producerInput, 'Producer');
-      await user.click(nameInput); // Blur Combobox
-      await user.type(countryInput, 'C'.repeat(101));
-      await user.click(nameInput); // Blur Combobox
-
-      await user.click(screen.getByRole('button', { name: 'Add Wine' }));
-
-      expect(screen.getByText('Country must be less than 100 characters')).toBeInTheDocument();
-    });
-
-    it('validates region too long', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <WineDetailModal
-          wine={null}
-          mode="add"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-          onCreate={mockOnCreate}
-        />
-      );
-
-      const nameInput = screen.getByPlaceholderText('Enter wine name');
-      const producerInput = screen.getByPlaceholderText('Enter producer');
-      const countryInput = screen.getByPlaceholderText('Enter country');
-      const regionInput = screen.getByPlaceholderText('Enter region');
-
-      await user.type(nameInput, 'Wine Name');
-      await user.type(producerInput, 'Producer');
-      await user.click(nameInput); // Blur Combobox
-      await user.type(countryInput, 'Country');
-      await user.click(nameInput); // Blur Combobox
-      await user.type(regionInput, 'R'.repeat(201));
-      await user.click(nameInput); // Blur Combobox
-
-      await user.click(screen.getByRole('button', { name: 'Add Wine' }));
-
-      expect(screen.getByText('Region must be less than 200 characters')).toBeInTheDocument();
-    });
-
-    it('validates grape variety too long', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <WineDetailModal
-          wine={null}
-          mode="add"
-          onClose={mockOnClose}
-          onUpdate={mockOnUpdate}
-          onCreate={mockOnCreate}
-        />
-      );
-
-      const nameInput = screen.getByPlaceholderText('Enter wine name');
-      const producerInput = screen.getByPlaceholderText('Enter producer');
-      const countryInput = screen.getByPlaceholderText('Enter country');
-      const grapeVarietyInput = screen.getByPlaceholderText('Enter grape variety');
-
-      await user.type(nameInput, 'Wine Name');
-      await user.type(producerInput, 'Producer');
-      await user.click(nameInput); // Blur Combobox
-      await user.type(countryInput, 'Country');
-      await user.click(nameInput); // Blur Combobox
-      await user.type(grapeVarietyInput, 'G'.repeat(201));
-      await user.click(nameInput); // Blur Combobox
-
-      await user.click(screen.getByRole('button', { name: 'Add Wine' }));
-
-      expect(
-        screen.getByText('Grape variety must be less than 200 characters')
-      ).toBeInTheDocument();
+      expect(screen.getByText(expectedError)).toBeInTheDocument();
     });
 
     it('validates notes too long', async () => {

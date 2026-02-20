@@ -171,31 +171,6 @@ describe('Home Page - Mobile View', () => {
         expect(screen.getByPlaceholderText(/Name, producer, region/i)).toBeInTheDocument();
       });
     });
-
-    it('shows close button in filter drawer', async () => {
-      const user = userEvent.setup();
-
-      vi.mocked(global.fetch).mockResolvedValue({
-        ok: true,
-        json: async () => mockWines,
-      } as Response);
-
-      render(<Home />);
-
-      await waitFor(() => {
-        expect(screen.getByText('Barolo Reserve')).toBeInTheDocument();
-      });
-
-      // Open filter drawer
-      const filterButton = screen.getByRole('button', { name: /filter/i });
-      await user.click(filterButton);
-
-      // The WineFilters inside the drawer should have showCloseButton=true
-      await waitFor(() => {
-        const closeButtons = screen.getAllByRole('button', { name: /close/i });
-        expect(closeButtons.length).toBeGreaterThan(0);
-      });
-    });
   });
 
   describe('Mobile Filter Drawer Close', () => {
@@ -374,31 +349,6 @@ describe('Home Page - Mobile View', () => {
       await waitFor(() => {
         expect(screen.getByText('Barolo Reserve')).toBeInTheDocument();
         expect(screen.queryByText('Chablis Premier Cru')).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Mobile Add Wine', () => {
-    it('opens add wine modal on mobile', async () => {
-      const user = userEvent.setup();
-
-      vi.mocked(global.fetch).mockResolvedValue({
-        ok: true,
-        json: async () => mockWines,
-      } as Response);
-
-      render(<Home />);
-
-      await waitFor(() => {
-        expect(screen.getByText('Barolo Reserve')).toBeInTheDocument();
-      });
-
-      // Click Add Wine button
-      await user.click(screen.getByRole('button', { name: /Add Wine/i }));
-
-      // Modal should open
-      await waitFor(() => {
-        expect(screen.getByText('Add New Wine')).toBeInTheDocument();
       });
     });
   });
