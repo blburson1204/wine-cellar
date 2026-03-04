@@ -19,6 +19,10 @@ skills, agents, commands, and ATOM hooks (see CLAUDE.md)
 
 ## Up Next
 
+### Jira Integration (see `specs/006-jira-integration-map/`)
+
+- [ ] Implement SpecKit-to-Jira mapping (spec ready, pending `/implement`)
+
 ### AWS Deployment (see `documents/aws-deployment-plan.md`)
 
 **Phase 1: Preparation**
@@ -50,6 +54,15 @@ skills, agents, commands, and ATOM hooks (see CLAUDE.md)
 **Low-Cost Alternative: Vercel + Railway**
 
 - [ ] Evaluate Vercel + Railway/Supabase ($0-5/month vs full AWS $50-110/month)
+
+**Framework Adoption** (see `documents/bryan-framework-v4-adoption-plan.md`
+§4.1)
+
+- [ ] Adopt `docker-expert` skill when containerization starts
+- [ ] Decide deployment path (full AWS vs Vercel+Railway) — determines which AWS
+      skills to adopt
+- [ ] Adopt `aws-expert` skill as operational playbook template (full AWS path
+      only)
 
 ---
 
@@ -165,6 +178,7 @@ skills, agents, commands, and ATOM hooks (see CLAUDE.md)
 - [ ] JWT-based authentication
 - [ ] User-specific wine collections
 - [ ] Role-based access control
+- [ ] Adopt `security-rbac` skill from v4 framework (see adoption plan §4.3)
 
 ### Security (Priority for Production)
 
@@ -211,8 +225,8 @@ skills, agents, commands, and ATOM hooks (see CLAUDE.md)
 - [ ] Jira integration - Map `/tasks` output to Jira tickets (Spec → Epic, Tasks
       → Stories)
 - [ ] Custom MCP server for Jira (tailored to SpecKit Epic→Task hierarchy)
-- [ ] Lovable integration - Import generated components into codebase; explore
-      bidirectional sync for prototyping workflow
+- [ ] Figma Make integration - Adapt v4 framework Figma components for MedGeo
+      (see `documents/figma-make-integration-draft.md` and adoption plan §4.2)
 - [ ] Slack integration - Progress notifications for SpecKit phases/tasks
       (webhook for personal, MCP server for team use)
 - [ ] Hook audit log - Append-only NDJSON log
@@ -239,4 +253,13 @@ skills, agents, commands, and ATOM hooks (see CLAUDE.md)
 
 ---
 
-**Last Updated**: February 14, 2026
+### Framework v4 Gap Analysis
+
+Full inventory of v4 components not yet installed, categorized by relevance. See
+`documents/framework-v4-gap-analysis.md` for the complete reference. Quick
+action items identified: install `frontmatter-reference.md` doc, review
+`claude-maintenance-expert` skill, review `checkpoint-workflow.md` doc.
+
+---
+
+**Last Updated**: March 4, 2026

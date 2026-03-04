@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: February 19, 2026
+**Last Updated**: March 4, 2026
 
 ## Project Overview
 
@@ -87,8 +87,7 @@ wine-cellar/
 │       │   │   └── ErrorBoundary.tsx  # Error boundary
 │       │   └── utils/          # API utilities with error handling
 │       ├── __tests__/          # React component tests
-│       ├── jest.config.js      # Jest configuration
-│       └── jest.setup.js       # Test environment setup
+│       └── vitest.config.ts    # Vitest configuration
 │
 ├── packages/
 │   └── database/               # Shared Prisma client
@@ -102,12 +101,13 @@ wine-cellar/
 │   └── PULL_REQUEST_TEMPLATE.md  # Pull request template
 │
 ├── .claude/
-│   ├── skills/                 # 23 skills (see CLAUDE.md for full list)
-│   ├── agents/                 # 6 agents (code-reviewer, test-analyzer, etc.)
-│   ├── commands/               # 13 commands (/specify, /clarify, /plan, etc.)
-│   ├── hooks/                  # ATOM and safety hooks
+│   ├── skills/                 # 28 skills + 4 sub-skills (see CLAUDE.md)
+│   ├── agents/                 # 8 agents (code-reviewer, preflight, etc.)
+│   ├── commands/               # 15 commands (/specify, /clarify, /plan, etc.)
+│   ├── hooks/                  # ATOM, safety, and SpecKit hooks
 │   │   ├── atom/               # Context & verification (4 hooks)
-│   │   └── safety/             # Command blocking & file guards (2 hooks)
+│   │   ├── safety/             # Command blocking & file guards (2 hooks)
+│   │   └── speckit/            # Post-tasks reconciliation (1 hook)
 │   ├── docs/                   # Framework documentation (ATOM, gates, context)
 │   ├── session-context/        # Session state (current-work.md, etc.)
 │   └── settings.json           # Hook registration config
@@ -122,9 +122,14 @@ wine-cellar/
 ├── .prettierrc                # Prettier configuration
 ├── .prettierignore            # Prettier ignore patterns
 ├── commitlint.config.js       # Commitlint configuration
+├── documents/
+│   ├── README.md               # Document index with update triggers
+│   ├── project-summary.md      # This file
+│   ├── error-handling-summary.md # Error handling patterns
+│   ├── patterns.md             # Established codebase patterns
+│   ├── ... (8 living docs, 4 active plans — see README.md)
+│   └── archive/                # Completed plans & point-in-time artifacts
 ├── TODO.md                     # Project roadmap
-├── project-summary.md          # This file
-└── error-handling-summary.md   # Error handling implementation details
 ```
 
 ## Database Schema
@@ -655,8 +660,9 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
    migration to Tailwind would improve consistency and make responsive design
    easier via utility prefixes (`md:`, `lg:`), but is a cleanup task — no
    performance or functional benefit. Worth doing before significant UI work;
-   fine to defer if UI is stable. See `documents/mobile-responsive-plan.md`
-   Option B for the original analysis.
+   fine to defer if UI is stable. See
+   `documents/archive/mobile-responsive-plan.md` Option B for the original
+   analysis.
 5. **No Sentry Integration**: Error tracking service not configured
    (infrastructure ready)
 

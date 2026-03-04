@@ -156,6 +156,8 @@ mistakes. The small upfront cost prevents large downstream costs.
 | Spec Validator               | Check spec completeness before planning           |
 | Capture Idea                 | Feature idea capture to future-work.md            |
 | Documentation Reconciliation | Documentation drift detection                     |
+| Preflight Schema Drift       | Validates spec references against Prisma schema   |
+| Preflight Interface          | Validates spec references against code signatures |
 
 ---
 
@@ -226,7 +228,11 @@ Consistent patterns across the codebase:
 - [x] Install ATOM hooks (stale-file prevention, compaction recovery, evidence
       enforcement)
 - [x] Install safety hooks (dangerous command blocking, file placement guards)
-- [ ] Integrate with project management (Jira, etc.)
+- [x] Add preflight agents (schema drift, interface validation)
+- [x] Add SpecKit hooks (post-tasks reconciliation)
+- [x] Writing quality enforcement (Elements of Style, AI anti-patterns)
+- [ ] Integrate with project management (Jira — spec in progress, see
+      `specs/006-jira-integration-map/`)
 - [ ] Add progress notifications (Slack, etc.)
 - [ ] Continuous refinement based on team feedback
 
@@ -293,4 +299,4 @@ Consistent patterns across the codebase:
 
 ---
 
-_Last Updated: February 2026_
+_Last Updated: March 2026_

@@ -1,6 +1,6 @@
 # Wine Cellar - Project Metrics Snapshot
 
-Last updated: February 19, 2026
+Last updated: March 4, 2026
 
 ## Codebase Statistics
 
@@ -83,12 +83,18 @@ Last updated: February 19, 2026
 
 ### Development Framework (SpecKit)
 
-| Category | Count |
-| -------- | ----- |
-| Skills   | 27    |
-| Commands | 13    |
-| Agents   | 6     |
-| Specs    | 5     |
+| Category         | Count |
+| ---------------- | ----- |
+| Skills           | 28    |
+| Sub-skills       | 4     |
+| Commands         | 15    |
+| Agents           | 8     |
+| Hooks            | 7     |
+| Specs (lifetime) | 6     |
+
+Framework version: v4 (selective adoption). See
+`documents/bryan-framework-v4-adoption-plan.md` for adoption decisions and
+`documents/framework-v4-gap-analysis.md` for components not installed.
 
 ---
 

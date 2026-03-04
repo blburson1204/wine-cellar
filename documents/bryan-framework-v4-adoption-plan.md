@@ -1,7 +1,8 @@
 # Bryan's Framework v4 Adoption Plan
 
-**Created**: March 4, 2026 **Status**: INSTALLED (Tier 1 complete, Tier 2
-selective adoption complete)
+**Created**: March 4, 2026 **Updated**: March 4, 2026 **Status**: INSTALLED
+(Tier 1 complete, Tier 2 selective adoption complete, Tier 3 evaluated with
+triggers)
 
 ## Overview
 
@@ -233,22 +234,143 @@ signs-of-ai-writing.md
 
 ---
 
-## Part 4: Tier 3 — Bookmark for Future
+## Part 4: Tier 3 — Adopt When Triggered
 
-Components not relevant now but worth revisiting if project scope changes.
+Components not needed today but evaluated in detail (March 2026) for upcoming
+work. Organized by adoption priority when their trigger fires.
 
-| Component                                                                      | Why Not Now                                             | When to Revisit                                |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------- |
-| Docker workflow (13 commands)                                                  | We use Docker only for Postgres, not for app deployment | If we containerize the full app                |
-| AWS skills (aws-expert, aws-cdk, aws-serverless-eda)                           | No AWS deployment planned                               | If we deploy to AWS                            |
-| Figma integration (3 skills, 1 agent)                                          | No Figma usage                                          | If we adopt Figma for design                   |
-| `db-expert` skill                                                              | We use Prisma exclusively; db-prisma covers our needs   | If we need raw SQL optimization                |
-| `prod-data-sampler` skill                                                      | No production deployment yet                            | When we deploy to production                   |
-| `security-rbac` skill                                                          | No multi-user auth yet                                  | When we add user accounts                      |
-| `design-system` skill                                                          | No formal design system                                 | When we formalize UI components                |
-| `promote-fix-promote` skill                                                    | CI/CD pattern we don't use                              | If we adopt a promotion-based deploy model     |
-| Meta-creation skills (meta-create-tool, meta-create-agents, meta-write-skills) | We're consumers of the framework, not authors           | If we start creating our own framework tools   |
-| `/generate-framework` commands                                                 | Bryan-specific                                          | Never (framework generation is Bryan's domain) |
+### 4.1 Promote When AWS Deployment Starts
+
+These three items become relevant when Wine Cellar moves off localhost. The
+recommended adoption order depends on which deployment path we choose (see
+decision point below).
+
+**Docker Expert Skill** — Adopt first, low effort
+
+- **Source**: `_bgframeworkv4/claude/skills/docker-expert/SKILL.md` (~220 lines)
+- **What**: Generic Dockerfile best practices — multi-stage builds, layer
+  caching, monorepo build context, `.dockerignore` gotchas, two-compose-file
+  pattern (`docker-compose.dev.yml` for hot reload vs `docker-compose.local.yml`
+  for built image testing).
+- **Action**: Copy and adapt. Useful regardless of deployment target (Railway
+  deploys from Docker images too).
+- **Skip**: The 13 Docker _commands_ (`docker-dev`, `docker-build`,
+  `docker-push`, `docker-deploy-staging`, etc.). They're thin wrappers around
+  shell scripts tuned for Bryan's ECS/ECR pipeline. We'll build our own deploy
+  scripts as needed.
+
+**AWS Expert Skill (as template)** — Adopt second, medium effort
+
+- **Source**: `_bgframeworkv4/claude/skills/aws-expert/SKILL.md` (~400 lines)
+- **What**: Project-specific AWS runbook covering ECS Fargate, RDS PostgreSQL,
+  ECR, Secrets Manager, SSM Parameter Store, EventBridge, CloudWatch, and S3.
+  Includes copy-paste CLI commands for common operations and troubleshooting
+  runbooks for failed jobs, unhealthy services, and cost optimization.
+- **Caveat**: Hardcoded to Bryan's project names throughout. Needs full
+  adaptation with Wine Cellar names, but the _structure_ is exactly what we need
+  as an operational playbook.
+- **Action**: Adapt as we build out infrastructure. Skip if we go Vercel +
+  Railway path.
+
+**AWS CDK Development Skill** — Adopt third, low effort
+
+- **Source**: `_bgframeworkv4/claude/skills/aws-cdk-development/SKILL.md` (~256
+  lines + references)
+- **What**: Generic CDK guidance — resource naming conventions (let
+  CloudFormation generate names), Lambda bundling with `NodejsFunction`,
+  multi-layer validation (`cdk-nag` + `validate-stack.sh`), development
+  workflow.
+- **Action**: Adoptable as-is if we choose CDK for infrastructure-as-code. Skip
+  if we go Vercel + Railway path.
+
+> **Decision point**: Our `aws-deployment-plan.md` presents two paths: full AWS
+> ($50-110/mo) vs Vercel + Railway ($0-5/mo). The AWS Expert and CDK skills are
+> oriented toward the full AWS path. If we go Vercel + Railway, only the Docker
+> Expert skill is needed. Decide the deployment path before investing adaptation
+> effort into AWS skills.
+
+### 4.2 Promote When Figma Make Work Starts (MedGeo)
+
+Four v4 components map directly to the phases in our
+`figma-make-integration-draft.md`. These should be adopted into the MedGeo
+project, not Wine Cellar.
+
+**Figma Sync Orchestrator (Agent)** — High effort to adapt
+
+- **Source**: `_bgframeworkv4/claude/agents/figma-sync-orchestrator.md` (~480
+  lines)
+- **What**: 11-phase pipeline: pre-flight → mapping reconciliation → diff
+  detection → change categorization → local divergence detection → file sync →
+  capability analysis → post-sync validation → spec generation → mapping update
+  → SpecKit pipeline. Protects locally-diverged files by defaulting to SKIP.
+- **Maps to**: Draft Plan Phase 2 (Sync Pipeline)
+- **Requires**: `configs/figma-mapping.json`, a Figma Make GitHub export repo,
+  and a `figma-ui/` component directory structure.
+
+**UI Figma Integrate (Skill)** — Medium effort to adapt
+
+- **Source**: `_bgframeworkv4/claude/skills/ui-figma-integrate/SKILL.md` (~280
+  lines)
+- **What**: Post-sync implementation cleanup — fixes versioned package imports,
+  `figma:asset/` references, adds `'use client'` directives, wires navigation
+  handlers, fixes responsive layout issues (overflow, scroll blocking, grids).
+  Includes visual comparison workflow.
+- **Maps to**: Draft Plan Phase 2 (Sync Pipeline)
+- **Note**: Useful even outside the full orchestration pipeline, whenever
+  pulling in Figma-generated components.
+
+**Design Auditor (Agent)** — Low-medium effort to adapt
+
+- **Source**: `_bgframeworkv4/claude/agents/design-auditor.md` (~179 lines)
+- **What**: Scans for design system violations at four priority levels: P1 raw
+  hex colors, P2 arbitrary Tailwind values, P3 missing component library
+  imports, P4 custom layouts bypassing the design shell. Outputs compliance
+  score and merge readiness verdict.
+- **Maps to**: Draft Plan Phase 3 (Design System Compliance)
+
+**UI Figma Sync (Skill)** — Used by the orchestrator
+
+- **Source**: `_bgframeworkv4/claude/skills/ui-figma-sync/SKILL.md` (~204 lines)
+- **What**: Diff detection and spec generation logic. Predates the orchestrator
+  agent, now referenced by it. Handles GitHub API commands for fetching commits,
+  change categorization, and prioritization by lines changed.
+
+The draft plan's "Coordinate with Bryan on accessing v3 framework source" step
+is already solved — we have v4 source locally at `~/_bgframeworkv4/`.
+
+### 4.3 Promote When Feature Triggers Fire
+
+**Security RBAC Skill** — Adopt when auth feature starts
+
+- **Source**: `_bgframeworkv4/claude/skills/security-rbac/SKILL.md` (~117 lines)
+- **Trigger**: Authentication & Authorization backlog item in TODO.md
+- **What**: Validates RBAC completeness during spec/planning. Blocks specs with
+  vague access language, requires `resource.action` permission format, enforces
+  dual-layer auth (API middleware + UI wrappers), requires data scoping
+  strategy.
+- **Action**: Adoptable as-is. Low effort.
+
+**Design System + Design Auditor** — Adopt when UI component library formalized
+
+- **Source**: `_bgframeworkv4/claude/skills/ui-design-system/SKILL.md` (~176
+  lines) + `design-auditor` agent (above)
+- **Trigger**: Formalizing a component library (e.g., adopting shadcn/ui)
+- **What**: Proactive prevention of design system violations before code is
+  written. Enforces design tokens over raw values, component library over custom
+  elements, standard Tailwind scale over arbitrary values.
+- **Action**: Medium effort. Needs a defined component library to enforce
+  against.
+
+### 4.4 Keep Bookmarked (No Promotion Planned)
+
+| Component                  | Why                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `prod-data-sampler`        | Requires AWS SSM tunnel and materialized views — too project-specific. FK-ordering pattern is interesting but not needed. |
+| `aws-serverless-eda`       | Wine Cellar doesn't need EventBridge/SQS/Lambda. Revisit only if we go serverless instead of containers.                  |
+| `db-expert`                | We use Prisma exclusively; `db-prisma` covers our needs.                                                                  |
+| `promote-fix-promote`      | CI/CD promotion pattern — revisit if we adopt staged environments.                                                        |
+| Meta-creation skills       | We're consumers of the framework, not authors.                                                                            |
+| `/generate-framework` cmds | Bryan-specific. Never adopting.                                                                                           |
 
 ---
 
@@ -257,7 +379,7 @@ Components not relevant now but worth revisiting if project scope changes.
 Components specific to Bryan's architecture with no Wine Cellar relevance.
 
 - **Portal architecture** — Three-portal system (admin, provider, member)
-- **Figma sync orchestration** — Design-to-code pipeline
+- **Figma sync orchestration** — Covered in Tier 3 (§4.2) for MedGeo adoption
 - **Multi-tenant patterns** — Tenant isolation, RBAC roles
 - **API versioning commands** — We have a single internal API
 - **Deployment orchestrator** — AWS ECS/ECR deployment pipeline
@@ -352,8 +474,11 @@ As with v3, these Wine Cellar-specific features must survive adoption:
 | **Already Have**       | Core hooks, commands, skills, agents                                                                                            | ~48                   |
 | **Tier 1 (Adopt)**     | Hook reorg, agent frontmatter, test-guide, react-best-practices, post-tasks hook, /archive-spec, /whats-new, skill improvements | 8 items — INSTALLED   |
 | **Tier 2 (Selective)** | Preflight agents (2/5), pattern registry (lightweight), writing-clearly — adopted; Agent Teams, composition-patterns — deferred | 3 adopted, 2 deferred |
-| **Tier 3 (Bookmark)**  | Docker, AWS, Figma, db-expert, prod-data-sampler, RBAC, design-system, meta-creation                                            | 10 items              |
+| **Tier 3 (Triggered)** | Docker + AWS (on deployment), Figma (on MedGeo), RBAC (on auth), Design System (on component library)                           | 10 items, 0 adopted   |
 | **Not Adopting**       | Portal, multi-tenant, API versioning, deployment, jobs, spec-coordination                                                       | 8 items               |
 
-**All planned installation is complete.** Tier 3 items remain bookmarked for
-future projects. Agent Teams and composition-patterns deferred for company work.
+**Tier 1 and Tier 2 installation is complete.** Tier 3 items are evaluated in
+detail (see Part 4) with specific triggers, adoption order, and effort
+estimates. Next triggers expected: AWS deployment (Docker + AWS skills) and
+MedGeo Figma Make work (Figma integration components). Agent Teams and
+composition-patterns deferred for company work.
