@@ -54,6 +54,18 @@
         ]
       }
     ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/speckit/post-tasks-reconciliation.sh",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

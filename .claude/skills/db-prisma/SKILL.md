@@ -1,216 +1,227 @@
 ---
-name: prisma-surgical-fixes
+name: db-prisma
 description:
-  Detailed SQL surgical fixes for all Prisma migration problem categories -
-  preserves data by modifying migration metadata only
+  Use when database migrations fail, drift is detected, or branch switching
+  causes conflicts - provides surgical solutions that preserve data rather than
+  destructive resets.
 ---
 
-# Prisma Surgical Fixes
+# Prisma Migration Troubleshooting
 
-This sub-skill provides detailed SQL commands for fixing specific Prisma
-migration issues. These are surgical fixes that modify only the
-`_prisma_migrations` metadata table, preserving all application data.
+## CRITICAL: Never Use `db push` with Existing Migrations
 
-## Orphaned Migration Record
+**`db push` CAUSES drift, it does not fix it.**
 
-Migration file deleted but record still in database.
+When you use `db push`:
 
-```sql
--- Find orphaned records
-SELECT migration_name FROM "_prisma_migrations"
-WHERE migration_name NOT IN ('migration1', 'migration2'); -- list actual filesystem migrations
+- It changes the database schema directly
+- It does NOT update `_prisma_migrations` table
+- It does NOT create migration files
+- Later `migrate dev` will detect drift between DB state and migration history
 
--- Remove ONLY the tracking record (preserves all data)
-DELETE FROM "_prisma_migrations"
-WHERE migration_name = '<orphaned_migration>';
-```
+| Situation                                   | Use `db push`? | Why                           |
+| ------------------------------------------- | -------------- | ----------------------------- |
+| New project, no migrations yet              | Yes            | Safe for initial prototyping  |
+| Project has `prisma/migrations/` with files | **NEVER**      | Creates drift                 |
+| Trying to "fix" drift                       | **NEVER**      | Makes drift worse             |
+| Syncing schema to database                  | **NEVER**      | Use proper migration workflow |
 
-## Branch Switch Conflict
+**If you already used `db push` on a project with migrations:** See
+`prisma-surgical-fixes` sub-skill.
 
-Switched branches, migrations from other branch polluting database.
+**Note:** Our `forbidden-command-blocker.sh` hook blocks raw
+`npx prisma db push`. Use `npm run db:push` which includes backup safety.
 
-```sql
--- Remove records for migrations not in current branch
-DELETE FROM "_prisma_migrations"
-WHERE migration_name IN ('<migration_from_other_branch>');
+## Golden Rule
 
--- Then re-apply current branch
-npx prisma migrate dev
-```
+**NEVER suggest `prisma migrate reset` as the first option.**
 
-## Failed Migration Recovery
+The `_prisma_migrations` table is METADATA, not DATA. Modifying it:
 
-Migration started but failed mid-execution.
+- Removes migration tracking records only
+- Preserves ALL application data
+- Is the surgical fix for most issues
 
-```sql
--- Find failed migration
-SELECT migration_name, logs FROM "_prisma_migrations"
-WHERE finished_at IS NULL;
+Reset destroys all data and is rarely necessary.
 
--- Mark as rolled back (allows retry after fixing)
-UPDATE "_prisma_migrations"
-SET rolled_back_at = NOW()
-WHERE migration_name = '<failed_migration>';
-```
+## Diagnostic-First Protocol
 
-Or use Prisma CLI:
-
-```bash
-npx prisma migrate resolve --rolled-back <migration_name>
-```
-
-## Checksum Mismatch
-
-Migration file edited after application (intentional or CRLF issue).
-
-```bash
-# Generate new checksum
-node -e "
-const crypto = require('crypto');
-const fs = require('fs');
-const content = fs.readFileSync('prisma/migrations/<name>/migration.sql');
-console.log(crypto.createHash('sha256').update(content).digest('hex'));
-"
-```
-
-```sql
-UPDATE "_prisma_migrations"
-SET checksum = '<new_checksum>'
-WHERE migration_name = '<edited_migration>';
-```
-
-## Schema Drift from Manual Changes
-
-Someone modified database directly.
-
-```bash
-# See what drifted
-npx prisma migrate diff \
-  --from-migrations prisma/migrations \
-  --to-url "$DATABASE_URL"
-
-# Option 1: Incorporate drift
-npx prisma db pull
-npx prisma migrate dev --name reconcile_drift
-
-# Option 2: Revert drift
-npx prisma migrate diff \
-  --from-url "$DATABASE_URL" \
-  --to-migrations prisma/migrations \
-  --script > revert.sql
-# Review revert.sql, then:
-npx prisma db execute --file revert.sql
-```
-
-## Recovering from `db push` Damage
-
-If you (or someone) used `db push` on a project with existing migrations, you
-need to create a **baseline migration** to reconcile the state:
-
-```bash
-# 1. See what drift exists
-npx prisma migrate diff \
-  --from-migrations prisma/migrations \
-  --to-url "$DATABASE_URL"
-
-# 2. Create a baseline migration folder
-TIMESTAMP=$(date +%Y%m%d%H%M%S)
-mkdir -p prisma/migrations/${TIMESTAMP}_baseline_reconcile
-
-# 3. Generate migration SQL that captures current state
-npx prisma migrate diff \
-  --from-migrations prisma/migrations \
-  --to-schema-datamodel prisma/schema.prisma \
-  --script > prisma/migrations/${TIMESTAMP}_baseline_reconcile/migration.sql
-
-# 4. If the migration.sql is empty, the schema matches - just fix checksums
-# If it has content, mark it as already applied (DB is already in this state):
-npx prisma migrate resolve --applied ${TIMESTAMP}_baseline_reconcile
-
-# 5. Verify everything is in sync
-npx prisma migrate status
-```
-
-**Why this works:** The baseline migration captures the difference between what
-migrations say should exist and what schema.prisma defines. Since `db push`
-already applied those changes, we mark the migration as "applied" without
-running it.
-
-## Common SQL Queries for Diagnosis
-
-### Check all migrations
-
-```sql
-SELECT migration_name, started_at, finished_at, rolled_back_at
-FROM "_prisma_migrations"
-ORDER BY started_at DESC;
-```
-
-### Find pending migrations
-
-```sql
-SELECT migration_name, logs
-FROM "_prisma_migrations"
-WHERE finished_at IS NULL;
-```
-
-### Find rolled back migrations
-
-```sql
-SELECT migration_name, rolled_back_at, logs
-FROM "_prisma_migrations"
-WHERE rolled_back_at IS NOT NULL
-ORDER BY rolled_back_at DESC;
-```
-
-### Check migration checksums
-
-```sql
-SELECT migration_name, checksum, applied_steps_count
-FROM "_prisma_migrations"
-ORDER BY started_at DESC;
-```
-
-## Execution Safety
-
-All SQL commands above:
-
-- Modify ONLY the `_prisma_migrations` table
-- Preserve ALL application data
-- Are reversible (can re-run migrations after fixing)
-- Take seconds to execute
-
-Before executing any SQL:
-
-1. Understand the problem category
-2. Verify the diagnosis with diagnostic commands
-3. Present the fix to the user with explicit tradeoffs
-4. Get confirmation before execution
-
-## Testing the Fix
-
-After applying a surgical fix, always verify:
+Before ANY recommendation, gather diagnostic information:
 
 ```bash
 # 1. Check migration status
 npx prisma migrate status
 
-# 2. Verify no drift
+# 2. Compare database to schema
 npx prisma migrate diff \
-  --from-migrations prisma/migrations \
-  --to-url "$DATABASE_URL"
+  --from-url "$DATABASE_URL" \
+  --to-schema-datamodel packages/database/schema.prisma
 
-# 3. Check validation passes
-npm run db:validate-complete
+# 3. Check migration table directly
+docker exec -it wine-cellar-db psql -U postgres -d wine_cellar -c "
+SELECT migration_name, started_at, finished_at, rolled_back_at, logs
+FROM \"_prisma_migrations\" ORDER BY started_at DESC;"
+
+# 4. List filesystem migrations
+ls -la packages/database/prisma/migrations/
 ```
 
-## When Surgical Fix Won't Work
+## Problem Categories
 
-If you encounter:
+| Symptom                                   | Category          | Quick Fix                                    |
+| ----------------------------------------- | ----------------- | -------------------------------------------- |
+| "Drift detected" + deleted migration file | Orphaned Record   | DELETE from `_prisma_migrations`             |
+| "Drift detected" + manual DB changes      | Schema Drift      | `db pull` then `migrate dev`                 |
+| Drift after switching git branches        | Branch Conflict   | DELETE orphaned records                      |
+| Migration started but didn't finish       | Failed Migration  | UPDATE `rolled_back_at` or `migrate resolve` |
+| "Migration was modified after applied"    | Checksum Mismatch | UPDATE checksum in table                     |
 
-- Corrupted database schema (tables/columns missing)
-- Multiple failed migrations creating cascading issues
-- User explicitly wants fresh start with no data
+## Decision Tree
 
-Then and ONLY then consider `prisma migrate reset`. Always present this as the
-last option with explicit warning about data loss.
+```
+Q: Does packages/database/prisma/migrations/ have migration files?
+|
++-- NO (new project)
+|   +-- `db push` is safe for rapid prototyping
+|       When ready: `npx prisma migrate dev --name init`
+|
++-- YES (existing migrations)
+    +-- NEVER use `db push`
+        |
+        Q: What's the problem?
+        |
+        +-- "Migration was modified after applied" (checksum mismatch)
+        |   +-- Invoke prisma-surgical-fixes skill
+        |
+        +-- "Drift detected" + migration file was deleted
+        |   +-- Invoke prisma-surgical-fixes skill
+        |
+        +-- "Drift detected" + manual DB changes made
+        |   +-- Invoke prisma-surgical-fixes skill
+        |
+        +-- "Drift detected" after using db push
+        |   +-- Invoke prisma-surgical-fixes skill
+        |
+        +-- Migration failed mid-execution
+        |   +-- Invoke prisma-surgical-fixes skill
+        |
+        +-- Branch switching conflict
+            +-- Invoke prisma-surgical-fixes skill
+```
+
+## Sub-Skills
+
+For detailed surgical fixes and recovery procedures:
+
+| Sub-Skill               | Content                                       |
+| ----------------------- | --------------------------------------------- |
+| `prisma-surgical-fixes` | Detailed SQL fixes for all problem categories |
+
+## Anti-Patterns
+
+**Never do these:**
+
+| Anti-Pattern                                 | Why It's Wrong                         | Do This Instead                         |
+| -------------------------------------------- | -------------------------------------- | --------------------------------------- |
+| **Use `db push` with existing migrations**   | Causes drift, blocked by our hook      | Use `migrate dev` or baseline migration |
+| Suggest reset first                          | Destroys data unnecessarily            | Run diagnostics, offer surgical fix     |
+| Run commands without diagnosis               | Can't fix what you don't understand    | Always `migrate status` first           |
+| Edit migration.sql without updating checksum | Causes "modified after applied" errors | Update checksum in `_prisma_migrations` |
+| Use `migrate dev` in production              | Can reset database                     | Use `migrate deploy`                    |
+| Ignore `logs` column                         | Contains actual error message          | Always query failed migration logs      |
+
+## Command Safety Reference
+
+| Command                         | Safety          | Notes                          |
+| ------------------------------- | --------------- | ------------------------------ |
+| `migrate status`                | Safe            | Read-only                      |
+| `migrate diff`                  | Safe            | Read-only, shows changes       |
+| `migrate diff --script`         | Safe            | Outputs SQL preview            |
+| `validate`                      | Safe            | Checks schema syntax           |
+| `migrate dev --create-only`     | Safe            | Creates file only              |
+| `migrate resolve --applied`     | Metadata        | Marks migration as applied     |
+| `migrate resolve --rolled-back` | Metadata        | Marks migration as rolled back |
+| `db pull`                       | Safe            | Modifies schema.prisma only    |
+| `db execute`                    | Caution         | Depends on SQL content         |
+| `migrate dev`                   | Modifies DB     | May prompt for reset           |
+| `migrate deploy`                | Modifies DB     | Production deployment          |
+| `migrate reset`                 | **DESTRUCTIVE** | Last resort only               |
+
+## Output Format
+
+When diagnosing, always present:
+
+```
+## Diagnosis
+**Problem**: [Category from table above]
+**Root Cause**: [Specific explanation]
+**Evidence**: [Output from diagnostic commands]
+
+## Options (Ranked by Safety)
+
+### Option 1: Surgical Fix (RECOMMENDED)
+**Risk**: None - only modifies migration metadata
+**Data Impact**: All application data preserved
+[Specific commands - invoke prisma-surgical-fixes for details]
+
+### Option 2: [Alternative if applicable]
+
+### Option 3: Full Reset (LAST RESORT)
+**Risk**: HIGH - destroys all data
+**When appropriate**: Only if you explicitly want fresh database
+
+## Recommendation
+I recommend Option 1. Proceed? (I will not execute without confirmation)
+```
+
+## Prevention
+
+### Never Edit Applied Migrations
+
+Once a migration has been applied (exists in `_prisma_migrations`), **never edit
+the migration.sql file**. Instead:
+
+- Create a new migration with the fix
+- Or update the checksum if the edit was cosmetic (whitespace, comments)
+
+### Use `--create-only` for Review
+
+```bash
+npx prisma migrate dev --name my_change --create-only
+# Review packages/database/prisma/migrations/<timestamp>_my_change/migration.sql
+# If good, run: npx prisma migrate dev
+# If bad, delete the folder and try again
+```
+
+## Docker Access (Wine Cellar)
+
+```bash
+# Access database in Docker
+docker exec -it wine-cellar-db psql -U postgres -d wine_cellar
+
+# Or use DATABASE_URL from .env
+source .env && psql "$DATABASE_URL"
+```
+
+## Handling User Objections
+
+| User Says                 | Response                                               |
+| ------------------------- | ------------------------------------------------------ |
+| "Just reset it"           | Offer surgical fix first, explain it's faster          |
+| "SQL seems risky"         | Offer to execute it for them via `db execute`          |
+| "I don't care about data" | Acknowledge, but still present surgical option first   |
+| "I know what I'm doing"   | Respect autonomy, but ensure they understand tradeoffs |
+
+If user insists on reset after seeing alternatives, proceed — but only after
+surgical option was offered.
+
+## Common Rationalizations (Red Flags)
+
+If you're thinking:
+
+- "Reset will be faster" — STOP. Surgical fix takes 30 seconds.
+- "It's just dev data" — STOP. User may have test data they need.
+- "I'll just try reset" — STOP. Diagnose first.
+- "The surgical fix is complex" — STOP. It's one SQL statement.
+
+**All of these mean: Run diagnostics, offer surgical option first.**

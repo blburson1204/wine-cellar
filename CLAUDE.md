@@ -55,6 +55,8 @@ packages/
   Development principles
 - [documents/error-handling-summary.md](documents/error-handling-summary.md) -
   Error patterns
+- [documents/patterns.md](documents/patterns.md) - Established codebase patterns
+  (check before implementing new features)
 - [.specify/skill-manifest.yaml](.specify/skill-manifest.yaml) - Skill trigger
   conditions (consult during SpecKit phases)
 
@@ -120,12 +122,23 @@ Located in `.claude/skills/`:
 - `feature-capture-idea` - Quick idea capture to future-work.md
 - `spec-validate` - Pre-planning spec completeness gate
 
+### Testing
+
+- `test-guide` - Comprehensive testing guide (auto-routes to backend/frontend)
+- `test-guide/testing-backend` - Backend testing with Vitest + Supertest
+- `test-guide/testing-frontend` - Frontend testing with RTL + userEvent
+- `test-guide/testing-anti-patterns` - What NOT to do in tests
+
 ### UI & Quality
 
 - `ui-accessibility` - WCAG 2.2 compliance
 - `error-handling` - Project error patterns
-- `testing` - Testing patterns and utilities
+- `react-best-practices` - React/Next.js performance optimization patterns
 - `ui-design` - UI design patterns
+
+### Writing & Communication
+
+- `writing-clearly` - Strunk's Elements of Style + AI anti-pattern elimination
 
 ### Meta / Framework
 
@@ -151,6 +164,7 @@ Located in `.claude/commands/`:
 
 - `/code-review` - Pre-commit security and compliance review
 - `/constitution` - Update project constitution
+- `/archive-spec` - Archive completed/deprecated/not-viable specs
 
 ### Session Management
 
@@ -158,6 +172,10 @@ Located in `.claude/commands/`:
 - `/checkpoint` - Save session state at SpecKit phase boundary
 - `/resume-spec` - Load checkpoint and resume work
 - `/handoff` - Create resume prompt for new sessions
+
+### Research
+
+- `/whats-new` - Discover latest Claude Code features with relevancy ratings
 
 ## Hooks Active
 
@@ -180,6 +198,11 @@ are fail-open (errors allow through). See `.claude/docs/atom.md` for details.
 - `file-placement-guard.sh` - Blocks `.sh`/`.sql`/`.py` file creation in repo
   root (place in `scripts/`)
 
+### SpecKit Hooks
+
+- `post-tasks-reconciliation.sh` - Reminds to reconcile artifacts after
+  tasks.json updates
+
 ## Agents Available
 
 Located in `.claude/agents/`:
@@ -190,3 +213,7 @@ Located in `.claude/agents/`:
 - `capture-idea` - Feature idea capture to future-work.md
 - `spec-validator` - Spec completeness validation
 - `documentation-reconciliation` - Documentation drift detection
+- `preflight-schema-drift` - Validates spec artifact references against Prisma
+  schema
+- `preflight-interface` - Validates spec artifact references against actual code
+  signatures
