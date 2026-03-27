@@ -11,6 +11,30 @@ const authConfig: JiraAuthConfig = {
 };
 const baseUrl = 'https://test.atlassian.net';
 
+function mockResponse(
+  body: unknown,
+  opts: { ok?: boolean; status?: number; statusText?: string } = {}
+) {
+  const json = JSON.stringify(body);
+  return {
+    ok: opts.ok ?? true,
+    status: opts.status ?? 200,
+    statusText: opts.statusText ?? 'OK',
+    text: async () => json,
+    json: async () => body,
+  };
+}
+
+function mockEmptyResponse(status = 204) {
+  return {
+    ok: true,
+    status,
+    statusText: 'No Content',
+    text: async () => '',
+    json: async () => ({}),
+  };
+}
+
 describe('JiraClient', () => {
   beforeEach(() => {
     mockFetch.mockReset();
@@ -21,14 +45,16 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          id: '10001',
-          key: 'WC-1',
-          self: 'https://test.atlassian.net/rest/api/3/issue/10001',
-        }),
-      });
+      mockFetch.mockResolvedValueOnce(
+        mockResponse(
+          {
+            id: '10001',
+            key: 'WC-1',
+            self: 'https://test.atlassian.net/rest/api/3/issue/10001',
+          },
+          { status: 201 }
+        )
+      );
 
       const result = await client.createIssue({
         fields: {
@@ -55,10 +81,9 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: '10001', key: 'WC-1', self: '' }),
-      });
+      mockFetch.mockResolvedValueOnce(
+        mockResponse({ id: '10001', key: 'WC-1', self: '' }, { status: 201 })
+      );
 
       await client.createIssue({
         fields: { project: { key: 'WC' }, summary: 'Test', issuetype: { name: 'Story' } },
@@ -75,7 +100,7 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+      mockFetch.mockResolvedValueOnce(mockEmptyResponse());
 
       await client.updateIssue('WC-1', {
         fields: { summary: 'Updated summary' },
@@ -93,9 +118,8 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockFetch.mockResolvedValueOnce(
+        mockResponse({
           id: '10001',
           key: 'WC-1',
           self: '',
@@ -105,8 +129,8 @@ describe('JiraClient', () => {
             issuetype: { name: 'Story' },
             updated: '',
           },
-        }),
-      });
+        })
+      );
 
       const issue = await client.getIssue('WC-1');
       expect(issue.key).toBe('WC-1');
@@ -122,15 +146,14 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
+      mockFetch.mockResolvedValueOnce(
+        mockResponse({
           transitions: [
             { id: '11', name: 'In Progress', to: { id: '3', name: 'In Progress' } },
             { id: '21', name: 'Done', to: { id: '4', name: 'Done' } },
           ],
-        }),
-      });
+        })
+      );
 
       const result = await client.getTransitions('WC-1');
       expect(result.transitions).toHaveLength(2);
@@ -143,7 +166,7 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: async () => ({}) });
+      mockFetch.mockResolvedValueOnce(mockEmptyResponse());
 
       await client.performTransition('WC-1', '11');
 
@@ -162,7 +185,7 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({ ok: true, status: 201, json: async () => ({}) });
+      mockFetch.mockResolvedValueOnce(mockEmptyResponse(201));
 
       await client.createIssueLink({
         type: { name: 'Blocks' },
@@ -182,10 +205,9 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ total: 1, issues: [{ id: '1', key: 'WC-1', self: '', fields: {} }] }),
-      });
+      mockFetch.mockResolvedValueOnce(
+        mockResponse({ total: 1, issues: [{ id: '1', key: 'WC-1', self: '', fields: {} }] })
+      );
 
       const result = await client.search({ jql: 'project = WC', maxResults: 50 });
       expect(result.total).toBe(1);
@@ -197,12 +219,12 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        statusText: 'Unauthorized',
-        json: async () => ({ errorMessages: ['Unauthorized'] }),
-      });
+      mockFetch.mockResolvedValueOnce(
+        mockResponse(
+          { errorMessages: ['Unauthorized'] },
+          { ok: false, status: 401, statusText: 'Unauthorized' }
+        )
+      );
 
       await expect(client.getIssue('WC-1')).rejects.toThrow('401');
     });
@@ -211,12 +233,12 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        statusText: 'Not Found',
-        json: async () => ({ errorMessages: ['Issue does not exist'] }),
-      });
+      mockFetch.mockResolvedValueOnce(
+        mockResponse(
+          { errorMessages: ['Issue does not exist'] },
+          { ok: false, status: 404, statusText: 'Not Found' }
+        )
+      );
 
       await expect(client.getIssue('WC-999')).rejects.toThrow('404');
     });
@@ -225,12 +247,12 @@ describe('JiraClient', () => {
       const { JiraClient } = await import('../../src/jira-client.js');
       const client = new JiraClient(baseUrl, authConfig);
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 429,
-        statusText: 'Too Many Requests',
-        json: async () => ({ errorMessages: ['Rate limit exceeded'] }),
-      });
+      mockFetch.mockResolvedValueOnce(
+        mockResponse(
+          { errorMessages: ['Rate limit exceeded'] },
+          { ok: false, status: 429, statusText: 'Too Many Requests' }
+        )
+      );
 
       await expect(client.getIssue('WC-1')).rejects.toThrow('429');
     });

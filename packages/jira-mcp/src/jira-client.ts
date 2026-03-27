@@ -84,19 +84,24 @@ export class JiraClient {
     if (!response.ok) {
       let errorMessages: string[] = [];
       try {
-        const errorBody = (await response.json()) as { errorMessages?: string[] };
+        const errorBody = (await response.json()) as {
+          errorMessages?: string[];
+          errors?: Record<string, string>;
+        };
         errorMessages = errorBody.errorMessages ?? [];
+        if (errorBody.errors) {
+          for (const [field, msg] of Object.entries(errorBody.errors)) {
+            errorMessages.push(`${field}: ${msg}`);
+          }
+        }
       } catch {
         // ignore JSON parse errors on error responses
       }
       throw new JiraClientError(response.status, response.statusText, errorMessages);
     }
 
-    // Some endpoints return 204 No Content
-    if (response.status === 204) {
-      return {} as T;
-    }
-
-    return response.json() as Promise<T>;
+    const text = await response.text();
+    if (!text) return {} as T;
+    return JSON.parse(text) as T;
   }
 }

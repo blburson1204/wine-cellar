@@ -16,8 +16,8 @@ const mockConfig: JiraSyncConfig = {
       blocked: 'Blocked',
     },
     phaseLabels: {},
-    storyIssueType: 'Story',
-    verifyIssueType: 'Sub-task',
+    storyIssueType: 'Task',
+    verifyIssueType: 'Subtask',
     epicIssueType: 'Epic',
   },
 };
@@ -41,12 +41,12 @@ describe('mapper', () => {
       const result = mapTaskToJiraIssue(task, mockConfig, 'WC-1');
 
       expect(result.fields.project.key).toBe('WC');
-      expect(result.fields.issuetype.name).toBe('Story');
+      expect(result.fields.issuetype.name).toBe('Task');
       expect(result.fields.summary).toContain('T001');
       expect(result.fields.summary).toContain('Scaffold package');
     });
 
-    it('should map a T-VERIFY task to a Sub-task issue type', async () => {
+    it('should use task issue type for all tasks including verify', async () => {
       const { mapTaskToJiraIssue } = await import('../../src/mapper.js');
       const task = makeTask({
         id: 'T-VERIFY-LINT',
@@ -55,15 +55,15 @@ describe('mapper', () => {
       });
       const result = mapTaskToJiraIssue(task, mockConfig, 'WC-1');
 
-      expect(result.fields.issuetype.name).toBe('Sub-task');
+      expect(result.fields.issuetype.name).toBe('Task');
     });
 
-    it('should set parent key for Sub-task issues', async () => {
+    it('should add verify-task label for verify tasks', async () => {
       const { mapTaskToJiraIssue } = await import('../../src/mapper.js');
       const task = makeTask({ id: 'T-VERIFY-LINT', phase: 'verify' });
       const result = mapTaskToJiraIssue(task, mockConfig, 'WC-1');
 
-      expect(result.fields.parent).toEqual({ key: 'WC-1' });
+      expect(result.fields.labels).toContain('verify-task');
     });
 
     it('should include phase as a label', async () => {

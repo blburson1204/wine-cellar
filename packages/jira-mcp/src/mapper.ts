@@ -9,13 +9,15 @@ import type {
 export function mapTaskToJiraIssue(
   task: SpecKitTask,
   config: JiraSyncConfig,
-  epicKey: string
+  _epicKey: string
 ): JiraCreateIssueRequest {
   const isVerifyTask =
     task.id.startsWith('T-VERIFY') || task.id.startsWith('T-DOC') || task.id.startsWith('T-FINAL');
-  const issueType = isVerifyTask ? config.mappings.verifyIssueType : config.mappings.storyIssueType;
+  // All tasks created as the story/task type — subtasks require a Task parent, not Epic
+  const issueType = config.mappings.storyIssueType;
 
-  const summary = `[${task.id}] ${task.description}`;
+  const rawSummary = `[${task.id}] ${task.description}`;
+  const summary = rawSummary.length > 255 ? rawSummary.slice(0, 252) + '...' : rawSummary;
 
   const fields: JiraCreateIssueRequest['fields'] = {
     project: { key: config.projectKey },
@@ -26,7 +28,7 @@ export function mapTaskToJiraIssue(
   };
 
   if (isVerifyTask) {
-    fields.parent = { key: epicKey };
+    fields.labels = [...(fields.labels ?? []), 'verify-task'];
   }
 
   return { fields };

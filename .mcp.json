@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "jira-speckit": {
-      "command": "node",
-      "args": ["packages/jira-mcp/build/index.js"]
-    }
-  }
-}

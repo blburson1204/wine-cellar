@@ -23,14 +23,6 @@ const DEFAULT_STATUS_TRANSITIONS: Record<string, string> = {
   blocked: 'Blocked',
 };
 
-const DEFAULT_MAPPINGS = {
-  statusTransitions: DEFAULT_STATUS_TRANSITIONS,
-  phaseLabels: {} as Record<string, string>,
-  storyIssueType: 'Story',
-  verifyIssueType: 'Sub-task',
-  epicIssueType: 'Epic',
-};
-
 export function loadConfig(): JiraSyncConfig {
   const parsed = envSchema.parse({
     JIRA_URL: process.env.JIRA_URL,
@@ -46,6 +38,12 @@ export function loadConfig(): JiraSyncConfig {
       email: parsed.JIRA_EMAIL,
       apiToken: parsed.JIRA_API_TOKEN,
     },
-    mappings: { ...DEFAULT_MAPPINGS },
+    mappings: {
+      statusTransitions: DEFAULT_STATUS_TRANSITIONS,
+      phaseLabels: {} as Record<string, string>,
+      storyIssueType: process.env.JIRA_STORY_TYPE ?? 'Task',
+      verifyIssueType: process.env.JIRA_SUBTASK_TYPE ?? 'Subtask',
+      epicIssueType: process.env.JIRA_EPIC_TYPE ?? 'Epic',
+    },
   };
 }

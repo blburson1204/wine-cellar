@@ -109,8 +109,8 @@ describe('config', () => {
       const { loadConfig } = await import('../../src/config.js');
       const config = loadConfig();
 
-      expect(config.mappings.storyIssueType).toBe('Story');
-      expect(config.mappings.verifyIssueType).toBe('Sub-task');
+      expect(config.mappings.storyIssueType).toBe('Task');
+      expect(config.mappings.verifyIssueType).toBe('Subtask');
       expect(config.mappings.epicIssueType).toBe('Epic');
     });
   });

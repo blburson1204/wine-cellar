@@ -23,6 +23,9 @@ apps/api/uploads/
 # Test uploads directory
 apps/api/uploads-test/
 
+# MCP server config (contains credentials)
+.mcp.json
+
 # Claude session state
 .claude/session-context/
 .claude/commands/handoff.md

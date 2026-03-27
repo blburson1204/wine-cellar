@@ -42,8 +42,8 @@ const mockConfig: JiraSyncConfig = {
       blocked: 'Blocked',
     },
     phaseLabels: {},
-    storyIssueType: 'Story',
-    verifyIssueType: 'Sub-task',
+    storyIssueType: 'Task',
+    verifyIssueType: 'Subtask',
     epicIssueType: 'Epic',
   },
 };
