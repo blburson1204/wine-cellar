@@ -66,6 +66,14 @@ describe('mapper', () => {
       expect(result.fields.labels).toContain('verify-task');
     });
 
+    it('should set parent to epic key for all tasks', async () => {
+      const { mapTaskToJiraIssue } = await import('../../src/mapper.js');
+      const task = makeTask();
+      const result = mapTaskToJiraIssue(task, mockConfig, 'WC-1');
+
+      expect(result.fields.parent).toEqual({ key: 'WC-1' });
+    });
+
     it('should include phase as a label', async () => {
       const { mapTaskToJiraIssue } = await import('../../src/mapper.js');
       const task = makeTask({ phase: 'tdd-unit' });

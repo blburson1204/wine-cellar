@@ -9,11 +9,10 @@ import type {
 export function mapTaskToJiraIssue(
   task: SpecKitTask,
   config: JiraSyncConfig,
-  _epicKey: string
+  epicKey: string
 ): JiraCreateIssueRequest {
   const isVerifyTask =
     task.id.startsWith('T-VERIFY') || task.id.startsWith('T-DOC') || task.id.startsWith('T-FINAL');
-  // All tasks created as the story/task type — subtasks require a Task parent, not Epic
   const issueType = config.mappings.storyIssueType;
 
   const rawSummary = `[${task.id}] ${task.description}`;
@@ -24,6 +23,7 @@ export function mapTaskToJiraIssue(
     summary,
     description: textToADF(task.description),
     issuetype: { name: issueType },
+    parent: { key: epicKey },
     labels: ['speckit', `phase:${task.phase}`],
   };
 
