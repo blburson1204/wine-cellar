@@ -90,10 +90,13 @@ wine-cellar/
 │       └── vitest.config.ts    # Vitest configuration
 │
 ├── packages/
-│   └── database/               # Shared Prisma client
-│       ├── prisma/
-│       │   └── schema.prisma   # Database schema
-│       └── index.ts            # Exported Prisma client
+│   ├── database/               # Shared Prisma client
+│   │   ├── prisma/
+│   │   │   └── schema.prisma   # Database schema
+│   │   └── index.ts            # Exported Prisma client
+│   └── jira-mcp/               # Jira MCP server (SpecKit → Jira sync)
+│       ├── src/                # config, jira-client, sync-engine, mapper, hash
+│       └── __tests__/          # 46 tests (unit + integration)
 │
 ├── .github/
 │   ├── workflows/

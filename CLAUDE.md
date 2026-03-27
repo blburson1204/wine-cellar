@@ -8,7 +8,7 @@ Personal wine collection manager. Full-stack TypeScript monorepo.
 
 ```bash
 npm run dev          # Start API (3001) + Web (3000)
-npm test             # Run all tests (604 tests)
+npm test             # Run all tests (650 tests)
 npm run lint         # ESLint check
 npm run type-check   # TypeScript check
 npm run format:check # Prettier check
@@ -22,6 +22,7 @@ apps/
   web/          # Next.js 15 frontend
 packages/
   database/     # Prisma schema + client
+  jira-mcp/     # Jira MCP server (SpecKit → Jira sync)
 ```
 
 ## Tech Stack
@@ -73,6 +74,7 @@ npm run db:studio    # Visual database editor
 ```bash
 npm run test:api        # API tests only (191)
 npm run test:web        # Web tests only (413)
+npm run test:jira-mcp   # Jira MCP tests only (46)
 npm run test:coverage   # With coverage report
 ```
 
@@ -176,6 +178,15 @@ Located in `.claude/commands/`:
 ### Research
 
 - `/whats-new` - Discover latest Claude Code features with relevancy ratings
+
+## MCP Servers
+
+Configured in `.mcp.json`:
+
+- **jira-speckit** (`packages/jira-mcp/`) - Syncs SpecKit tasks to Jira. Specs
+  become Epics, tasks become Stories, verify tasks become Sub-tasks. Requires
+  `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` env vars.
+  Tools: `sync_spec_to_jira`, `get_jira_status`, `update_task_status`.
 
 ## Hooks Active
 
