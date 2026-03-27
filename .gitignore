@@ -29,3 +29,6 @@ apps/api/uploads-test/
 # Claude session state
 .claude/session-context/
 .claude/commands/handoff.md
+
+# Jira sync state (instance-specific)
+jira-sync.json
