@@ -41,3 +41,17 @@
 | security-review       | keyword: credentials, API token, authentication                   | Credential storage, auth layer, environment variable handling         |
 | meta-skill-guide      | always                                                            | Universal dispatcher                                                  |
 | meta-context-optimize | always                                                            | Context management for long planning session                          |
+
+## /implement phase (2026-03-27)
+
+| Skill                    | Trigger                            | Reason                                               |
+| ------------------------ | ---------------------------------- | ---------------------------------------------------- |
+| meta-skill-guide         | always                             | Universal dispatcher                                 |
+| workflow-verify-complete | always                             | Evidence-based completion before claiming tasks done |
+| meta-context-optimize    | always                             | Context management for 17-task implementation        |
+| feature-capture-idea     | always                             | Idea capture during implementation                   |
+| test-tdd                 | frontmatter: type=feature-major    | TDD discipline — write failing tests first           |
+| error-handling           | keyword: error handling, API error | AppError patterns for Jira client errors             |
+| security-review          | keyword: credentials, API token    | Credential handling in config and client             |
+| code-review              | frontmatter: type=feature-major    | Review before merge to main                          |
+| doc-gate                 | frontmatter: type=feature-major    | Documentation gate at completion                     |
