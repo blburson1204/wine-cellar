@@ -75,6 +75,7 @@ npm run db:studio    # Visual database editor
 npm run test:api        # API tests only (191)
 npm run test:web        # Web tests only (413)
 npm run test:jira-mcp   # Jira MCP tests only (46)
+npm run test:slack-mcp  # Slack MCP tests only
 npm run test:coverage   # With coverage report
 ```
 
@@ -188,6 +189,12 @@ Configured in `.mcp.json`:
   `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY` env vars.
   Tools: `sync_spec_to_jira`, `get_jira_status`, `update_task_status`.
 
+- **slack-speckit** (`packages/slack-mcp/`) - Sends SpecKit progress
+  notifications to Slack. Supports phase transitions, task completions, and
+  milestone events via webhook or Bot API. Requires `SLACK_WEBHOOK_URL` or
+  `SLACK_BOT_TOKEN` + `SLACK_CHANNEL` env vars. Optional `SLACK_TIMEOUT_MS`.
+  Tools: `send_progress`, `get_spec_status`.
+
 ## Hooks Active
 
 Located in `.claude/hooks/`, registered in `.claude/settings.json`. All hooks
@@ -213,6 +220,10 @@ are fail-open (errors allow through). See `.claude/docs/atom.md` for details.
 
 - `post-tasks-reconciliation.sh` - Reminds to reconcile artifacts after
   tasks.json updates
+- `slack-notify.sh` - Sends Slack notifications on spec.md and tasks.json writes
+  (phase transitions, task completions)
+- `slack-milestone.sh` - Sends Slack milestone notification when spec
+  verification completes
 
 ## Agents Available
 

@@ -1,6 +1,6 @@
 # Wine Cellar Project Summary
 
-**Last Updated**: March 4, 2026
+**Last Updated**: March 28, 2026
 
 ## Project Overview
 
@@ -94,9 +94,12 @@ wine-cellar/
 │   │   ├── prisma/
 │   │   │   └── schema.prisma   # Database schema
 │   │   └── index.ts            # Exported Prisma client
-│   └── jira-mcp/               # Jira MCP server (SpecKit → Jira sync)
-│       ├── src/                # config, jira-client, sync-engine, mapper, hash
-│       └── __tests__/          # 46 tests (unit + integration)
+│   ├── jira-mcp/               # Jira MCP server (SpecKit → Jira sync)
+│   │   ├── src/                # config, jira-client, sync-engine, mapper, hash
+│   │   └── __tests__/          # 46 tests (unit + integration)
+│   └── slack-mcp/              # Slack MCP server (SpecKit → Slack notifications)
+│       ├── src/                # config, slack-client, formatter, spec-reader, notify
+│       └── __tests__/          # unit + integration tests
 │
 ├── .github/
 │   ├── workflows/
@@ -110,7 +113,7 @@ wine-cellar/
 │   ├── hooks/                  # ATOM, safety, and SpecKit hooks
 │   │   ├── atom/               # Context & verification (4 hooks)
 │   │   ├── safety/             # Command blocking & file guards (2 hooks)
-│   │   └── speckit/            # Post-tasks reconciliation (1 hook)
+│   │   └── speckit/            # Post-tasks reconciliation, Slack notifications (3 hooks)
 │   ├── docs/                   # Framework documentation (ATOM, gates, context)
 │   ├── session-context/        # Session state (current-work.md, etc.)
 │   └── settings.json           # Hook registration config
