@@ -8,7 +8,7 @@ Personal wine collection manager. Full-stack TypeScript monorepo.
 
 ```bash
 npm run dev          # Start API (3001) + Web (3000)
-npm test             # Run all tests (650 tests)
+npm test             # Run all tests (729 tests)
 npm run lint         # ESLint check
 npm run type-check   # TypeScript check
 npm run format:check # Prettier check
@@ -23,6 +23,7 @@ apps/
 packages/
   database/     # Prisma schema + client
   jira-mcp/     # Jira MCP server (SpecKit → Jira sync)
+  slack-mcp/    # Slack MCP server (SpecKit → Slack notifications)
 ```
 
 ## Tech Stack
@@ -75,7 +76,7 @@ npm run db:studio    # Visual database editor
 npm run test:api        # API tests only (191)
 npm run test:web        # Web tests only (413)
 npm run test:jira-mcp   # Jira MCP tests only (46)
-npm run test:slack-mcp  # Slack MCP tests only
+npm run test:slack-mcp  # Slack MCP tests only (79)
 npm run test:coverage   # With coverage report
 ```
 

@@ -456,4 +456,29 @@ The following items are marked for future implementation:
 
 ---
 
-**Last Updated:** January 24, 2026 **Status:** ✅ Production Ready
+## MCP Server Error Patterns
+
+### Fire-and-Forget (slack-mcp)
+
+The Slack notification system uses a fire-and-forget pattern: notification
+failures are silently swallowed to never block the SpecKit pipeline.
+
+- `SlackClient.postWebhook()` and `postMessage()` return `boolean` (never throw)
+- HTTP errors (4xx, 5xx), timeouts, and network failures all return `false`
+- `AbortController` enforces configurable timeout (`SLACK_TIMEOUT_MS`)
+- Hook scripts always `exit 0` regardless of notification outcome
+- `SlackClientError` class exists for debugging but is never propagated
+
+### Stateful Error Recovery (jira-mcp)
+
+The Jira integration uses stricter error handling since sync state must stay
+consistent:
+
+- `JiraClientError` class with `status`, `statusText`, and `errorMessages`
+- HTTP errors are thrown and caught at the sync engine level
+- Sync state (`jira-sync.json`) is only written after successful operations
+- Content hashing prevents unnecessary API calls that could fail
+
+---
+
+**Last Updated:** March 28, 2026 **Status:** ✅ Production Ready

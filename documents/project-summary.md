@@ -525,22 +525,26 @@ detailed test breakdown.
 
 ### Available Scripts
 
-| Command                 | Description                           |
-| ----------------------- | ------------------------------------- |
-| `npm run dev`           | Start both API and web servers        |
-| `npm run dev:api`       | Start API server only                 |
-| `npm run dev:web`       | Start web server only                 |
-| `npm run db:generate`   | Generate Prisma client                |
-| `npm run db:push`       | Push schema changes to database       |
-| `npm run db:studio`     | Open Prisma Studio (visual DB editor) |
-| `npm test`              | Run all tests                         |
-| `npm run test:watch`    | Run tests in watch mode               |
-| `npm run test:coverage` | Generate test coverage report         |
-| `npm run lint`          | Run ESLint to check code quality      |
-| `npm run lint:fix`      | Auto-fix ESLint issues                |
-| `npm run format`        | Format code with Prettier             |
-| `npm run format:check`  | Check code formatting                 |
-| `npm run type-check`    | Run TypeScript type checking          |
+| Command                  | Description                           |
+| ------------------------ | ------------------------------------- |
+| `npm run dev`            | Start both API and web servers        |
+| `npm run dev:api`        | Start API server only                 |
+| `npm run dev:web`        | Start web server only                 |
+| `npm run db:generate`    | Generate Prisma client                |
+| `npm run db:push`        | Push schema changes to database       |
+| `npm run db:studio`      | Open Prisma Studio (visual DB editor) |
+| `npm test`               | Run all tests (729)                   |
+| `npm run test:api`       | API tests only (191)                  |
+| `npm run test:web`       | Web tests only (413)                  |
+| `npm run test:jira-mcp`  | Jira MCP tests only (46)              |
+| `npm run test:slack-mcp` | Slack MCP tests only (79)             |
+| `npm run test:watch`     | Run tests in watch mode               |
+| `npm run test:coverage`  | Generate test coverage report         |
+| `npm run lint`           | Run ESLint to check code quality      |
+| `npm run lint:fix`       | Auto-fix ESLint issues                |
+| `npm run format`         | Format code with Prettier             |
+| `npm run format:check`   | Check code formatting                 |
+| `npm run type-check`     | Run TypeScript type checking          |
 
 ## Development Workflow
 
@@ -573,6 +577,32 @@ detailed test breakdown.
    # Stop database:
    docker-compose down
    ```
+
+## MCP Server Integrations
+
+Two MCP (Model Context Protocol) servers provide tool-based integration with
+external services. Both are standalone TypeScript packages in `packages/`,
+registered in `.mcp.json`.
+
+### jira-speckit (`packages/jira-mcp/`)
+
+Syncs SpecKit artifacts to Jira. Specs become Epics, tasks become Stories.
+Maintains persistent sync state in `jira-sync.json` for incremental updates.
+
+- **Tools**: `sync_spec_to_jira`, `get_jira_status`, `update_task_status`
+- **Env vars**: `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY`
+- **Tests**: 46 tests (`npm run test:jira-mcp`)
+
+### slack-speckit (`packages/slack-mcp/`)
+
+Sends SpecKit progress notifications to Slack. Dual-mode: webhook for automatic
+personal notifications via hooks, bot API for team-facing MCP tools.
+
+- **Tools**: `send_progress`, `get_spec_status`
+- **Webhook mode env**: `SLACK_WEBHOOK_URL` (auto-fires from SpecKit hooks)
+- **Bot mode env**: `SLACK_BOT_TOKEN`, `SLACK_CHANNEL`
+- **Shared env**: `SLACK_TIMEOUT_MS` (default: 10000ms)
+- **Tests**: 79 tests (`npm run test:slack-mcp`)
 
 ## Error Handling & Logging Implementation
 

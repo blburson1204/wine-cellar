@@ -3,7 +3,7 @@
 Established patterns in the Wine Cellar codebase. Check here before implementing
 new features to reuse existing approaches and maintain consistency.
 
-Last updated: 2026-03-04
+Last updated: 2026-03-28
 
 ---
 
@@ -79,6 +79,46 @@ through `packages/database/prisma/schema.prisma` and are applied via
 
 **When to use:** All database access. Never import Prisma directly in `apps/` —
 always go through the shared package.
+
+---
+
+## 6. MCP Server Architecture
+
+**Location:** `packages/{jira-mcp,slack-mcp}/` **Used by:** Claude Code via
+`.mcp.json` configuration
+
+MCP (Model Context Protocol) servers provide tool-based integration with
+external services. Each server is a standalone TypeScript package in `packages/`
+that exposes tools via the `@modelcontextprotocol/sdk`. Servers run as stdio
+processes, spawned by the MCP runtime when tools are invoked.
+
+**Package structure (follow for new MCP servers):**
+
+```
+packages/{name}-mcp/
+├── src/
+│   ├── index.ts       # Server setup + tool registration
+│   ├── config.ts      # Zod-validated env var loading
+│   ├── types.ts       # Shared TypeScript types
+│   └── ...            # Domain-specific modules
+├── __tests__/
+│   ├── unit/          # Config, formatters, helpers
+│   └── integration/   # MCP tool handlers, client behavior
+├── package.json       # @modelcontextprotocol/sdk + zod
+├── tsconfig.json      # ES2022, Node16, strict
+└── vitest.config.ts   # 80% coverage thresholds
+```
+
+**Key patterns:**
+
+- **Config via Zod**: Env vars validated at startup with clear error messages
+- **Tool registration**: `server.tool(name, description, zodSchema, handler)`
+- **Fire-and-forget** (slack-mcp): Failures logged but never block the caller
+- **Stateful sync** (jira-mcp): Persistent `jira-sync.json` tracks mappings
+- **Registration**: Add server entry to `.mcp.json` with env vars
+
+**When to use:** Any new external service integration that Claude Code should
+interact with via tools (e.g., GitHub, Linear, PagerDuty).
 
 ---
 
