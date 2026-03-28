@@ -47,23 +47,70 @@
    ```
 6. MCP tools `send_progress` and `get_spec_status` are now available.
 
-## Verification
+## Manual Usage
 
-### Webhook Mode
+### Webhook Mode (CLI)
 
-```bash
-# Run any SpecKit command to trigger a notification:
-# e.g., transition from specify → plan
-# Check your Slack channel for the notification message
-```
+Send notifications directly via the `notify.js` CLI. Requires
+`SLACK_WEBHOOK_URL` in your environment.
 
-### MCP Mode
+**Phase transition:**
 
 ```bash
-# Use the MCP tool directly:
-# send_progress with spec_id="007", event_type="milestone", message="Test notification"
-# Check your Slack channel for the message
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..." \
+  node packages/slack-mcp/build/notify.js '{
+    "type": "phase_transition",
+    "specId": "007",
+    "specName": "my-feature",
+    "timestamp": "2026-03-28T14:00:00Z",
+    "details": { "fromPhase": "plan", "toPhase": "tasks" }
+  }'
 ```
+
+**Task completion:**
+
+```bash
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..." \
+  node packages/slack-mcp/build/notify.js '{
+    "type": "task_completion",
+    "specId": "007",
+    "specName": "my-feature",
+    "timestamp": "2026-03-28T14:00:00Z",
+    "details": { "taskId": "T001", "taskDescription": "Setup scaffolding", "status": "completed" }
+  }'
+```
+
+**Milestone:**
+
+```bash
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..." \
+  node packages/slack-mcp/build/notify.js '{
+    "type": "milestone",
+    "specId": "007",
+    "specName": "my-feature",
+    "timestamp": "2026-03-28T14:00:00Z",
+    "details": { "milestone": "all_tasks_complete", "summary": "All 20 tasks done!" }
+  }'
+```
+
+### MCP Mode (via Claude Code)
+
+When the slack-speckit MCP server is configured in `.mcp.json`, ask Claude to
+use the tools directly:
+
+- **Send a notification:** "Use `send_progress` with spec_id 007, event_type
+  milestone, message 'All tasks complete'"
+- **Check spec status:** "Use `get_spec_status` with spec_id
+  007-slack-integration-progress"
+
+### Automatic (Hooks)
+
+When `SLACK_WEBHOOK_URL` is set in your shell environment, SpecKit hooks fire
+automatically on:
+
+- **Phase transitions** — when spec.md frontmatter `phase` field changes
+- **Task completions** — when tasks.json is written with status changes
+- **Milestones** — when spec verification completes
 
 ## Troubleshooting
 
