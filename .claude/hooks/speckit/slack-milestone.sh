@@ -165,14 +165,27 @@ if [[ "$ALL_PASSING" == "true" ]] && [[ $PASSED_COUNT -gt 0 ]]; then
     exit 0
   fi
 
+  # Load env vars from .mcp.json (hook scripts don't inherit MCP server env)
+  MCP_CONFIG="$REPO_ROOT/.mcp.json"
+  if [[ -f "$MCP_CONFIG" ]]; then
+    export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_WEBHOOK_URL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+    export SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_BOT_TOKEN // empty' "$MCP_CONFIG" 2>/dev/null)}"
+    export SLACK_CHANNEL="${SLACK_CHANNEL:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_CHANNEL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+    export SLACK_TIMEOUT_MS="${SLACK_TIMEOUT_MS:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_TIMEOUT_MS // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  fi
+
+  # If still no webhook URL, nothing to do
+  if [[ -z "${SLACK_WEBHOOK_URL:-}" ]]; then
+    exit 0
+  fi
+
   TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
   # Try to extract spec name from spec.md frontmatter
   SPEC_NAME="$SPEC_ID"
   SPEC_FILE="$SPEC_DIR/spec.md"
   if [[ -f "$SPEC_FILE" ]]; then
-    # Extract title from YAML frontmatter (between --- markers)
-    SPEC_NAME=$(awk '/^---$/,/^---$/' "$SPEC_FILE" 2>/dev/null | grep -E '^title:' | sed 's/^title:[[:space:]]*//' | tr -d '"' | head -1) || true
+    SPEC_NAME=$(head -30 "$SPEC_FILE" 2>/dev/null | grep -E '^\s*spec_name:' | head -1 | sed 's/.*spec_name:[[:space:]]*//' | tr -d '"') || true
     if [[ -z "$SPEC_NAME" ]]; then
       SPEC_NAME="$SPEC_ID"
     fi

@@ -69,6 +69,23 @@ if [[ ! -f "$NOTIFY_SCRIPT" ]]; then
   exit 0
 fi
 
+# ── Load env vars from .mcp.json ────────────────────────────────────
+# Hook scripts don't inherit MCP server env vars, so read them from .mcp.json
+# (single source of truth) and export for notify.js
+
+MCP_CONFIG="$REPO_ROOT/.mcp.json"
+if [[ -f "$MCP_CONFIG" ]]; then
+  export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_WEBHOOK_URL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_BOT_TOKEN // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export SLACK_CHANNEL="${SLACK_CHANNEL:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_CHANNEL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export SLACK_TIMEOUT_MS="${SLACK_TIMEOUT_MS:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_TIMEOUT_MS // empty' "$MCP_CONFIG" 2>/dev/null)}"
+fi
+
+# If still no webhook URL, nothing to do
+if [[ -z "${SLACK_WEBHOOK_URL:-}" ]]; then
+  exit 0
+fi
+
 # ── Detect event type and build notification ─────────────────────────
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -77,8 +94,7 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 SPEC_NAME="$SPEC_ID"
 SPEC_FILE="$SPEC_DIR/spec.md"
 if [[ -f "$SPEC_FILE" ]]; then
-  # Extract title from YAML frontmatter (between --- markers)
-  SPEC_NAME=$(awk '/^---$/,/^---$/' "$SPEC_FILE" 2>/dev/null | grep -E '^title:' | sed 's/^title:[[:space:]]*//' | tr -d '"' | head -1) || true
+  SPEC_NAME=$(head -30 "$SPEC_FILE" 2>/dev/null | grep -E '^\s*spec_name:' | head -1 | sed 's/.*spec_name:[[:space:]]*//' | tr -d '"') || true
   if [[ -z "$SPEC_NAME" ]]; then
     SPEC_NAME="$SPEC_ID"
   fi
@@ -94,18 +110,20 @@ case "$FILE_NAME" in
       exit 0
     fi
 
-    # Extract phase from frontmatter
-    NEW_PHASE=$(echo "$NEW_CONTENT" | awk '/^---$/,/^---$/' 2>/dev/null | grep -E '^phase:' | sed 's/^phase:[[:space:]]*//' | tr -d '"' | head -1) || true
+    # Extract phase from frontmatter (may be indented under meta:)
+    # Use head to limit to frontmatter region (first 30 lines)
+    NEW_PHASE=$(echo "$NEW_CONTENT" | head -30 | grep -E '^\s*phase:' | head -1 | sed 's/.*phase:[[:space:]]*//' | tr -d '"') || true
 
     if [[ -z "$NEW_PHASE" ]]; then
       exit 0
     fi
 
-    # Try to get previous phase from existing file (if exists)
+    # Try to get previous phase
+    # PostToolUse fires AFTER the Write completes, so the file on disk already
+    # has the new content. Use git to get the last committed version instead.
     OLD_PHASE=""
-    if [[ -f "$FILE_PATH" ]]; then
-      OLD_PHASE=$(awk '/^---$/,/^---$/' "$FILE_PATH" 2>/dev/null | grep -E '^phase:' | sed 's/^phase:[[:space:]]*//' | tr -d '"' | head -1) || true
-    fi
+    REL_PATH="${FILE_PATH#$REPO_ROOT/}"
+    OLD_PHASE=$(git show "HEAD:${REL_PATH}" 2>/dev/null | head -30 | grep -E '^\s*phase:' | head -1 | sed 's/.*phase:[[:space:]]*//' | tr -d '"') || true
 
     # Only notify if phase changed
     if [[ "$OLD_PHASE" != "$NEW_PHASE" ]]; then
@@ -151,11 +169,11 @@ case "$FILE_NAME" in
       exit 0
     fi
 
-    # Try to read old tasks file for comparison
+    # Try to read old tasks from last committed version
+    # PostToolUse fires AFTER Write, so file on disk already has new content
     OLD_TASKS="[]"
-    if [[ -f "$FILE_PATH" ]]; then
-      OLD_TASKS=$(jq -r '.tasks // []' "$FILE_PATH" 2>/dev/null) || OLD_TASKS="[]"
-    fi
+    REL_PATH="${FILE_PATH#$REPO_ROOT/}"
+    OLD_TASKS=$(git show "HEAD:${REL_PATH}" 2>/dev/null | jq -r '.tasks // []' 2>/dev/null) || OLD_TASKS="[]"
 
     # Find tasks that changed to "done" or "completed"
     # Compare each task's status
