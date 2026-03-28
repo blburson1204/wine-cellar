@@ -222,13 +222,17 @@ skills, agents, commands, and ATOM hooks (see CLAUDE.md)
 
 ### SpecKit / Development Tooling
 
-- [ ] Jira integration - Map `/tasks` output to Jira tickets (Spec → Epic, Tasks
-      → Stories)
-- [ ] Custom MCP server for Jira (tailored to SpecKit Epic→Task hierarchy)
+- [x] Jira integration - Map `/tasks` output to Jira tickets (Spec → Epic, Tasks
+      → Stories) — completed spec 006, `packages/jira-mcp/`
+- [x] Custom MCP server for Jira (tailored to SpecKit Epic→Task hierarchy) —
+      completed spec 006
 - [ ] Figma Make integration - Adapt v4 framework Figma components for MedGeo
       (see `documents/figma-make-integration-draft.md` and adoption plan §4.2)
-- [ ] Slack integration - Progress notifications for SpecKit phases/tasks
-      (webhook for personal, MCP server for team use)
+- [x] Slack integration - Progress notifications for SpecKit phases/tasks
+      (webhook for personal, MCP server for team use) — completed spec 007,
+      `packages/slack-mcp/`
+- [ ] Automatic Jira status sync - PostToolUse hook on tasks.json writes to
+      auto-push status changes to Jira (presence of jira-sync.json = "on")
 - [ ] Hook audit log - Append-only NDJSON log
       (`.claude/session-context/audit-log.ndjson`) recording hook invocations
       with timestamp, event type, hook name, and allow/deny decision. Low
