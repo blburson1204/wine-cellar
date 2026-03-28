@@ -1,0 +1,124 @@
+{
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Initialize packages/slack-mcp/ scaffolding: package.json, tsconfig.json, vitest.config.ts, .gitignore",
+      "status": "done",
+      "notes": "Phase: setup | Target: packages/slack-mcp/package.json | Verify: package.json exists with @modelcontextprotocol/sdk and zod dependencies; tsconfig.json compiles; vitest.config.ts has 80% thresholds"
+    },
+    {
+      "id": "T002",
+      "description": "Define shared TypeScript types: SlackConfig, NotificationEvent, PhaseTransition, TaskCompletion, Milestone, SpecProgress, SpecKitPhase",
+      "status": "done",
+      "notes": "Phase: setup | Target: packages/slack-mcp/src/types.ts | Gate: T001 | Verify: types.ts exports all types from contracts/slack-mcp-tools.ts; npx tsc --noEmit passes"
+    },
+    {
+      "id": "T003",
+      "description": "Write unit tests for config module: env var validation, mode detection (webhook/mcp/both/noop), timeout parsing, defaults, error messages",
+      "status": "done",
+      "notes": "Phase: setup | Target: packages/slack-mcp/__tests__/unit/config.test.ts | Gate: T002 | Verify: Test file created with ~8 test cases covering all config scenarios; tests fail (TDD red phase)"
+    },
+    {
+      "id": "T004",
+      "description": "Implement config.ts: Zod schema for SLACK_WEBHOOK_URL, SLACK_BOT_TOKEN, SLACK_CHANNEL, SLACK_TIMEOUT_MS; loadConfig() with mode detection",
+      "status": "done",
+      "notes": "Phase: setup | Target: packages/slack-mcp/src/config.ts | Gate: T003 | Verify: Config unit tests pass (TDD green phase); Zod validates URL format, token prefix, timeout range"
+    },
+    {
+      "id": "T005",
+      "description": "Write unit tests for slack-client: webhook POST, bot token POST, timeout handling, HTTP error handling (4xx, 5xx, 429), network failure, fire-and-forget behavior",
+      "status": "done",
+      "notes": "Phase: core | Target: packages/slack-mcp/__tests__/unit/slack-client.test.ts | Gate: T004 | Verify: Test file created with ~8 test cases; tests fail (TDD red phase)"
+    },
+    {
+      "id": "T006",
+      "description": "Write unit tests for formatter: Block Kit message construction for phase_transition, task_completion, milestone events; emoji mapping, color coding, field structure",
+      "status": "done",
+      "notes": "Phase: core | Target: packages/slack-mcp/__tests__/unit/formatter.test.ts | Gate: T004 | Verify: Test file created with ~10 test cases; tests fail (TDD red phase)"
+    },
+    {
+      "id": "T007",
+      "description": "Write unit tests for spec-reader: parse spec.md frontmatter, parse tasks.json, build SpecProgress, handle missing files",
+      "status": "done",
+      "notes": "Phase: core | Target: packages/slack-mcp/__tests__/unit/spec-reader.test.ts | Gate: T004 | Verify: Test file created with ~6 test cases; tests fail (TDD red phase)"
+    },
+    {
+      "id": "T008",
+      "description": "Implement slack-client.ts: SlackClient class with postWebhook() and postMessage() methods; configurable timeout via AbortController; fire-and-forget error handling; SlackClientError class",
+      "status": "done",
+      "notes": "Phase: core | Target: packages/slack-mcp/src/slack-client.ts | Gate: T005 | Verify: Slack client unit tests pass (TDD green phase)"
+    },
+    {
+      "id": "T009",
+      "description": "Implement formatter.ts: formatPhaseTransition(), formatTaskCompletion(), formatMilestone() returning Slack Block Kit payloads with emoji, color-coded status, structured fields",
+      "status": "done",
+      "notes": "Phase: core | Target: packages/slack-mcp/src/formatter.ts | Gate: T006 | Verify: Formatter unit tests pass (TDD green phase)"
+    },
+    {
+      "id": "T010",
+      "description": "Implement spec-reader.ts: readSpecFrontmatter() and readTasksProgress() functions; parse YAML frontmatter from spec.md, parse tasks.json, return SpecProgress",
+      "status": "done",
+      "notes": "Phase: core | Target: packages/slack-mcp/src/spec-reader.ts | Gate: T007 | Verify: Spec reader unit tests pass (TDD green phase)"
+    },
+    {
+      "id": "T011",
+      "description": "Write integration tests for MCP server tools: send_progress tool registration/dispatch, get_spec_status tool registration/dispatch, error responses, extensible tool pattern",
+      "status": "done",
+      "notes": "Phase: mcp | Target: packages/slack-mcp/__tests__/integration/mcp-tools.test.ts | Gate: T010 | Verify: Test file created with ~8 test cases; tests fail (TDD red phase)"
+    },
+    {
+      "id": "T012",
+      "description": "Implement index.ts: createMcpServer() with send_progress and get_spec_status tools; Zod input schemas; main entry point with StdioServerTransport; extensible tool registration pattern",
+      "status": "done",
+      "notes": "Phase: mcp | Target: packages/slack-mcp/src/index.ts | Gate: T011 | Verify: MCP tool integration tests pass (TDD green phase); server starts without errors"
+    },
+    {
+      "id": "T013",
+      "description": "Write integration tests for notify.ts CLI: webhook dispatch on phase transition, task completion, milestone events; graceful no-op when unconfigured; fire-and-forget on HTTP failure",
+      "status": "done",
+      "notes": "Phase: hooks | Target: packages/slack-mcp/__tests__/integration/notify.test.ts | Gate: T012 | Verify: Test file created with ~6 test cases; tests fail (TDD red phase)"
+    },
+    {
+      "id": "T014",
+      "description": "Implement notify.ts: CLI entry point for hook-triggered webhook notifications; parse event JSON from stdin/args; load config; format message; POST via slack-client; exit 0 always",
+      "status": "done",
+      "notes": "Phase: hooks | Target: packages/slack-mcp/src/notify.ts | Gate: T013 | Verify: Notify integration tests pass (TDD green phase)"
+    },
+    {
+      "id": "T015",
+      "description": "Create .claude/hooks/speckit/slack-notify.sh: detect phase transitions and task completions from PostToolUse stdin JSON; call node packages/slack-mcp/build/notify.js; fail-open pattern",
+      "status": "done",
+      "notes": "Phase: hooks | Target: .claude/hooks/speckit/slack-notify.sh | Gate: T014 | Verify: Hook script is executable; correctly detects spec.md and tasks.json writes; exits 0 on all paths"
+    },
+    {
+      "id": "T016",
+      "description": "Register slack-notify.sh hook in .claude/settings.json under PostToolUse with matcher for Write tool; add milestone notification on Stop event for verify-passed",
+      "status": "done",
+      "notes": "Phase: hooks | Target: .claude/settings.json | Gate: T015 | Verify: settings.json is valid JSON; new hook entries reference correct script paths; existing hooks unchanged"
+    },
+    {
+      "id": "T017",
+      "description": "Write hook integration tests: verify slack-notify.sh correctly parses PostToolUse JSON, calls notify.js with proper args, handles missing SLACK_WEBHOOK_URL gracefully",
+      "status": "done",
+      "notes": "Phase: integration | Target: packages/slack-mcp/__tests__/integration/hook-integration.test.ts | Gate: T016 | Verify: Test file created with ~6 test cases; tests pass"
+    },
+    {
+      "id": "T018",
+      "description": "Add .mcp.json entry for slack-speckit MCP server alongside existing jira-speckit; update monorepo npm scripts for slack-mcp build/test",
+      "status": "done",
+      "notes": "Phase: integration | Target: .mcp.json | Gate: T017 | Verify: .mcp.json is valid JSON with slack-speckit entry; npm run test:slack-mcp works; npm run build in packages/slack-mcp succeeds"
+    },
+    {
+      "id": "T-DOC-GATE",
+      "description": "Documentation reconciliation - identify and update affected docs (CLAUDE.md, project-summary.md, patterns.md)",
+      "status": "done",
+      "notes": "Phase: verify | Gate: T018 | Verify: documentation-update-report.md generated with Status: PASS"
+    },
+    {
+      "id": "T-FINAL",
+      "description": "All verification gates passed - spec complete",
+      "status": "done",
+      "notes": "Phase: verify | Gate: T-DOC-GATE | Verify: All composed checks pass"
+    }
+  ]
+}
