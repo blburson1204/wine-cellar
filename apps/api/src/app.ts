@@ -41,7 +41,18 @@ export const createApp = (): Express => {
   const app = express();
 
   // Request parsing
-  app.use(cors());
+  // CORS: Use CORS_ORIGIN env var in production; permissive when unset (development)
+  const corsOrigin = process.env.CORS_ORIGIN;
+  app.use(
+    cors(
+      corsOrigin
+        ? {
+            origin: corsOrigin,
+            credentials: true,
+          }
+        : undefined
+    )
+  );
   app.use(express.json());
 
   // Request tracking and logging
