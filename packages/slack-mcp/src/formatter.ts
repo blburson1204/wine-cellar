@@ -98,7 +98,7 @@ export function formatPhaseTransition(event: NotificationEvent): SlackBlockKitPa
         type: 'header',
         text: {
           type: 'plain_text',
-          text: `${toPhaseEmoji} ${event.specName}`,
+          text: `${toPhaseEmoji} SpecKit Phase Transition`,
           emoji: true,
         },
       },
@@ -154,10 +154,6 @@ export function formatTaskCompletion(event: NotificationEvent): SlackBlockKitPay
           {
             type: 'mrkdwn',
             text: `*Status:*\n${statusEmoji} ${details.status} (${statusColor})`,
-          },
-          {
-            type: 'mrkdwn',
-            text: `*Spec:*\n${event.specName}`,
           },
         ],
       },

@@ -32,7 +32,7 @@ describe('formatter', () => {
       expect(result.blocks.length).toBeGreaterThan(0);
     });
 
-    it('should include spec name in the header', async () => {
+    it('should include "SpecKit Phase Transition" in the header', async () => {
       const event: NotificationEvent = {
         type: 'phase_transition',
         specId: '007-slack-integration',
@@ -52,9 +52,9 @@ describe('formatter', () => {
       );
       expect(headerBlock).toBeDefined();
 
-      // The spec name should appear somewhere in the message
+      // The header should use the generic title, not the spec name
       const stringified = JSON.stringify(result);
-      expect(stringified).toContain('Slack Integration');
+      expect(stringified).toContain('SpecKit Phase Transition');
     });
 
     it('should include from and to phase in the message', async () => {
