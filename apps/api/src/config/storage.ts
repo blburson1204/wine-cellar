@@ -1,6 +1,30 @@
 import path from 'path';
 
 /**
+ * Environment helpers
+ */
+export const isProduction = process.env.NODE_ENV === 'production';
+export const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+export const isTest = process.env.NODE_ENV === 'test';
+
+/**
+ * Storage provider type
+ */
+export type StorageProvider = 'local' | 'cloudinary';
+
+/**
+ * Get the configured storage provider
+ * Defaults to 'local' when STORAGE_PROVIDER is not set
+ */
+export const getStorageProvider = (): StorageProvider => {
+  const provider = process.env.STORAGE_PROVIDER?.toLowerCase();
+  if (provider === 'cloudinary') {
+    return 'cloudinary';
+  }
+  return 'local';
+};
+
+/**
  * Storage configuration for wine label images
  */
 export const storageConfig = {
@@ -25,14 +49,25 @@ export const storageConfig = {
 };
 
 /**
- * Environment helpers
+ * Cloudinary configuration
+ * Required when STORAGE_PROVIDER=cloudinary
  */
-export const isProduction = process.env.NODE_ENV === 'production';
-export const isDevelopment = process.env.NODE_ENV === 'development';
+export const cloudinaryConfig = {
+  cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+  apiKey: process.env.CLOUDINARY_API_KEY || '',
+  apiSecret: process.env.CLOUDINARY_API_SECRET || '',
+  folder: process.env.CLOUDINARY_FOLDER || 'wine-cellar',
+};
 
 /**
- * AWS S3 configuration (for Phase 4)
- * Currently not used - will be implemented in production phase
+ * Check if Cloudinary is properly configured
+ */
+export const isCloudinaryConfigured = (): boolean => {
+  return !!(cloudinaryConfig.cloudName && cloudinaryConfig.apiKey && cloudinaryConfig.apiSecret);
+};
+
+/**
+ * AWS S3 configuration (legacy - not currently used)
  */
 export const useS3 = isProduction && !!process.env.AWS_S3_BUCKET;
 
