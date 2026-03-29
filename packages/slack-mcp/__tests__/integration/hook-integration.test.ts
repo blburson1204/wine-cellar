@@ -45,6 +45,11 @@ async function runHook(
       cwd: REPO_ROOT,
       env: {
         ...process.env,
+        // Prevent real Slack messages during tests: set to empty string.
+        // The hooks use ${VAR-default} (not :-) so empty = "explicitly disabled"
+        // and won't fall back to loading from .mcp.json.
+        SLACK_WEBHOOK_URL: '',
+        SLACK_BOT_TOKEN: '',
         ...env,
         // Ensure PATH includes node
         PATH: process.env.PATH,

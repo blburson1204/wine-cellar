@@ -168,10 +168,11 @@ if [[ "$ALL_PASSING" == "true" ]] && [[ $PASSED_COUNT -gt 0 ]]; then
   # Load env vars from .mcp.json (hook scripts don't inherit MCP server env)
   MCP_CONFIG="$REPO_ROOT/.mcp.json"
   if [[ -f "$MCP_CONFIG" ]]; then
-    export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_WEBHOOK_URL // empty' "$MCP_CONFIG" 2>/dev/null)}"
-    export SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_BOT_TOKEN // empty' "$MCP_CONFIG" 2>/dev/null)}"
-    export SLACK_CHANNEL="${SLACK_CHANNEL:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_CHANNEL // empty' "$MCP_CONFIG" 2>/dev/null)}"
-    export SLACK_TIMEOUT_MS="${SLACK_TIMEOUT_MS:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_TIMEOUT_MS // empty' "$MCP_CONFIG" 2>/dev/null)}"
+    # Use ${VAR-default} (not :-) so tests can disable with VAR=''
+    export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_WEBHOOK_URL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+    export SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_BOT_TOKEN // empty' "$MCP_CONFIG" 2>/dev/null)}"
+    export SLACK_CHANNEL="${SLACK_CHANNEL-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_CHANNEL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+    export SLACK_TIMEOUT_MS="${SLACK_TIMEOUT_MS-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_TIMEOUT_MS // empty' "$MCP_CONFIG" 2>/dev/null)}"
   fi
 
   # If still no webhook URL, nothing to do

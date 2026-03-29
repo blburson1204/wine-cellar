@@ -21,6 +21,21 @@ trap 'exit 0' ERR
 # Get repository root
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 
+# ── Cache helpers ────────────────────────────────────────────────────
+# Cache the last-seen file content so that multiple writes between commits
+# don't re-detect the same changes. Fall back to git HEAD if no cache.
+
+CACHE_DIR="/tmp/speckit-hook-cache"
+mkdir -p "$CACHE_DIR" 2>/dev/null || true
+
+get_cache_key() {
+  if command -v md5 >/dev/null 2>&1; then
+    echo -n "$1" | md5
+  else
+    echo -n "$1" | md5sum | cut -d' ' -f1
+  fi
+}
+
 # ── Read stdin ───────────────────────────────────────────────────────
 
 INPUT=$(cat 2>/dev/null) || exit 0
@@ -75,10 +90,11 @@ fi
 
 MCP_CONFIG="$REPO_ROOT/.mcp.json"
 if [[ -f "$MCP_CONFIG" ]]; then
-  export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_WEBHOOK_URL // empty' "$MCP_CONFIG" 2>/dev/null)}"
-  export SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_BOT_TOKEN // empty' "$MCP_CONFIG" 2>/dev/null)}"
-  export SLACK_CHANNEL="${SLACK_CHANNEL:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_CHANNEL // empty' "$MCP_CONFIG" 2>/dev/null)}"
-  export SLACK_TIMEOUT_MS="${SLACK_TIMEOUT_MS:-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_TIMEOUT_MS // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  # Use ${VAR-default} (not :-) so tests can disable with VAR=''
+  export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_WEBHOOK_URL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_BOT_TOKEN // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export SLACK_CHANNEL="${SLACK_CHANNEL-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_CHANNEL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export SLACK_TIMEOUT_MS="${SLACK_TIMEOUT_MS-$(jq -r '.mcpServers["slack-speckit"].env.SLACK_TIMEOUT_MS // empty' "$MCP_CONFIG" 2>/dev/null)}"
 fi
 
 # If still no webhook URL, nothing to do
@@ -118,12 +134,18 @@ case "$FILE_NAME" in
       exit 0
     fi
 
-    # Try to get previous phase
-    # PostToolUse fires AFTER the Write completes, so the file on disk already
-    # has the new content. Use git to get the last committed version instead.
+    # Try to get previous phase from cache first, then git HEAD.
+    # Cache prevents duplicate notifications when file is written multiple
+    # times between commits (git HEAD only updates on commit).
     OLD_PHASE=""
-    REL_PATH="${FILE_PATH#$REPO_ROOT/}"
-    OLD_PHASE=$(git show "HEAD:${REL_PATH}" 2>/dev/null | head -30 | grep -E '^\s*phase:' | head -1 | sed 's/.*phase:[[:space:]]*//' | tr -d '"') || true
+    CACHE_KEY=$(get_cache_key "$FILE_PATH")
+    PHASE_CACHE="$CACHE_DIR/${CACHE_KEY}.phase"
+    if [[ -f "$PHASE_CACHE" ]]; then
+      OLD_PHASE=$(cat "$PHASE_CACHE" 2>/dev/null) || true
+    else
+      REL_PATH="${FILE_PATH#$REPO_ROOT/}"
+      OLD_PHASE=$(git show "HEAD:${REL_PATH}" 2>/dev/null | head -30 | grep -E '^\s*phase:' | head -1 | sed 's/.*phase:[[:space:]]*//' | tr -d '"') || true
+    fi
 
     # Only notify if phase changed
     if [[ "$OLD_PHASE" != "$NEW_PHASE" ]]; then
@@ -151,6 +173,9 @@ case "$FILE_NAME" in
       # Fire-and-forget: call notify.js
       node "$NOTIFY_SCRIPT" "$EVENT_JSON" 2>/dev/null &
     fi
+
+    # Update cache with current phase (prevents duplicate detection on next write)
+    echo "$NEW_PHASE" > "$PHASE_CACHE" 2>/dev/null || true
     ;;
 
   tasks.json|prd.json)
@@ -169,11 +194,17 @@ case "$FILE_NAME" in
       exit 0
     fi
 
-    # Try to read old tasks from last committed version
-    # PostToolUse fires AFTER Write, so file on disk already has new content
+    # Read old tasks from cache first, then git HEAD.
+    # Cache prevents duplicate notifications between commits.
     OLD_TASKS="[]"
-    REL_PATH="${FILE_PATH#$REPO_ROOT/}"
-    OLD_TASKS=$(git show "HEAD:${REL_PATH}" 2>/dev/null | jq -r '.tasks // []' 2>/dev/null) || OLD_TASKS="[]"
+    CACHE_KEY=$(get_cache_key "$FILE_PATH")
+    TASKS_CACHE="$CACHE_DIR/${CACHE_KEY}.tasks"
+    if [[ -f "$TASKS_CACHE" ]]; then
+      OLD_TASKS=$(cat "$TASKS_CACHE" 2>/dev/null | jq -r '.tasks // []' 2>/dev/null) || OLD_TASKS="[]"
+    else
+      REL_PATH="${FILE_PATH#$REPO_ROOT/}"
+      OLD_TASKS=$(git show "HEAD:${REL_PATH}" 2>/dev/null | jq -r '.tasks // []' 2>/dev/null) || OLD_TASKS="[]"
+    fi
 
     # Find tasks that changed to "done" or "completed"
     # Compare each task's status
@@ -215,6 +246,9 @@ case "$FILE_NAME" in
         node "$NOTIFY_SCRIPT" "$EVENT_JSON" 2>/dev/null &
       fi
     done || true
+
+    # Update cache with current tasks content (prevents duplicate detection)
+    echo "$NEW_CONTENT" > "$TASKS_CACHE" 2>/dev/null || true
     ;;
 esac
 

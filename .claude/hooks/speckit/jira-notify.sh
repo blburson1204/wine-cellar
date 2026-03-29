@@ -20,6 +20,21 @@ trap 'exit 0' ERR
 # Get repository root
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 
+# ── Cache helpers ────────────────────────────────────────────────────
+# Cache the last-seen file content so that multiple writes between commits
+# don't re-detect the same changes. Fall back to git HEAD if no cache.
+
+CACHE_DIR="/tmp/speckit-hook-cache"
+mkdir -p "$CACHE_DIR" 2>/dev/null || true
+
+get_cache_key() {
+  if command -v md5 >/dev/null 2>&1; then
+    echo -n "$1" | md5
+  else
+    echo -n "$1" | md5sum | cut -d' ' -f1
+  fi
+}
+
 # ── Read stdin ───────────────────────────────────────────────────────
 
 INPUT=$(cat 2>/dev/null) || exit 0
@@ -79,10 +94,11 @@ fi
 
 MCP_CONFIG="$REPO_ROOT/.mcp.json"
 if [[ -f "$MCP_CONFIG" ]]; then
-  export JIRA_URL="${JIRA_URL:-$(jq -r '.mcpServers["jira-speckit"].env.JIRA_URL // empty' "$MCP_CONFIG" 2>/dev/null)}"
-  export JIRA_EMAIL="${JIRA_EMAIL:-$(jq -r '.mcpServers["jira-speckit"].env.JIRA_EMAIL // empty' "$MCP_CONFIG" 2>/dev/null)}"
-  export JIRA_API_TOKEN="${JIRA_API_TOKEN:-$(jq -r '.mcpServers["jira-speckit"].env.JIRA_API_TOKEN // empty' "$MCP_CONFIG" 2>/dev/null)}"
-  export JIRA_PROJECT_KEY="${JIRA_PROJECT_KEY:-$(jq -r '.mcpServers["jira-speckit"].env.JIRA_PROJECT_KEY // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  # Use ${VAR-default} (not :-) so tests can disable with VAR=''
+  export JIRA_URL="${JIRA_URL-$(jq -r '.mcpServers["jira-speckit"].env.JIRA_URL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export JIRA_EMAIL="${JIRA_EMAIL-$(jq -r '.mcpServers["jira-speckit"].env.JIRA_EMAIL // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export JIRA_API_TOKEN="${JIRA_API_TOKEN-$(jq -r '.mcpServers["jira-speckit"].env.JIRA_API_TOKEN // empty' "$MCP_CONFIG" 2>/dev/null)}"
+  export JIRA_PROJECT_KEY="${JIRA_PROJECT_KEY-$(jq -r '.mcpServers["jira-speckit"].env.JIRA_PROJECT_KEY // empty' "$MCP_CONFIG" 2>/dev/null)}"
 fi
 
 # If Jira credentials are missing, nothing to do
@@ -106,14 +122,18 @@ if [[ -z "$NEW_TASKS" || "$NEW_TASKS" == "[]" ]]; then
 fi
 
 # ── Read previous tasks state (FR-005, FR-013) ───────────────────────
-# PostToolUse fires AFTER Write completes, so the file on disk already
-# has the new content. Use git to get the last committed version.
-# If file was never committed (first write), OLD_TASKS stays "[]"
-# and all non-pending statuses are treated as changes.
+# Read old tasks from cache first, then git HEAD.
+# Cache prevents duplicate Jira transitions between commits.
 
 OLD_TASKS="[]"
-REL_PATH="${FILE_PATH#$REPO_ROOT/}"
-OLD_TASKS=$(git show "HEAD:${REL_PATH}" 2>/dev/null | jq -r '.tasks // []' 2>/dev/null) || OLD_TASKS="[]"
+CACHE_KEY=$(get_cache_key "$FILE_PATH")
+TASKS_CACHE="$CACHE_DIR/${CACHE_KEY}.jira-tasks"
+if [[ -f "$TASKS_CACHE" ]]; then
+  OLD_TASKS=$(cat "$TASKS_CACHE" 2>/dev/null | jq -r '.tasks // []' 2>/dev/null) || OLD_TASKS="[]"
+else
+  REL_PATH="${FILE_PATH#$REPO_ROOT/}"
+  OLD_TASKS=$(git show "HEAD:${REL_PATH}" 2>/dev/null | jq -r '.tasks // []' 2>/dev/null) || OLD_TASKS="[]"
+fi
 
 # ── Detect status changes and dispatch to notify.js ─────────────────
 
@@ -146,6 +166,9 @@ echo "$NEW_TASKS" | jq -c '.[]' 2>/dev/null | while read -r TASK; do
   node "$NOTIFY_SCRIPT" "$EVENT_JSON" 2>/dev/null &
 
 done || true
+
+# Update cache with current tasks content (prevents duplicate detection)
+echo "$NEW_CONTENT" > "$TASKS_CACHE" 2>/dev/null || true
 
 # Always exit 0 (fail-open)
 exit 0
