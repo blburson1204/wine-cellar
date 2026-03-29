@@ -122,6 +122,67 @@ interact with via tools (e.g., GitHub, Linear, PagerDuty).
 
 ---
 
+## 7. Storage Provider Factory
+
+**Location:** `apps/api/src/services/storage/` +
+`apps/api/src/config/storage.ts` **Used by:** Image upload/retrieval endpoints
+
+Storage abstraction with multiple provider implementations (local filesystem,
+Cloudinary). Provider selected via `STORAGE_PROVIDER` environment variable. All
+providers implement `IStorageService` interface for portable storage operations.
+
+**Provider implementations:**
+
+```
+apps/api/src/services/storage/
+  index.ts                        # IStorageService interface + factory
+  local-storage.service.ts        # Filesystem storage (development)
+  cloudinary-storage.service.ts   # Cloud storage (production)
+```
+
+**Configuration pattern:**
+
+- `STORAGE_PROVIDER=local` → LocalStorageService
+- `STORAGE_PROVIDER=cloudinary` → CloudinaryStorageService (requires
+  CLOUDINARY\_\* env vars)
+- Factory throws clear error if provider is unknown or required env vars are
+  missing
+
+**When to use:** Any new external storage integration (S3, Azure Blob, etc.).
+Add new provider class, implement IStorageService, register in factory.
+
+---
+
+## 8. Environment-based Service Selection
+
+**Location:** Various config files in `apps/api/src/config/` **Used by:**
+Storage, CORS, API URL configuration, authentication
+
+Services and middleware configured via environment variables with sensible
+development defaults. Validation at startup ensures missing required variables
+fail fast with clear error messages.
+
+**Pattern structure:**
+
+1. Define environment variables in `.env.example` with documentation
+2. Read and validate env vars in config module (e.g., `storage.ts`)
+3. Select service implementation or behavior based on env var value
+4. Throw startup error if required config is missing
+
+**Examples in codebase:**
+
+- `STORAGE_PROVIDER` selects storage service
+- `CORS_ORIGIN` configures allowed origins (defaults to permissive in dev)
+- `NEXT_PUBLIC_API_URL` points frontend to API (localhost in dev, Railway URL in
+  prod)
+- `AUTH_USERNAME` and `AUTH_PASSWORD` enable Basic Auth middleware (disabled if
+  not set)
+
+**When to use:** Any service that needs different behavior in development vs
+production, or any integration with external services that require credentials.
+
+---
+
 ## Adding New Patterns
 
 When a new pattern emerges (used in 3+ places), add it here:

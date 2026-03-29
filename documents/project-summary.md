@@ -23,6 +23,8 @@ interface for tracking wines with full CRUD operations.
 - **API Framework**: Express.js
 - **Language**: TypeScript
 - **Architecture**: RESTful API
+- **Image Storage**: Cloudinary (production), Local filesystem (development)
+- **Authentication**: HTTP Basic Auth (configurable via environment variables)
 
 ### Database
 
@@ -257,7 +259,8 @@ curl -X POST http://localhost:3001/api/wines \
 - [x] Image preview before committing changes
 - [x] Image optimization (resize, compress, format conversion)
 - [x] File validation (type, size, magic number)
-- [x] Local file storage with caching
+- [x] Cloud storage (Cloudinary) with local development fallback
+- [x] Storage provider abstraction via IStorageService interface
 
 ### Wine Favorites
 
@@ -490,8 +493,14 @@ detailed test breakdown.
    ```bash
    cat > .env << 'EOF'
    DATABASE_URL="postgresql://postgres:postgres@localhost:5433/wine_cellar"
+   STORAGE_PROVIDER=local
+   # Optional: Add AUTH_USERNAME and AUTH_PASSWORD for local auth testing
+   # Optional: Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET for cloud storage testing
    EOF
    ```
+
+   See `.env.example` files in root and subdirectories for all available
+   environment variables.
 
 3. **Copy .env to subdirectories**:
 
@@ -685,11 +694,10 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
 
 ## Known Limitations
 
-1. **No Authentication**: All wines are publicly accessible
+1. **Basic Authentication Only**: Simple HTTP Basic Auth for production access
+   control (full user management system planned)
 2. **No Pagination**: Large collections may have performance issues
-3. **Local Image Storage Only**: Wine images stored locally (AWS S3 planned for
-   production)
-4. **Hybrid Styling**: Mix of TailwindCSS utility classes and inline styles (no
+3. **Hybrid Styling**: Mix of TailwindCSS utility classes and inline styles (no
    CSS modules or styled-components). Newer components (Combobox, FilterDrawer,
    MobileFilterToggle) use Tailwind classes; original components (page.tsx,
    layout.tsx, WineTable, WineDetailModal) use inline React styles. Full
@@ -699,22 +707,33 @@ See [TODO.md](TODO.md) for the complete roadmap. Top priorities:
    fine to defer if UI is stable. See
    `documents/archive/mobile-responsive-plan.md` Option B for the original
    analysis.
-5. **No Sentry Integration**: Error tracking service not configured
+4. **No Sentry Integration**: Error tracking service not configured
    (infrastructure ready)
+
+## Deployment
+
+The Wine Cellar application is deployed to production using:
+
+- **Frontend**: Vercel (Next.js hosting with automatic deployments)
+- **Backend**: Railway (Express API + PostgreSQL)
+- **Image Storage**: Cloudinary (25GB free tier)
+- **Authentication**: HTTP Basic Auth (configurable via environment variables)
+- **Configuration**: See `railway.json` and `.env.example` files
+
+See [aws-deployment-plan.md](documents/aws-deployment-plan.md) for the original
+deployment research and Vercel + Railway decision rationale.
 
 ## Future Enhancements
 
 See [TODO.md](TODO.md) for comprehensive list. Major features planned:
 
-- User authentication and authorization
+- Full user authentication and authorization system
 - Thumbnail images in wine table (Phase 2)
-- AWS S3 + CloudFront for production image storage (Phase 3)
 - Cellar location tracking
 - Drinking window recommendations
 - Collection analytics and reports
 - Mobile PWA
 - CSV import/export
-- Deployment to production (Vercel/Railway)
 
 ## Contributing
 

@@ -9,7 +9,7 @@ tool (GitHub, Notion, Obsidian, VS Code preview, etc.)
 graph TB
     subgraph "Frontend - Next.js 15 + React 18"
         direction TB
-        Browser["Browser<br/>(localhost:3000)"]
+        Browser["Browser<br/>(localhost:3000 dev,<br/>Vercel prod)"]
         Page["page.tsx<br/>State Management<br/>Filters, Sort, CRUD"]
         subgraph "Components"
             WT["WineTable<br/>Desktop table view"]
@@ -25,7 +25,7 @@ graph TB
 
     subgraph "Backend - Express + TypeScript"
         direction TB
-        Server["server.ts<br/>(localhost:3001)"]
+        Server["server.ts<br/>(localhost:3001 dev,<br/>Railway prod)"]
         subgraph "Middleware Stack"
             CORS["CORS"]
             JSON["JSON Parser"]
@@ -42,8 +42,9 @@ graph TB
         end
         subgraph "Services"
             ZOD["Zod Schemas<br/>Validation + OpenAPI"]
-            STORAGE["Storage Service<br/>(Interface pattern)"]
-            LOCAL["LocalStorageService<br/>File system"]
+            STORAGE["Storage Factory<br/>(IStorageService)"]
+            LOCAL["LocalStorageService<br/>File system (dev)"]
+            CLOUDINARY["CloudinaryStorageService<br/>Cloud storage (prod)"]
             SHARP["Sharp<br/>Image optimization"]
         end
     end
@@ -51,9 +52,10 @@ graph TB
     subgraph "Data Layer"
         direction TB
         PRISMA["Prisma ORM<br/>(packages/database)<br/>Singleton client"]
-        PG[("PostgreSQL 15<br/>(Docker, port 5433)<br/>wine_cellar")]
+        PG[("PostgreSQL 15<br/>(Docker dev, Railway prod)<br/>wine_cellar")]
         PG_TEST[("Test Database<br/>wine_cellar_test")]
-        DISK[("Local Disk<br/>uploads/wines/<br/>Optimized JPEGs")]
+        DISK[("Local Disk<br/>uploads/wines/<br/>Development only")]
+        CLOUD[("Cloudinary<br/>Cloud image storage<br/>Production")]
     end
 
     subgraph "Quality Infrastructure"
@@ -83,7 +85,9 @@ graph TB
     CRUD --> ZOD
     IMG --> STORAGE
     STORAGE --> LOCAL
+    STORAGE --> CLOUDINARY
     LOCAL --> SHARP
+    CLOUDINARY --> SHARP
     CRUD --> ERR
     IMG --> ERR
     CRUD --> PRISMA
@@ -92,11 +96,13 @@ graph TB
     PRISMA --> PG
     PRISMA --> PG_TEST
     LOCAL --> DISK
+    CLOUDINARY --> CLOUD
 
     style Browser fill:#7C2D3C,color:#fff
     style PG fill:#336791,color:#fff
     style PG_TEST fill:#336791,color:#fff,stroke-dasharray: 5 5
     style DISK fill:#8B7355,color:#fff
+    style CLOUD fill:#4285F4,color:#fff
     style CI fill:#24292e,color:#fff
     style TESTS fill:#2d8c3c,color:#fff
 ```
@@ -143,7 +149,9 @@ sequenceDiagram
     participant M as Multer
     participant V as Validator
     participant S as Sharp
-    participant FS as File System
+    participant ST as Storage Factory
+    participant FS as File System (dev)
+    participant CL as Cloudinary (prod)
     participant P as Prisma
     participant D as PostgreSQL
 
@@ -156,7 +164,15 @@ sequenceDiagram
     V-->>A: Valid image
     A->>S: Optimize (resize 1200px, JPEG 85%, strip EXIF)
     S-->>A: Optimized buffer
-    A->>FS: Write to uploads/wines/{id}.jpg
+    A->>ST: Select storage provider (env var)
+    alt Local Storage (STORAGE_PROVIDER=local)
+        ST->>FS: Write to uploads/wines/{id}.jpg
+        FS-->>ST: File path
+    else Cloudinary (STORAGE_PROVIDER=cloudinary)
+        ST->>CL: Upload to Cloudinary
+        CL-->>ST: Public URL
+    end
+    ST-->>A: Storage identifier (path or URL)
     A->>P: Update wine.imageUrl
     P->>D: UPDATE "Wine" SET "imageUrl"
     D-->>P: Updated

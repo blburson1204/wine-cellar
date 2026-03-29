@@ -1,5 +1,11 @@
 # AWS Deployment Plan for Wine Cellar Application
 
+> **Implementation Status (March 2026):** The Wine Cellar application has been
+> successfully deployed using the **Vercel + Railway** approach (see "Low-Cost
+> Alternative" section below). This document remains as reference architecture
+> for potential future AWS migration. See spec 009-deploy-wine-cellar for
+> implementation details.
+
 ## Overview
 
 This document outlines the steps required to deploy the Wine Cellar application
