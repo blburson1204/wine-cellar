@@ -1,21 +1,29 @@
+import { getStorageProvider, isCloudinaryConfigured } from '../../config/storage';
+import { CloudinaryStorageService } from './cloudinary-storage.service';
 import { LocalStorageService } from './local-storage.service';
 import { IStorageService } from './storage.interface';
-// import { S3StorageService } from './s3-storage.service'; // Phase 4
 
 /**
  * Create and return the appropriate storage service based on configuration
  *
- * Currently returns LocalStorageService for all environments.
- * In Phase 4, this will check for S3 configuration and return S3StorageService
- * when appropriate.
+ * Uses STORAGE_PROVIDER env var to determine which service to use:
+ * - 'cloudinary': Uses CloudinaryStorageService (requires Cloudinary credentials)
+ * - 'local' (default): Uses LocalStorageService
  *
  * @returns Storage service instance
  */
 export function createStorageService(): IStorageService {
-  // Phase 4: Add S3 support
-  // if (useS3) {
-  //   return new S3StorageService();
-  // }
+  const provider = getStorageProvider();
+
+  if (provider === 'cloudinary') {
+    if (!isCloudinaryConfigured()) {
+      console.warn(
+        'STORAGE_PROVIDER=cloudinary but Cloudinary credentials are missing. Falling back to local storage.'
+      );
+      return new LocalStorageService();
+    }
+    return new CloudinaryStorageService();
+  }
 
   return new LocalStorageService();
 }
