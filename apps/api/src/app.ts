@@ -284,6 +284,13 @@ export const createApp = (): Express => {
         });
       }
 
+      // Cloud URLs (Cloudinary): redirect to external URL
+      if (wine.imageUrl.startsWith('http://') || wine.imageUrl.startsWith('https://')) {
+        log.info('Redirecting to cloud image URL', { wineId: id, imageUrl: wine.imageUrl });
+        return res.redirect(302, wine.imageUrl);
+      }
+
+      // Local files: serve from disk
       // Try uploaded images first (from uploads directory)
       const uploadedImagePath = path.join(__dirname, '..', 'uploads', 'wines', wine.imageUrl);
 
