@@ -10,6 +10,7 @@ import { prisma } from '@wine-cellar/database';
 import { requestIdMiddleware } from './middleware/requestId';
 import { httpLogger } from './middleware/httpLogger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { createBasicAuthMiddleware } from './middleware/basicAuth';
 import { validate } from './middleware/validate';
 import { createWineSchema, updateWineSchema, wineIdSchema } from './schemas/wine.schema';
 import { NotFoundError, ImageUploadError } from './errors/AppError';
@@ -58,6 +59,9 @@ export const createApp = (): Express => {
   // Request tracking and logging
   app.use(requestIdMiddleware);
   app.use(httpLogger);
+
+  // Basic Auth (when AUTH_USERNAME and AUTH_PASSWORD are set)
+  app.use(createBasicAuthMiddleware());
 
   // API Documentation (Swagger UI)
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
