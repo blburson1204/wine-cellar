@@ -1,0 +1,139 @@
+{
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Create .env.example files for all workspaces (root, api, web, database) documenting required environment variables including AUTH_USERNAME and AUTH_PASSWORD",
+      "status": "done",
+      "notes": "Phase 3.1",
+      "target_file": "apps/api/.env.example",
+      "verify": ".env.example files exist at root, apps/api, apps/web, packages/database with all required vars documented",
+      "gate": null
+    },
+    {
+      "id": "T002",
+      "description": "Update API CORS configuration to read from CORS_ORIGIN env var (permissive fallback in development)",
+      "status": "done",
+      "notes": "Phase 3.1",
+      "target_file": "apps/api/src/app.ts",
+      "verify": "CORS reads from CORS_ORIGIN env var; defaults to permissive when unset; existing tests still pass",
+      "gate": null
+    },
+    {
+      "id": "T003",
+      "description": "Update storage config to add Cloudinary configuration and STORAGE_PROVIDER env var selection",
+      "status": "done",
+      "notes": "Phase 3.1",
+      "target_file": "apps/api/src/config/storage.ts",
+      "verify": "storageConfig includes cloudinaryConfig; STORAGE_PROVIDER env var parsed; isProduction/isDevelopment helpers updated",
+      "gate": null
+    },
+    {
+      "id": "T004",
+      "description": "TDD RED: Write CloudinaryStorageService unit tests (mock cloudinary SDK) covering upload, delete, getImageUrl, imageExists, and error handling",
+      "status": "done",
+      "notes": "Phase 3.2",
+      "target_file": "apps/api/__tests__/services/storage/cloudinary-storage.service.test.ts",
+      "verify": "Test file exists with ~10 test cases; all tests FAIL (no implementation yet)",
+      "gate": "T003"
+    },
+    {
+      "id": "T005",
+      "description": "TDD GREEN: Implement CloudinaryStorageService (implements IStorageService) using cloudinary SDK upload_stream, destroy, and URL generation",
+      "status": "done",
+      "notes": "Phase 3.2",
+      "target_file": "apps/api/src/services/storage/cloudinary-storage.service.ts",
+      "verify": "All CloudinaryStorageService tests pass; npm run test:api passes",
+      "gate": "T004"
+    },
+    {
+      "id": "T006",
+      "description": "Update storage factory (services/storage/index.ts) to return CloudinaryStorageService when STORAGE_PROVIDER=cloudinary",
+      "status": "done",
+      "notes": "Phase 3.2",
+      "target_file": "apps/api/src/services/storage/index.ts",
+      "verify": "Factory returns correct service based on STORAGE_PROVIDER; existing tests pass with STORAGE_PROVIDER=local or unset",
+      "gate": "T005"
+    },
+    {
+      "id": "T007",
+      "description": "Update image retrieval endpoint (GET /api/wines/:id/image) to redirect for Cloudinary URLs (wine.imageUrl starting with http)",
+      "status": "done",
+      "notes": "Phase 3.3",
+      "target_file": "apps/api/src/app.ts",
+      "verify": "Cloud URLs redirect (302); local filenames serve file (existing behavior); integration tests pass",
+      "gate": "T006"
+    },
+    {
+      "id": "T008",
+      "description": "Update next.config.js to read API URL from NEXT_PUBLIC_API_URL env var (default localhost:3001 for dev)",
+      "status": "done",
+      "notes": "Phase 3.3",
+      "target_file": "apps/web/next.config.js",
+      "verify": "next.config.js reads NEXT_PUBLIC_API_URL; defaults to http://localhost:3001; no hardcoded localhost in production",
+      "gate": "T006"
+    },
+    {
+      "id": "T009",
+      "description": "Create railway.json with build command (npm ci + db:generate + build), start command, and health check path",
+      "status": "done",
+      "notes": "Phase 3.3",
+      "target_file": "railway.json",
+      "verify": "railway.json exists at repo root with correct build/start commands and /api/health healthcheck",
+      "gate": "T006"
+    },
+    {
+      "id": "T010",
+      "description": "TDD: Write tests then implement Basic Auth middleware for Express API — require HTTP Basic Auth on all routes except GET /api/health when AUTH_USERNAME and AUTH_PASSWORD env vars are set; skip auth when unset",
+      "status": "done",
+      "notes": "Phase 3.4",
+      "target_file": "apps/api/src/middleware/basicAuth.ts",
+      "verify": "Middleware blocks unauthenticated requests (401) when env vars set; passes through when unset; /api/health always accessible; tests pass",
+      "gate": "T006"
+    },
+    {
+      "id": "T011",
+      "description": "Implement Next.js middleware for Basic Auth on all pages — require HTTP Basic Auth when AUTH_USERNAME and AUTH_PASSWORD env vars are set; skip when unset",
+      "status": "done",
+      "notes": "Phase 3.4",
+      "target_file": "apps/web/src/middleware.ts",
+      "verify": "Next.js middleware returns 401 with WWW-Authenticate header when credentials missing/wrong; passes through when env vars unset; local dev unaffected",
+      "gate": "T006"
+    },
+    {
+      "id": "T012",
+      "description": "Write integration tests for image endpoint redirect behavior (cloud URLs vs local filenames) and storage factory switching",
+      "status": "done",
+      "notes": "Phase 3.5",
+      "target_file": "apps/api/__tests__/routes/wine-image-cloud.integration.test.ts",
+      "verify": "Integration tests cover: redirect for http URLs, serve file for local filenames, factory returns correct provider",
+      "gate": "T007"
+    },
+    {
+      "id": "T013",
+      "description": "Run full test suite (npm test) to verify no regressions across all 729+ existing tests",
+      "status": "done",
+      "notes": "Phase 3.5",
+      "target_file": null,
+      "verify": "All tests pass including new Cloudinary, auth, and integration tests; zero regressions",
+      "gate": "T012"
+    },
+    {
+      "id": "T-DOC-GATE",
+      "description": "Documentation reconciliation - identify and update affected docs",
+      "status": "done",
+      "notes": "Phase verify",
+      "target_file": null,
+      "verify": "documentation-update-report.md generated with Status: PASS",
+      "gate": "T013"
+    },
+    {
+      "id": "T-FINAL",
+      "description": "All verification gates passed - spec complete",
+      "status": "done",
+      "notes": "Phase verify",
+      "target_file": null,
+      "verify": "All composed checks pass",
+      "gate": "T-DOC-GATE"
+    }
+  ]
+}
