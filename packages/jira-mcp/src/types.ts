@@ -239,3 +239,33 @@ export interface SpecKitTasksFile {
   spec_name: string;
   tasks: SpecKitTask[];
 }
+
+// ============================================================
+// Notify Dispatcher Types (notify.ts / jira-notify.sh)
+// ============================================================
+
+/**
+ * Event passed from jira-notify.sh (bash) to notify.js (Node.js)
+ * as a JSON string in argv[2].
+ * Spec: 008-feature-004-automatic
+ */
+export interface JiraNotifyEvent {
+  /** Absolute path to the spec directory containing jira-sync.json */
+  specDir: string;
+  /** SpecKit task ID (e.g., "T001", "T-FINAL") */
+  taskId: string;
+  /** New SpecKit status after the change */
+  newStatus: SpecKitStatus;
+}
+
+/**
+ * Result of processing a single notify event.
+ * Used internally by notify.ts — not serialized.
+ */
+export interface JiraNotifyResult {
+  success: boolean;
+  jiraKey: string;
+  previousStatus: string;
+  newStatus: string;
+  error?: string;
+}

@@ -138,7 +138,11 @@ Given the implementation details provided as an argument, do this:
    - Ensure all required artifacts were generated
    - Confirm no ERROR states in execution
 
-7. Report results with branch name, file paths, and generated artifacts.
+7. **Update spec.md phase**: Rewrite FEATURE_SPEC using the **Write tool** (not
+   Edit) with the `phase` field updated to `plan`. Using Write is required so
+   the PostToolUse:Write hook fires for Slack phase-transition notifications.
+
+8. Report results with branch name, file paths, and generated artifacts.
 
 Use absolute paths with the repository root for all file operations to avoid
 path issues.

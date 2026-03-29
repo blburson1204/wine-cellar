@@ -95,7 +95,7 @@ wine-cellar/
 │   │   │   └── schema.prisma   # Database schema
 │   │   └── index.ts            # Exported Prisma client
 │   ├── jira-mcp/               # Jira MCP server (SpecKit → Jira sync)
-│   │   ├── src/                # config, jira-client, sync-engine, mapper, hash
+│   │   ├── src/                # config, jira-client, sync-engine, mapper, hash, notify
 │   │   └── __tests__/          # 46 tests (unit + integration)
 │   └── slack-mcp/              # Slack MCP server (SpecKit → Slack notifications)
 │       ├── src/                # config, slack-client, formatter, spec-reader, notify
@@ -113,7 +113,7 @@ wine-cellar/
 │   ├── hooks/                  # ATOM, safety, and SpecKit hooks
 │   │   ├── atom/               # Context & verification (4 hooks)
 │   │   ├── safety/             # Command blocking & file guards (2 hooks)
-│   │   └── speckit/            # Post-tasks reconciliation, Slack notifications (3 hooks)
+│   │   └── speckit/            # Post-tasks reconciliation, Slack/Jira notifications (4 hooks)
 │   ├── docs/                   # Framework documentation (ATOM, gates, context)
 │   ├── session-context/        # Session state (current-work.md, etc.)
 │   └── settings.json           # Hook registration config
@@ -536,7 +536,7 @@ detailed test breakdown.
 | `npm test`               | Run all tests (729)                   |
 | `npm run test:api`       | API tests only (191)                  |
 | `npm run test:web`       | Web tests only (413)                  |
-| `npm run test:jira-mcp`  | Jira MCP tests only (46)              |
+| `npm run test:jira-mcp`  | Jira MCP tests only (~63)             |
 | `npm run test:slack-mcp` | Slack MCP tests only (79)             |
 | `npm run test:watch`     | Run tests in watch mode               |
 | `npm run test:coverage`  | Generate test coverage report         |
@@ -591,7 +591,7 @@ Maintains persistent sync state in `jira-sync.json` for incremental updates.
 
 - **Tools**: `sync_spec_to_jira`, `get_jira_status`, `update_task_status`
 - **Env vars**: `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY`
-- **Tests**: 46 tests (`npm run test:jira-mcp`)
+- **Tests**: ~63 tests (`npm run test:jira-mcp`)
 
 ### slack-speckit (`packages/slack-mcp/`)
 

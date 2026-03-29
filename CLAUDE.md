@@ -75,7 +75,7 @@ npm run db:studio    # Visual database editor
 ```bash
 npm run test:api        # API tests only (191)
 npm run test:web        # Web tests only (413)
-npm run test:jira-mcp   # Jira MCP tests only (46)
+npm run test:jira-mcp   # Jira MCP tests only (~63)
 npm run test:slack-mcp  # Slack MCP tests only (79)
 npm run test:coverage   # With coverage report
 ```
@@ -225,6 +225,9 @@ are fail-open (errors allow through). See `.claude/docs/atom.md` for details.
   (phase transitions, task completions)
 - `slack-milestone.sh` - Sends Slack milestone notification when spec
   verification completes
+- `jira-notify.sh` - Automatically syncs task status changes to Jira on
+  tasks.json writes. Activates only when `jira-sync.json` exists in the spec
+  directory. Fail-open: Jira errors never block implementation work.
 
 ## Agents Available
 

@@ -195,14 +195,19 @@ T-FINAL complete
 
 ## Post-Generation
 
-1. **Validate JSON**:
+1. **Update spec.md phase**: Rewrite the spec's `spec.md` using the **Write
+   tool** (not Edit) with the `phase` field updated to `tasks`. Using Write is
+   required so the PostToolUse:Write hook fires for Slack phase-transition
+   notifications.
+
+2. **Validate JSON**:
 
    ```bash
    cat FEATURE_DIR/tasks.json | jq . > /dev/null
    jq '[.tasks[] | select(.parallel == true and .target_file == null)] | length' FEATURE_DIR/tasks.json  # Must be 0
    ```
 
-2. **Update session context** (`.claude/session-context/current-work.md`):
+3. **Update session context** (`.claude/session-context/current-work.md`):
 
    ```markdown
    # Current Work: Spec {spec_id} - {spec_name}
@@ -213,7 +218,35 @@ T-FINAL complete
    - **Next**: {first_task_id}: {description}
    ```
 
-3. **Output summary**: | Check | Result | |-------|--------| | Valid JSON | Yes
+4. **Jira sync prompt** (FR-001..FR-004 of spec 008-feature-004-automatic):
+
+   After writing tasks.json, offer to sync to Jira — but only when:
+   - The Jira MCP server is available (tools `sync_spec_to_jira` is accessible)
+   - `jira-sync.json` does NOT already exist in the spec directory (re-runs skip
+     this)
+
+   If both conditions are met, prompt the developer:
+
+   ```
+   Sync tasks to Jira? [Y/n]
+   ```
+
+   **Y (or Enter)**: Call `sync_spec_to_jira` with `specDir` set to the spec
+   directory. Display the result summary (Epic key + number of Stories created).
+   If the call fails, display the error and continue — `/tasks` completes
+   normally.
+
+   **n**: Skip silently. The developer can manually run `sync_spec_to_jira`
+   later.
+
+   **Jira MCP unavailable** (env vars missing or server not configured): Skip
+   the prompt entirely — no error shown.
+
+   This arms the `jira-notify.sh` PostToolUse:Write hook for the rest of the
+   `/implement` phase. Once `jira-sync.json` exists, every task status change in
+   tasks.json automatically syncs to Jira.
+
+5. **Output summary**: | Check | Result | |-------|--------| | Valid JSON | Yes
    | | Parallel tasks with target_file | 100% | | T-FINAL generated | Yes
    (single composite gate) |
 

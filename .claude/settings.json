@@ -67,6 +67,11 @@
             "type": "command",
             "command": ".claude/hooks/speckit/slack-notify.sh",
             "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/speckit/jira-notify.sh",
+            "timeout": 5000
           }
         ]
       }
