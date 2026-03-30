@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js",
+    "start": "tsx src/server.ts",
     "build": "tsc",
     "test": "npm run test:db:setup && vitest run",
     "test:watch": "npm run test:db:setup && vitest",
