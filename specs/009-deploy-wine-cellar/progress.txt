@@ -1,0 +1,83 @@
+# Ralph Progress Log
+Started: Sun Mar 29 16:15:42 MDT 2026
+PRD: specs/009-deploy-wine-cellar/prd.json
+Tool: claude
+---
+
+## Iteration 1 - Task T001 - Sun Mar 29 16:17:16 MDT 2026
+Description: Create .env.example files for all workspaces (root, api, web, database) documenting required environment variables including AUTH_USERNAME and AUTH_PASSWORD
+Result: Task completed
+---
+
+## Iteration 2 - Task T002 - Sun Mar 29 16:18:24 MDT 2026
+Description: Update API CORS configuration to read from CORS_ORIGIN env var (permissive fallback in development)
+Result: Task completed
+---
+
+## Iteration 3 - Task T003 - Sun Mar 29 16:19:47 MDT 2026
+Description: Update storage config to add Cloudinary configuration and STORAGE_PROVIDER env var selection
+Result: Session ended (check task status)
+---
+
+## Iteration 4 - Task T004 - Sun Mar 29 16:21:45 MDT 2026
+Description: TDD RED: Write CloudinaryStorageService unit tests (mock cloudinary SDK) covering upload, delete, getImageUrl, imageExists, and error handling
+Result: Session ended (check task status)
+---
+
+## Iteration 5 - Task T005 - Sun Mar 29 16:22:54 MDT 2026
+Description: TDD GREEN: Implement CloudinaryStorageService (implements IStorageService) using cloudinary SDK upload_stream, destroy, and URL generation
+Result: Session ended (check task status)
+---
+
+## Iteration 6 - Task T006 - Sun Mar 29 16:24:53 MDT 2026
+Description: Update storage factory (services/storage/index.ts) to return CloudinaryStorageService when STORAGE_PROVIDER=cloudinary
+Result: Session ended (check task status)
+---
+
+## Iteration 7 - Task T007 - Sun Mar 29 16:26:33 MDT 2026
+Description: Update image retrieval endpoint (GET /api/wines/:id/image) to redirect for Cloudinary URLs (wine.imageUrl starting with http)
+Result: Task completed
+---
+
+## Iteration 8 - Task T008 - Sun Mar 29 16:27:55 MDT 2026
+Description: Update next.config.js to read API URL from NEXT_PUBLIC_API_URL env var (default localhost:3001 for dev)
+Result: Task completed
+---
+
+## Iteration 9 - Task T009 - Sun Mar 29 16:29:01 MDT 2026
+Description: Create railway.json with build command (npm ci + db:generate + build), start command, and health check path
+Result: Task completed
+---
+
+## Iteration 10 - Task T010 - Sun Mar 29 16:32:09 MDT 2026
+Description: TDD: Write tests then implement Basic Auth middleware for Express API — require HTTP Basic Auth on all routes except GET /api/health when AUTH_USERNAME and AUTH_PASSWORD env vars are set; skip auth when unset
+Result: Task completed
+---
+
+## Iteration 11 - Task T011 - Sun Mar 29 16:33:40 MDT 2026
+Description: Implement Next.js middleware for Basic Auth on all pages — require HTTP Basic Auth when AUTH_USERNAME and AUTH_PASSWORD env vars are set; skip when unset
+Result: Task completed
+---
+
+## Iteration 12 - Task T012 - Sun Mar 29 16:35:32 MDT 2026
+Description: Write integration tests for image endpoint redirect behavior (cloud URLs vs local filenames) and storage factory switching
+Result: Task completed
+---
+
+## Iteration 13 - Task T013 - Sun Mar 29 16:36:25 MDT 2026
+Description: Run full test suite (npm test) to verify no regressions across all 729+ existing tests
+Result: Session ended (check task status)
+---
+
+## Iteration 14 - Task T-DOC-GATE - Sun Mar 29 16:40:41 MDT 2026
+Description: Documentation reconciliation - identify and update affected docs
+Result: Task completed
+---
+
+## Iteration 15 - Task T-FINAL - Sun Mar 29 16:43:09 MDT 2026
+Description: All verification gates passed - spec complete
+Result: Task completed
+---
+
+## Completed - Sun Mar 29 16:43:09 MDT 2026
+All tasks done after 15 iterations.
